@@ -1,0 +1,27 @@
+FROM node:18-alpine AS base
+RUN npm install -g pnpm
+
+FROM base AS dependencies
+WORKDIR /app
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+COPY apps/worker/package.json ./apps/worker/
+COPY packages/database/package.json ./packages/database/
+COPY packages/types/package.json ./packages/types/
+RUN pnpm install --frozen-lockfile
+
+FROM base AS build
+WORKDIR /app
+COPY . .
+COPY --from=dependencies /app/node_modules ./node_modules
+COPY --from=dependencies /app/apps/worker/node_modules ./apps/worker/node_modules
+COPY --from=dependencies /app/packages/database/node_modules ./packages/database/node_modules
+RUN pnpm --filter @stockboom/database db:generate
+RUN pnpm --filter @stockboom/worker build
+
+FROM base AS runtime
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=build /app/apps/worker/dist ./dist
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/packages ./packages
+CMD ["node", "dist/main.js"]

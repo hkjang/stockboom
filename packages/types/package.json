@@ -1,0 +1,13 @@
+{
+    "name": "@stockboom/types",
+    "version": "1.0.0",
+    "private": true,
+    "main": "./index.ts",
+    "types": "./index.ts",
+    "dependencies": {
+        "@stockboom/database": "workspace:*"
+    },
+    "devDependencies": {
+        "typescript": "^5.3.3"
+    }
+}

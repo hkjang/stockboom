@@ -1,0 +1,60 @@
+{
+    "common": {
+        "buy": "Buy",
+        "sell": "Sell",
+        "hold": "Hold",
+        "loading": "Loading...",
+        "error": "Error",
+        "success": "Success",
+        "cancel": "Cancel",
+        "save": "Save",
+        "delete": "Delete",
+        "edit": "Edit",
+        "search": "Search"
+    },
+    "dashboard": {
+        "title": "Dashboard",
+        "portfolio": "Portfolio",
+        "totalValue": "Total Value",
+        "cashBalance": "Cash Balance",
+        "profitLoss": "Profit/Loss",
+        "recentTrades": "Recent Trades"
+    },
+    "trades": {
+        "title": "Trade History",
+        "time": "Time",
+        "stock": "Stock",
+        "type": "Type",
+        "quantity": "Quantity",
+        "price": "Price",
+        "total": "Total",
+        "status": "Status"
+    },
+    "strategy": {
+        "title": "Trading Strategy",
+        "create": "Create New Strategy",
+        "name": "Strategy Name",
+        "indicators": "Technical Indicators",
+        "riskManagement": "Risk Management",
+        "stopLoss": "Stop Loss",
+        "takeProfit": "Take Profit",
+        "maxPosition": "Max Position Size"
+    },
+    "ai": {
+        "reports": "AI Reports",
+        "riskScore": "Risk Score",
+        "confidence": "Confidence",
+        "recommendation": "Recommendation",
+        "summary": "Summary"
+    },
+    "admin": {
+        "dashboard": "Admin Dashboard",
+        "users": "User Management",
+        "monitoring": "System Monitoring",
+        "queues": "Queue Management",
+        "totalUsers": "Total Users",
+        "activeTrades": "Active Trades",
+        "queueJobs": "Queue Jobs",
+        "apiRequests": "API Requests/min"
+    }
+}

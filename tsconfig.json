@@ -1,0 +1,34 @@
+{
+    "compilerOptions": {
+        "target": "ES2021",
+        "lib": [
+            "ES2021"
+        ],
+        "module": "commonjs",
+        "rootDir": "./",
+        "moduleResolution": "node",
+        "baseUrl": "./",
+        "paths": {
+            "@stockboom/database": [
+                "../../packages/database"
+            ],
+            "@stockboom/types": [
+                "../../packages/types"
+            ]
+        },
+        "resolveJsonModule": true,
+        "declaration": true,
+        "outDir": "./dist",
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "skipLibCheck": true
+    },
+    "include": [
+        "**/*"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
+}

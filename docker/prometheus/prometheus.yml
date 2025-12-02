@@ -1,0 +1,25 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  # NestJS API metrics
+  - job_name: 'stockboom-api'
+    static_configs:
+      - targets: ['api:3001']
+    metrics_path: '/metrics'
+
+  # PostgreSQL metrics (requires postgres_exporter)
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres:5432']
+
+  # Redis metrics (requires redis_exporter)
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']

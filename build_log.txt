@@ -1,0 +1,772 @@
+
+> @stockboom/api@1.0.0 build C:\Users\USER\projects\stockboom\apps\api
+> nest build
+
+Entrypoint [1mmain[39m[22m =
+
+[1m[31mERROR[39m[22m in [1m[32mmain[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'ts-loader' in 'C:\Users\USER\projects\stockboom\apps\api'[39m[22m
+
+[1m[31mERROR[39m[22m in [1m./src/admin/admin.module.ts:4:28[39m[22m
+TS2307: Cannot find module '@nestjs/bull' or its corresponding type declarations.
+  [0m [90m 2 |[39m [36mimport[39m { [33mAdminController[39m } [36mfrom[39m [32m'./admin.controller'[39m[33m;[39m
+   [90m 3 |[39m [36mimport[39m { [33mAdminService[39m } [36mfrom[39m [32m'./admin.service'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 4 |[39m [36mimport[39m { [33mBullModule[39m } [36mfrom[39m [32m'@nestjs/bull'[39m[33m;[39m
+   [90m   |[39m                            [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 5 |[39m
+   [90m 6 |[39m [33m@[39m[33mModule[39m({
+   [90m 7 |[39m     imports[33m:[39m [[0m
+
+[1m[31mERROR[39m[22m in [1m./src/admin/admin.service.ts:2:29[39m[22m
+TS2307: Cannot find module '@nestjs/bull' or its corresponding type declarations.
+  [0m [90m 1 |[39m [36mimport[39m { [33mInjectable[39m } [36mfrom[39m [32m'@nestjs/common'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 2 |[39m [36mimport[39m { [33mInjectQueue[39m } [36mfrom[39m [32m'@nestjs/bull'[39m[33m;[39m
+   [90m   |[39m                             [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 3 |[39m [36mimport[39m { [33mQueue[39m } [36mfrom[39m [32m'bull'[39m[33m;[39m
+   [90m 4 |[39m [36mimport[39m { prisma } [36mfrom[39m [32m'@stockboom/database'[39m[33m;[39m
+   [90m 5 |[39m [36mimport[39m [33m*[39m [36mas[39m os [36mfrom[39m [32m'os'[39m[33m;[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/admin/admin.service.ts:3:23[39m[22m
+TS2307: Cannot find module 'bull' or its corresponding type declarations.
+  [0m [90m 1 |[39m [36mimport[39m { [33mInjectable[39m } [36mfrom[39m [32m'@nestjs/common'[39m[33m;[39m
+   [90m 2 |[39m [36mimport[39m { [33mInjectQueue[39m } [36mfrom[39m [32m'@nestjs/bull'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 3 |[39m [36mimport[39m { [33mQueue[39m } [36mfrom[39m [32m'bull'[39m[33m;[39m
+   [90m   |[39m                       [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 4 |[39m [36mimport[39m { prisma } [36mfrom[39m [32m'@stockboom/database'[39m[33m;[39m
+   [90m 5 |[39m [36mimport[39m [33m*[39m [36mas[39m os [36mfrom[39m [32m'os'[39m[33m;[39m
+   [90m 6 |[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/ai/ai.service.ts:82:39[39m[22m
+TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
+  Type 'null' is not assignable to type 'string'.
+  [0m [90m 80 |[39m             })[33m;[39m
+   [90m 81 |[39m
+  [31m[1m>[22m[39m[90m 82 |[39m             [36mconst[39m result [33m=[39m [33mJSON[39m[33m.[39mparse(response[33m.[39mchoices[[35m0[39m][33m.[39mmessage[33m.[39mcontent)[33m;[39m
+   [90m    |[39m                                       [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 83 |[39m
+   [90m 84 |[39m             [90m// Save AI report[39m
+   [90m 85 |[39m             [36mawait[39m prisma[33m.[39maIReport[33m.[39mcreate({[0m
+
+[1m[31mERROR[39m[22m in [1m./src/ai/ai.service.ts:97:50[39m[22m
+TS2304: Cannot find name 'startTime'.
+  [0m [90m  95 |[39m                     summary[33m:[39m result[33m.[39msummary[33m,[39m
+   [90m  96 |[39m                     recommendation[33m:[39m result[33m.[39mrecommendation[33m,[39m
+  [31m[1m>[22m[39m[90m  97 |[39m                     processingTime[33m:[39m [33mDate[39m[33m.[39mnow() [33m-[39m startTime[33m,[39m
+   [90m     |[39m                                                  [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m  98 |[39m                 }[33m,[39m
+   [90m  99 |[39m             })[33m;[39m
+   [90m 100 |[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/ai/ai.service.ts:151:34[39m[22m
+TS2345: Argument of type 'any' is not assignable to parameter of type 'never'.
+  [0m [90m 149 |[39m
+   [90m 150 |[39m                 [36mif[39m (existingReport) {
+  [31m[1m>[22m[39m[90m 151 |[39m                     reports[33m.[39mpush(existingReport)[33m;[39m
+   [90m     |[39m                                  [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 152 |[39m                     totalSentimentScore [33m+=[39m [33mNumber[39m(existingReport[33m.[39mresults[[32m'sentimentScore'[39m] [33m||[39m [35m0[39m)[33m;[39m
+   [90m 153 |[39m                     totalRiskScore [33m+=[39m [33mNumber[39m(existingReport[33m.[39mriskScore [33m||[39m [35m0[39m)[33m;[39m
+   [90m 154 |[39m                 } [36melse[39m {[0m
+
+[1m[31mERROR[39m[22m in [1m./src/ai/ai.service.ts:157:34[39m[22m
+TS2345: Argument of type '{ sentiment: "POSITIVE" | "NEGATIVE" | "NEUTRAL"; sentimentScore: number; riskScore: number; summary: string; recommendation: "BUY" | "SELL" | "HOLD"; confidence: number; }' is not assignable to parameter of type 'never'.
+  [0m [90m 155 |[39m                     [90m// Analyze new[39m
+   [90m 156 |[39m                     [36mconst[39m analysis [33m=[39m [36mawait[39m [36mthis[39m[33m.[39manalyzeNews(news[33m.[39mid)[33m;[39m
+  [31m[1m>[22m[39m[90m 157 |[39m                     reports[33m.[39mpush(analysis)[33m;[39m
+   [90m     |[39m                                  [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 158 |[39m                     totalSentimentScore [33m+=[39m analysis[33m.[39msentimentScore[33m;[39m
+   [90m 159 |[39m                     totalRiskScore [33m+=[39m analysis[33m.[39mriskScore[33m;[39m
+   [90m 160 |[39m                 }[0m
+
+[1m[31mERROR[39m[22m in [1m./src/ai/ai.service.ts:261:35[39m[22m
+TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
+  Type 'null' is not assignable to type 'string'.
+  [0m [90m 259 |[39m         })[33m;[39m
+   [90m 260 |[39m
+  [31m[1m>[22m[39m[90m 261 |[39m         [36mconst[39m report [33m=[39m [33mJSON[39m[33m.[39mparse(response[33m.[39mchoices[[35m0[39m][33m.[39mmessage[33m.[39mcontent)[33m;[39m
+   [90m     |[39m                                   [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 262 |[39m
+   [90m 263 |[39m         [90m// Save comprehensive report[39m
+   [90m 264 |[39m         [36mconst[39m startTime [33m=[39m [33mDate[39m[33m.[39mnow()[33m;[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/ai/pattern-detection.service.ts:45:28[39m[22m
+TS2345: Argument of type 'any' is not assignable to parameter of type 'never'.
+  [0m [90m 43 |[39m         [36mconst[39m volumeAnomaly [33m=[39m [36mthis[39m[33m.[39mdetectVolumeAnomaly(candles)[33m;[39m
+   [90m 44 |[39m         [36mif[39m (volumeAnomaly) {
+  [31m[1m>[22m[39m[90m 45 |[39m             anomalies[33m.[39mpush(volumeAnomaly)[33m;[39m
+   [90m    |[39m                            [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 46 |[39m         }
+   [90m 47 |[39m
+   [90m 48 |[39m         [90m// 2. Price Anomaly Detection[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/ai/pattern-detection.service.ts:51:28[39m[22m
+TS2345: Argument of type 'any' is not assignable to parameter of type 'never'.
+  [0m [90m 49 |[39m         [36mconst[39m priceAnomaly [33m=[39m [36mthis[39m[33m.[39mdetectPriceAnomaly(candles)[33m;[39m
+   [90m 50 |[39m         [36mif[39m (priceAnomaly) {
+  [31m[1m>[22m[39m[90m 51 |[39m             anomalies[33m.[39mpush(priceAnomaly)[33m;[39m
+   [90m    |[39m                            [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 52 |[39m         }
+   [90m 53 |[39m
+   [90m 54 |[39m         [90m// 3. Volatility Spike Detection[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/ai/pattern-detection.service.ts:57:28[39m[22m
+TS2345: Argument of type 'any' is not assignable to parameter of type 'never'.
+  [0m [90m 55 |[39m         [36mconst[39m volatilityAnomaly [33m=[39m [36mthis[39m[33m.[39mdetectVolatilitySpike(candles)[33m;[39m
+   [90m 56 |[39m         [36mif[39m (volatilityAnomaly) {
+  [31m[1m>[22m[39m[90m 57 |[39m             anomalies[33m.[39mpush(volatilityAnomaly)[33m;[39m
+   [90m    |[39m                            [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 58 |[39m         }
+   [90m 59 |[39m
+   [90m 60 |[39m         [90m// Calculate severity[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/ai/pattern-detection.service.ts:72:79[39m[22m
+TS2339: Property 'type' does not exist on type 'never'.
+  [0m [90m 70 |[39m         [36mconst[39m hasAnomaly [33m=[39m anomalies[33m.[39mlength [33m>[39m [35m0[39m[33m;[39m
+   [90m 71 |[39m         [36mconst[39m description [33m=[39m hasAnomaly
+  [31m[1m>[22m[39m[90m 72 |[39m             [33m?[39m [32m`Detected ${anomalies.length} anomalies: ${anomalies.map(a => a.type).join(', ')}`[39m
+   [90m    |[39m                                                                               [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 73 |[39m             [33m:[39m [32m'No anomalies detected'[39m[33m;[39m
+   [90m 74 |[39m
+   [90m 75 |[39m         [36mreturn[39m {[0m
+
+[1m[31mERROR[39m[22m in [1m./src/ai/pattern-detection.service.ts:148:26[39m[22m
+TS2345: Argument of type 'number' is not assignable to parameter of type 'never'.
+  [0m [90m 146 |[39m             [36mconst[39m previousClose [33m=[39m [33mNumber[39m(candles[i [33m+[39m [35m1[39m][33m.[39mclose)[33m;[39m
+   [90m 147 |[39m             [36mconst[39m dailyReturn [33m=[39m (currentClose [33m-[39m previousClose) [33m/[39m previousClose[33m;[39m
+  [31m[1m>[22m[39m[90m 148 |[39m             returns[33m.[39mpush(dailyReturn)[33m;[39m
+   [90m     |[39m                          [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 149 |[39m         }
+   [90m 150 |[39m
+   [90m 151 |[39m         [90m// Calculate volatility (standard deviation of returns)[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/ai/pattern-detection.service.ts:203:27[39m[22m
+TS2345: Argument of type 'any' is not assignable to parameter of type 'never'.
+  [0m [90m 201 |[39m         [36mconst[39m doublePattern [33m=[39m [36mthis[39m[33m.[39mdetectDoublePattern(candles)[33m;[39m
+   [90m 202 |[39m         [36mif[39m (doublePattern) {
+  [31m[1m>[22m[39m[90m 203 |[39m             patterns[33m.[39mpush(doublePattern)[33m;[39m
+   [90m     |[39m                           [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 204 |[39m         }
+   [90m 205 |[39m
+   [90m 206 |[39m         [90m// Detect Triangle Pattern[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/ai/pattern-detection.service.ts:209:27[39m[22m
+TS2345: Argument of type 'any' is not assignable to parameter of type 'never'.
+  [0m [90m 207 |[39m         [36mconst[39m trianglePattern [33m=[39m [36mthis[39m[33m.[39mdetectTrianglePattern(candles)[33m;[39m
+   [90m 208 |[39m         [36mif[39m (trianglePattern) {
+  [31m[1m>[22m[39m[90m 209 |[39m             patterns[33m.[39mpush(trianglePattern)[33m;[39m
+   [90m     |[39m                           [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 210 |[39m         }
+   [90m 211 |[39m
+   [90m 212 |[39m         [36mreturn[39m {[0m
+
+[1m[31mERROR[39m[22m in [1m./src/ai/pattern-detection.service.ts:337:29[39m[22m
+TS2345: Argument of type 'number' is not assignable to parameter of type 'never'.
+  [0m [90m 335 |[39m             }
+   [90m 336 |[39m             [36mif[39m (isMaxima) {
+  [31m[1m>[22m[39m[90m 337 |[39m                 maxima[33m.[39mpush(i)[33m;[39m
+   [90m     |[39m                             [31m[1m^[22m[39m
+   [90m 338 |[39m             }
+   [90m 339 |[39m         }
+   [90m 340 |[39m         [36mreturn[39m maxima[33m;[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/ai/pattern-detection.service.ts:354:29[39m[22m
+TS2345: Argument of type 'number' is not assignable to parameter of type 'never'.
+  [0m [90m 352 |[39m             }
+   [90m 353 |[39m             [36mif[39m (isMinima) {
+  [31m[1m>[22m[39m[90m 354 |[39m                 minima[33m.[39mpush(i)[33m;[39m
+   [90m     |[39m                             [31m[1m^[22m[39m
+   [90m 355 |[39m             }
+   [90m 356 |[39m         }
+   [90m 357 |[39m         [36mreturn[39m minima[33m;[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/alerts/alerts.module.ts:2:28[39m[22m
+TS2307: Cannot find module '@nestjs/bull' or its corresponding type declarations.
+  [0m [90m 1 |[39m [36mimport[39m { [33mModule[39m } [36mfrom[39m [32m'@nestjs/common'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 2 |[39m [36mimport[39m { [33mBullModule[39m } [36mfrom[39m [32m'@nestjs/bull'[39m[33m;[39m
+   [90m   |[39m                            [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 3 |[39m [36mimport[39m { [33mAlertsController[39m } [36mfrom[39m [32m'./alerts.controller'[39m[33m;[39m
+   [90m 4 |[39m [36mimport[39m { [33mAlertsService[39m } [36mfrom[39m [32m'./alerts.service'[39m[33m;[39m
+   [90m 5 |[39m [36mimport[39m { [33mStocksModule[39m } [36mfrom[39m [32m'../stocks/stocks.module'[39m[33m;[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/alerts/alerts.service.ts:2:29[39m[22m
+TS2307: Cannot find module '@nestjs/bull' or its corresponding type declarations.
+  [0m [90m 1 |[39m [36mimport[39m { [33mInjectable[39m[33m,[39m [33mNotFoundException[39m } [36mfrom[39m [32m'@nestjs/common'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 2 |[39m [36mimport[39m { [33mInjectQueue[39m } [36mfrom[39m [32m'@nestjs/bull'[39m[33m;[39m
+   [90m   |[39m                             [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 3 |[39m [36mimport[39m { [33mQueue[39m } [36mfrom[39m [32m'bull'[39m[33m;[39m
+   [90m 4 |[39m [36mimport[39m { [33mCron[39m[33m,[39m [33mCronExpression[39m } [36mfrom[39m [32m'@nestjs/schedule'[39m[33m;[39m
+   [90m 5 |[39m [36mimport[39m { prisma[33m,[39m [33mAlert[39m[33m,[39m [33mAlertType[39m[33m,[39m [33mPrisma[39m } [36mfrom[39m [32m'@stockboom/database'[39m[33m;[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/alerts/alerts.service.ts:3:23[39m[22m
+TS2307: Cannot find module 'bull' or its corresponding type declarations.
+  [0m [90m 1 |[39m [36mimport[39m { [33mInjectable[39m[33m,[39m [33mNotFoundException[39m } [36mfrom[39m [32m'@nestjs/common'[39m[33m;[39m
+   [90m 2 |[39m [36mimport[39m { [33mInjectQueue[39m } [36mfrom[39m [32m'@nestjs/bull'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 3 |[39m [36mimport[39m { [33mQueue[39m } [36mfrom[39m [32m'bull'[39m[33m;[39m
+   [90m   |[39m                       [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 4 |[39m [36mimport[39m { [33mCron[39m[33m,[39m [33mCronExpression[39m } [36mfrom[39m [32m'@nestjs/schedule'[39m[33m;[39m
+   [90m 5 |[39m [36mimport[39m { prisma[33m,[39m [33mAlert[39m[33m,[39m [33mAlertType[39m[33m,[39m [33mPrisma[39m } [36mfrom[39m [32m'@stockboom/database'[39m[33m;[39m
+   [90m 6 |[39m [36mimport[39m { [33mNotificationJob[39m } [36mfrom[39m [32m'@stockboom/types'[39m[33m;[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/alerts/alerts.service.ts:5:18[39m[22m
+TS2305: Module '"@stockboom/database"' has no exported member 'Alert'.
+  [0m [90m 3 |[39m [36mimport[39m { [33mQueue[39m } [36mfrom[39m [32m'bull'[39m[33m;[39m
+   [90m 4 |[39m [36mimport[39m { [33mCron[39m[33m,[39m [33mCronExpression[39m } [36mfrom[39m [32m'@nestjs/schedule'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { prisma[33m,[39m [33mAlert[39m[33m,[39m [33mAlertType[39m[33m,[39m [33mPrisma[39m } [36mfrom[39m [32m'@stockboom/database'[39m[33m;[39m
+   [90m   |[39m                  [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 6 |[39m [36mimport[39m { [33mNotificationJob[39m } [36mfrom[39m [32m'@stockboom/types'[39m[33m;[39m
+   [90m 7 |[39m [36mimport[39m { [33mStocksService[39m } [36mfrom[39m [32m'../stocks/stocks.service'[39m[33m;[39m
+   [90m 8 |[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/alerts/alerts.service.ts:5:25[39m[22m
+TS2305: Module '"@stockboom/database"' has no exported member 'AlertType'.
+  [0m [90m 3 |[39m [36mimport[39m { [33mQueue[39m } [36mfrom[39m [32m'bull'[39m[33m;[39m
+   [90m 4 |[39m [36mimport[39m { [33mCron[39m[33m,[39m [33mCronExpression[39m } [36mfrom[39m [32m'@nestjs/schedule'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { prisma[33m,[39m [33mAlert[39m[33m,[39m [33mAlertType[39m[33m,[39m [33mPrisma[39m } [36mfrom[39m [32m'@stockboom/database'[39m[33m;[39m
+   [90m   |[39m                         [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 6 |[39m [36mimport[39m { [33mNotificationJob[39m } [36mfrom[39m [32m'@stockboom/types'[39m[33m;[39m
+   [90m 7 |[39m [36mimport[39m { [33mStocksService[39m } [36mfrom[39m [32m'../stocks/stocks.service'[39m[33m;[39m
+   [90m 8 |[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/alerts/alerts.service.ts:5:36[39m[22m
+TS2724: '"@stockboom/database"' has no exported member named 'Prisma'. Did you mean 'prisma'?
+  [0m [90m 3 |[39m [36mimport[39m { [33mQueue[39m } [36mfrom[39m [32m'bull'[39m[33m;[39m
+   [90m 4 |[39m [36mimport[39m { [33mCron[39m[33m,[39m [33mCronExpression[39m } [36mfrom[39m [32m'@nestjs/schedule'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { prisma[33m,[39m [33mAlert[39m[33m,[39m [33mAlertType[39m[33m,[39m [33mPrisma[39m } [36mfrom[39m [32m'@stockboom/database'[39m[33m;[39m
+   [90m   |[39m                                    [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 6 |[39m [36mimport[39m { [33mNotificationJob[39m } [36mfrom[39m [32m'@stockboom/types'[39m[33m;[39m
+   [90m 7 |[39m [36mimport[39m { [33mStocksService[39m } [36mfrom[39m [32m'../stocks/stocks.service'[39m[33m;[39m
+   [90m 8 |[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/alerts/alerts.service.ts:207:46[39m[22m
+TS2339: Property 'changeRate' does not exist on type 'KISQuote | YahooQuote'.
+  Property 'changeRate' does not exist on type 'YahooQuote'.
+  [0m [90m 205 |[39m                     [36mconst[39m isTriggered [33m=[39m [36mawait[39m [36mthis[39m[33m.[39mcheckAlert(alert[33m,[39m {
+   [90m 206 |[39m                         symbol[33m:[39m conditions[33m.[39msymbol[33m,[39m
+  [31m[1m>[22m[39m[90m 207 |[39m                         changePercent[33m:[39m quote[33m.[39mchangeRate[33m,[39m
+   [90m     |[39m                                              [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 208 |[39m                         volume[33m:[39m quote[33m.[39mvolume[33m,[39m
+   [90m 209 |[39m                     })[33m;[39m
+   [90m 210 |[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/alerts/dto/alert.dto.ts:3:10[39m[22m
+TS2305: Module '"@stockboom/database"' has no exported member 'AlertType'.
+  [0m [90m 1 |[39m [36mimport[39m { [33mApiProperty[39m } [36mfrom[39m [32m'@nestjs/swagger'[39m[33m;[39m
+   [90m 2 |[39m [36mimport[39m { [33mIsString[39m[33m,[39m [33mIsEnum[39m[33m,[39m [33mIsOptional[39m[33m,[39m [33mIsObject[39m[33m,[39m [33mIsBoolean[39m } [36mfrom[39m [32m'class-validator'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 3 |[39m [36mimport[39m { [33mAlertType[39m } [36mfrom[39m [32m'@stockboom/database'[39m[33m;[39m
+   [90m   |[39m          [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 4 |[39m
+   [90m 5 |[39m [36mexport[39m [36mclass[39m [33mCreateAlertDto[39m {
+   [90m 6 |[39m     [33m@[39m[33mApiProperty[39m({ [36menum[39m[33m:[39m [33mAlertType[39m[33m,[39m example[33m:[39m [32m'PRICE_CHANGE'[39m })[0m
+
+[1m[31mERROR[39m[22m in [1m./src/analysis/analysis.service.ts:73:30[39m[22m
+TS2345: Argument of type '{ stock: { symbol: any; name: any; currentPrice: any; }; signal: { signal: string; strength: number; indicators: { rsi: any; macd: any; }; timestamp: Date; }; indicators: any; analysisTime: Date; }' is not assignable to parameter of type 'never'.
+  [0m [90m 71 |[39m             [36mtry[39m {
+   [90m 72 |[39m                 [36mconst[39m analysis [33m=[39m [36mawait[39m [36mthis[39m[33m.[39manalyzeStock(stockId[33m,[39m timeframe)[33m;[39m
+  [31m[1m>[22m[39m[90m 73 |[39m                 results[33m.[39mpush(analysis)[33m;[39m
+   [90m    |[39m                              [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 74 |[39m             } [36mcatch[39m (error) {
+   [90m 75 |[39m                 [36mthis[39m[33m.[39mlogger[33m.[39merror([32m`Failed to analyze stock ${stockId}:`[39m[33m,[39m error)[33m;[39m
+   [90m 76 |[39m                 results[33m.[39mpush({[0m
+
+[1m[31mERROR[39m[22m in [1m./src/analysis/analysis.service.ts:76:30[39m[22m
+TS2345: Argument of type '{ stockId: string; error: any; }' is not assignable to parameter of type 'never'.
+  [0m [90m 74 |[39m             } [36mcatch[39m (error) {
+   [90m 75 |[39m                 [36mthis[39m[33m.[39mlogger[33m.[39merror([32m`Failed to analyze stock ${stockId}:`[39m[33m,[39m error)[33m;[39m
+  [31m[1m>[22m[39m[90m 76 |[39m                 results[33m.[39mpush({
+   [90m    |[39m                              [31m[1m^[22m[39m
+  [31m[1m>[22m[39m[90m 77 |[39m                     stockId[33m,[39m
+   [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+  [31m[1m>[22m[39m[90m 78 |[39m                     error[33m:[39m error[33m.[39mmessage[33m,[39m
+   [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+  [31m[1m>[22m[39m[90m 79 |[39m                 })[33m;[39m
+   [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 80 |[39m             }
+   [90m 81 |[39m         }
+   [90m 82 |[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/analysis/indicators.service.ts:185:17[39m[22m
+TS18048: 'macdData.MACD' is possibly 'undefined'.
+  [0m [90m 183 |[39m
+   [90m 184 |[39m             [36mlet[39m signal [33m=[39m [32m'HOLD'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 185 |[39m             [36mif[39m (macdData[33m.[39m[33mMACD[39m [33m>[39m macdData[33m.[39msignal) {
+   [90m     |[39m                 [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 186 |[39m                 signal [33m=[39m [32m'BUY'[39m[33m;[39m
+   [90m 187 |[39m             } [36melse[39m [36mif[39m (macdData[33m.[39m[33mMACD[39m [33m<[39m macdData[33m.[39msignal) {
+   [90m 188 |[39m                 signal [33m=[39m [32m'SELL'[39m[33m;[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/analysis/indicators.service.ts:185:33[39m[22m
+TS18048: 'macdData.signal' is possibly 'undefined'.
+  [0m [90m 183 |[39m
+   [90m 184 |[39m             [36mlet[39m signal [33m=[39m [32m'HOLD'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 185 |[39m             [36mif[39m (macdData[33m.[39m[33mMACD[39m [33m>[39m macdData[33m.[39msignal) {
+   [90m     |[39m                                 [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 186 |[39m                 signal [33m=[39m [32m'BUY'[39m[33m;[39m
+   [90m 187 |[39m             } [36melse[39m [36mif[39m (macdData[33m.[39m[33mMACD[39m [33m<[39m macdData[33m.[39msignal) {
+   [90m 188 |[39m                 signal [33m=[39m [32m'SELL'[39m[33m;[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/analysis/indicators.service.ts:187:24[39m[22m
+TS18048: 'macdData.MACD' is possibly 'undefined'.
+  [0m [90m 185 |[39m             [36mif[39m (macdData[33m.[39m[33mMACD[39m [33m>[39m macdData[33m.[39msignal) {
+   [90m 186 |[39m                 signal [33m=[39m [32m'BUY'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 187 |[39m             } [36melse[39m [36mif[39m (macdData[33m.[39m[33mMACD[39m [33m<[39m macdData[33m.[39msignal) {
+   [90m     |[39m                        [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 188 |[39m                 signal [33m=[39m [32m'SELL'[39m[33m;[39m
+   [90m 189 |[39m             }
+   [90m 190 |[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/analysis/indicators.service.ts:187:40[39m[22m
+TS18048: 'macdData.signal' is possibly 'undefined'.
+  [0m [90m 185 |[39m             [36mif[39m (macdData[33m.[39m[33mMACD[39m [33m>[39m macdData[33m.[39msignal) {
+   [90m 186 |[39m                 signal [33m=[39m [32m'BUY'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 187 |[39m             } [36melse[39m [36mif[39m (macdData[33m.[39m[33mMACD[39m [33m<[39m macdData[33m.[39msignal) {
+   [90m     |[39m                                        [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 188 |[39m                 signal [33m=[39m [32m'SELL'[39m[33m;[39m
+   [90m 189 |[39m             }
+   [90m 190 |[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/app.module.ts:5:28[39m[22m
+TS2307: Cannot find module '@nestjs/bull' or its corresponding type declarations.
+  [0m [90m 3 |[39m [36mimport[39m { [33mScheduleModule[39m } [36mfrom[39m [32m'@nestjs/schedule'[39m[33m;[39m
+   [90m 4 |[39m [36mimport[39m { [33mThrottlerModule[39m } [36mfrom[39m [32m'@nestjs/throttler'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { [33mBullModule[39m } [36mfrom[39m [32m'@nestjs/bull'[39m[33m;[39m
+   [90m   |[39m                            [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 6 |[39m [36mimport[39m { [33mAuthModule[39m } [36mfrom[39m [32m'./auth/auth.module'[39m[33m;[39m
+   [90m 7 |[39m [36mimport[39m { [33mUsersModule[39m } [36mfrom[39m [32m'./users/users.module'[39m[33m;[39m
+   [90m 8 |[39m [36mimport[39m { [33mStocksModule[39m } [36mfrom[39m [32m'./stocks/stocks.module'[39m[33m;[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/auth/auth.service.ts:8:10[39m[22m
+TS2305: Module '"@stockboom/database"' has no exported member 'User'.
+  [0m [90m  6 |[39m [36mimport[39m { toDataURL } [36mfrom[39m [32m'qrcode'[39m[33m;[39m
+   [90m  7 |[39m [36mimport[39m { [33mUsersService[39m } [36mfrom[39m [32m'../users/users.service'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m  8 |[39m [36mimport[39m { [33mUser[39m } [36mfrom[39m [32m'@stockboom/database'[39m[33m;[39m
+   [90m    |[39m          [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m  9 |[39m
+   [90m 10 |[39m [33m@[39m[33mInjectable[39m()
+   [90m 11 |[39m [36mexport[39m [36mclass[39m [33mAuthService[39m {[0m
+
+[1m[31mERROR[39m[22m in [1m./src/health/health-check.service.ts:3:29[39m[22m
+TS2307: Cannot find module '@nestjs/bull' or its corresponding type declarations.
+  [0m [90m 1 |[39m [36mimport[39m { [33mInjectable[39m[33m,[39m [33mLogger[39m[33m,[39m [33mOnModuleInit[39m } [36mfrom[39m [32m'@nestjs/common'[39m[33m;[39m
+   [90m 2 |[39m [36mimport[39m { [33mCron[39m[33m,[39m [33mCronExpression[39m } [36mfrom[39m [32m'@nestjs/schedule'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 3 |[39m [36mimport[39m { [33mInjectQueue[39m } [36mfrom[39m [32m'@nestjs/bull'[39m[33m;[39m
+   [90m   |[39m                             [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 4 |[39m [36mimport[39m { [33mQueue[39m } [36mfrom[39m [32m'bull'[39m[33m;[39m
+   [90m 5 |[39m
+   [90m 6 |[39m [90m/**[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/health/health-check.service.ts:4:23[39m[22m
+TS2307: Cannot find module 'bull' or its corresponding type declarations.
+  [0m [90m 2 |[39m [36mimport[39m { [33mCron[39m[33m,[39m [33mCronExpression[39m } [36mfrom[39m [32m'@nestjs/schedule'[39m[33m;[39m
+   [90m 3 |[39m [36mimport[39m { [33mInjectQueue[39m } [36mfrom[39m [32m'@nestjs/bull'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 4 |[39m [36mimport[39m { [33mQueue[39m } [36mfrom[39m [32m'bull'[39m[33m;[39m
+   [90m   |[39m                       [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 5 |[39m
+   [90m 6 |[39m [90m/**[39m
+   [90m 7 |[39m [90m * Health Check Service[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/notifications/notifications.service.ts:3:18[39m[22m
+TS2305: Module '"@stockboom/database"' has no exported member 'Notification'.
+  [0m [90m 1 |[39m [36mimport[39m { [33mInjectable[39m } [36mfrom[39m [32m'@nestjs/common'[39m[33m;[39m
+   [90m 2 |[39m [36mimport[39m { [33mConfigService[39m } [36mfrom[39m [32m'@nestjs/config'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 3 |[39m [36mimport[39m { prisma[33m,[39m [33mNotification[39m[33m,[39m [33mPrisma[39m } [36mfrom[39m [32m'@stockboom/database'[39m[33m;[39m
+   [90m   |[39m                  [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 4 |[39m [36mimport[39m [33m*[39m [36mas[39m nodemailer [36mfrom[39m [32m'nodemailer'[39m[33m;[39m
+   [90m 5 |[39m
+   [90m 6 |[39m [33m@[39m[33mInjectable[39m()[0m
+
+[1m[31mERROR[39m[22m in [1m./src/notifications/notifications.service.ts:3:32[39m[22m
+TS2724: '"@stockboom/database"' has no exported member named 'Prisma'. Did you mean 'prisma'?
+  [0m [90m 1 |[39m [36mimport[39m { [33mInjectable[39m } [36mfrom[39m [32m'@nestjs/common'[39m[33m;[39m
+   [90m 2 |[39m [36mimport[39m { [33mConfigService[39m } [36mfrom[39m [32m'@nestjs/config'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 3 |[39m [36mimport[39m { prisma[33m,[39m [33mNotification[39m[33m,[39m [33mPrisma[39m } [36mfrom[39m [32m'@stockboom/database'[39m[33m;[39m
+   [90m   |[39m                                [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 4 |[39m [36mimport[39m [33m*[39m [36mas[39m nodemailer [36mfrom[39m [32m'nodemailer'[39m[33m;[39m
+   [90m 5 |[39m
+   [90m 6 |[39m [33m@[39m[33mInjectable[39m()[0m
+
+[1m[31mERROR[39m[22m in [1m./src/notifications/notifications.service.ts:12:39[39m[22m
+TS2551: Property 'createTransporter' does not exist on type 'typeof import("C:/Users/USER/projects/stockboom/node_modules/.pnpm/@types+nodemailer@6.4.21/node_modules/@types/nodemailer/index")'. Did you mean 'createTransport'?
+  [0m [90m 10 |[39m     constructor([36mprivate[39m configService[33m:[39m [33mConfigService[39m) {
+   [90m 11 |[39m         [90m// Initialize email transporter[39m
+  [31m[1m>[22m[39m[90m 12 |[39m         [36mthis[39m[33m.[39mtransporter [33m=[39m nodemailer[33m.[39mcreateTransporter({
+   [90m    |[39m                                       [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 13 |[39m             host[33m:[39m [36mthis[39m[33m.[39mconfigService[33m.[39m[36mget[39m([32m'SMTP_HOST'[39m)[33m,[39m
+   [90m 14 |[39m             port[33m:[39m [36mthis[39m[33m.[39mconfigService[33m.[39m[36mget[39m([32m'SMTP_PORT'[39m)[33m,[39m
+   [90m 15 |[39m             secure[33m:[39m [36mfalse[39m[33m,[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/portfolios/portfolios.service.ts:2:18[39m[22m
+TS2305: Module '"@stockboom/database"' has no exported member 'Portfolio'.
+  [0m [90m 1 |[39m [36mimport[39m { [33mInjectable[39m[33m,[39m [33mNotFoundException[39m[33m,[39m [33mBadRequestException[39m } [36mfrom[39m [32m'@nestjs/common'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 2 |[39m [36mimport[39m { prisma[33m,[39m [33mPortfolio[39m[33m,[39m [33mPosition[39m[33m,[39m [33mPrisma[39m } [36mfrom[39m [32m'@stockboom/database'[39m[33m;[39m
+   [90m   |[39m                  [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 3 |[39m [36mimport[39m { [33mMarketDataService[39m } [36mfrom[39m [32m'../market-data/market-data.service'[39m[33m;[39m
+   [90m 4 |[39m
+   [90m 5 |[39m [33m@[39m[33mInjectable[39m()[0m
+
+[1m[31mERROR[39m[22m in [1m./src/portfolios/portfolios.service.ts:2:29[39m[22m
+TS2305: Module '"@stockboom/database"' has no exported member 'Position'.
+  [0m [90m 1 |[39m [36mimport[39m { [33mInjectable[39m[33m,[39m [33mNotFoundException[39m[33m,[39m [33mBadRequestException[39m } [36mfrom[39m [32m'@nestjs/common'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 2 |[39m [36mimport[39m { prisma[33m,[39m [33mPortfolio[39m[33m,[39m [33mPosition[39m[33m,[39m [33mPrisma[39m } [36mfrom[39m [32m'@stockboom/database'[39m[33m;[39m
+   [90m   |[39m                             [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 3 |[39m [36mimport[39m { [33mMarketDataService[39m } [36mfrom[39m [32m'../market-data/market-data.service'[39m[33m;[39m
+   [90m 4 |[39m
+   [90m 5 |[39m [33m@[39m[33mInjectable[39m()[0m
+
+[1m[31mERROR[39m[22m in [1m./src/portfolios/portfolios.service.ts:2:39[39m[22m
+TS2724: '"@stockboom/database"' has no exported member named 'Prisma'. Did you mean 'prisma'?
+  [0m [90m 1 |[39m [36mimport[39m { [33mInjectable[39m[33m,[39m [33mNotFoundException[39m[33m,[39m [33mBadRequestException[39m } [36mfrom[39m [32m'@nestjs/common'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 2 |[39m [36mimport[39m { prisma[33m,[39m [33mPortfolio[39m[33m,[39m [33mPosition[39m[33m,[39m [33mPrisma[39m } [36mfrom[39m [32m'@stockboom/database'[39m[33m;[39m
+   [90m   |[39m                                       [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 3 |[39m [36mimport[39m { [33mMarketDataService[39m } [36mfrom[39m [32m'../market-data/market-data.service'[39m[33m;[39m
+   [90m 4 |[39m
+   [90m 5 |[39m [33m@[39m[33mInjectable[39m()[0m
+
+[1m[31mERROR[39m[22m in [1m./src/portfolios/portfolios.service.ts:251:59[39m[22m
+TS2339: Property 'getPortfolioData' does not exist on type 'MarketDataService'.
+  [0m [90m 249 |[39m
+   [90m 250 |[39m             [90m// Sync balance and positions from broker API[39m
+  [31m[1m>[22m[39m[90m 251 |[39m             [36mconst[39m syncData [33m=[39m [36mawait[39m [36mthis[39m[33m.[39mmarketDataService[33m.[39mgetPortfolioData(
+   [90m     |[39m                                                           [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 252 |[39m                 brokerAccount[33m.[39mbroker[33m,[39m
+   [90m 253 |[39m                 brokerAccount[33m.[39mid[33m,[39m
+   [90m 254 |[39m             )[33m;[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/queue/queue.module.ts:2:28[39m[22m
+TS2307: Cannot find module '@nestjs/bull' or its corresponding type declarations.
+  [0m [90m 1 |[39m [36mimport[39m { [33mModule[39m } [36mfrom[39m [32m'@nestjs/common'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 2 |[39m [36mimport[39m { [33mBullModule[39m } [36mfrom[39m [32m'@nestjs/bull'[39m[33m;[39m
+   [90m   |[39m                            [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 3 |[39m [36mimport[39m { [33mBullBoardModule[39m } [36mfrom[39m [32m'@bull-board/nestjs'[39m[33m;[39m
+   [90m 4 |[39m [36mimport[39m { [33mExpressAdapter[39m } [36mfrom[39m [32m'@bull-board/express'[39m[33m;[39m
+   [90m 5 |[39m [36mimport[39m { [33mBullAdapter[39m } [36mfrom[39m [32m'@bull-board/api/bullAdapter'[39m[33m;[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/schedulers/data-collection.scheduler.ts:3:29[39m[22m
+TS2307: Cannot find module '@nestjs/bull' or its corresponding type declarations.
+  [0m [90m 1 |[39m [36mimport[39m { [33mInjectable[39m[33m,[39m [33mLogger[39m } [36mfrom[39m [32m'@nestjs/common'[39m[33m;[39m
+   [90m 2 |[39m [36mimport[39m { [33mCron[39m[33m,[39m [33mCronExpression[39m } [36mfrom[39m [32m'@nestjs/schedule'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 3 |[39m [36mimport[39m { [33mInjectQueue[39m } [36mfrom[39m [32m'@nestjs/bull'[39m[33m;[39m
+   [90m   |[39m                             [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 4 |[39m [36mimport[39m { [33mQueue[39m } [36mfrom[39m [32m'bull'[39m[33m;[39m
+   [90m 5 |[39m [36mimport[39m { prisma } [36mfrom[39m [32m'@stockboom/database'[39m[33m;[39m
+   [90m 6 |[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/schedulers/data-collection.scheduler.ts:4:23[39m[22m
+TS2307: Cannot find module 'bull' or its corresponding type declarations.
+  [0m [90m 2 |[39m [36mimport[39m { [33mCron[39m[33m,[39m [33mCronExpression[39m } [36mfrom[39m [32m'@nestjs/schedule'[39m[33m;[39m
+   [90m 3 |[39m [36mimport[39m { [33mInjectQueue[39m } [36mfrom[39m [32m'@nestjs/bull'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 4 |[39m [36mimport[39m { [33mQueue[39m } [36mfrom[39m [32m'bull'[39m[33m;[39m
+   [90m   |[39m                       [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 5 |[39m [36mimport[39m { prisma } [36mfrom[39m [32m'@stockboom/database'[39m[33m;[39m
+   [90m 6 |[39m
+   [90m 7 |[39m [90m/**[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/stocks/stocks.service.ts:2:18[39m[22m
+TS2305: Module '"@stockboom/database"' has no exported member 'Stock'.
+  [0m [90m 1 |[39m [36mimport[39m { [33mInjectable[39m[33m,[39m [33mLogger[39m[33m,[39m [33mNotFoundException[39m } [36mfrom[39m [32m'@nestjs/common'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 2 |[39m [36mimport[39m { prisma[33m,[39m [33mStock[39m[33m,[39m [33mPrisma[39m } [36mfrom[39m [32m'@stockboom/database'[39m[33m;[39m
+   [90m   |[39m                  [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 3 |[39m [36mimport[39m { [33mMarketDataService[39m } [36mfrom[39m [32m'../market-data/market-data.service'[39m[33m;[39m
+   [90m 4 |[39m
+   [90m 5 |[39m [33m@[39m[33mInjectable[39m()[0m
+
+[1m[31mERROR[39m[22m in [1m./src/stocks/stocks.service.ts:2:25[39m[22m
+TS2724: '"@stockboom/database"' has no exported member named 'Prisma'. Did you mean 'prisma'?
+  [0m [90m 1 |[39m [36mimport[39m { [33mInjectable[39m[33m,[39m [33mLogger[39m[33m,[39m [33mNotFoundException[39m } [36mfrom[39m [32m'@nestjs/common'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 2 |[39m [36mimport[39m { prisma[33m,[39m [33mStock[39m[33m,[39m [33mPrisma[39m } [36mfrom[39m [32m'@stockboom/database'[39m[33m;[39m
+   [90m   |[39m                         [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 3 |[39m [36mimport[39m { [33mMarketDataService[39m } [36mfrom[39m [32m'../market-data/market-data.service'[39m[33m;[39m
+   [90m 4 |[39m
+   [90m 5 |[39m [33m@[39m[33mInjectable[39m()[0m
+
+[1m[31mERROR[39m[22m in [1m./src/strategies/dto/strategy.dto.ts:3:10[39m[22m
+TS2305: Module '"@stockboom/database"' has no exported member 'StrategyType'.
+  [0m [90m 1 |[39m [36mimport[39m { [33mApiProperty[39m } [36mfrom[39m [32m'@nestjs/swagger'[39m[33m;[39m
+   [90m 2 |[39m [36mimport[39m { [33mIsString[39m[33m,[39m [33mIsEnum[39m[33m,[39m [33mIsOptional[39m[33m,[39m [33mIsNumber[39m[33m,[39m [33mIsObject[39m[33m,[39m [33mIsBoolean[39m[33m,[39m [33mIsDateString[39m[33m,[39m [33mMin[39m } [36mfrom[39m [32m'class-validator'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 3 |[39m [36mimport[39m { [33mStrategyType[39m } [36mfrom[39m [32m'@stockboom/database'[39m[33m;[39m
+   [90m   |[39m          [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 4 |[39m
+   [90m 5 |[39m [36mexport[39m [36mclass[39m [33mCreateStrategyDto[39m {
+   [90m 6 |[39m     [33m@[39m[33mApiProperty[39m({ example[33m:[39m [32m'RSI Oversold Strategy'[39m })[0m
+
+[1m[31mERROR[39m[22m in [1m./src/strategies/strategies.service.ts:2:18[39m[22m
+TS2305: Module '"@stockboom/database"' has no exported member 'Strategy'.
+  [0m [90m 1 |[39m [36mimport[39m { [33mInjectable[39m[33m,[39m [33mNotFoundException[39m } [36mfrom[39m [32m'@nestjs/common'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 2 |[39m [36mimport[39m { prisma[33m,[39m [33mStrategy[39m[33m,[39m [33mStrategyType[39m[33m,[39m [33mPrisma[39m } [36mfrom[39m [32m'@stockboom/database'[39m[33m;[39m
+   [90m   |[39m                  [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 3 |[39m [36mimport[39m { [33mIndicatorsService[39m } [36mfrom[39m [32m'../analysis/indicators.service'[39m[33m;[39m
+   [90m 4 |[39m
+   [90m 5 |[39m [33m@[39m[33mInjectable[39m()[0m
+
+[1m[31mERROR[39m[22m in [1m./src/strategies/strategies.service.ts:2:28[39m[22m
+TS2305: Module '"@stockboom/database"' has no exported member 'StrategyType'.
+  [0m [90m 1 |[39m [36mimport[39m { [33mInjectable[39m[33m,[39m [33mNotFoundException[39m } [36mfrom[39m [32m'@nestjs/common'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 2 |[39m [36mimport[39m { prisma[33m,[39m [33mStrategy[39m[33m,[39m [33mStrategyType[39m[33m,[39m [33mPrisma[39m } [36mfrom[39m [32m'@stockboom/database'[39m[33m;[39m
+   [90m   |[39m                            [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 3 |[39m [36mimport[39m { [33mIndicatorsService[39m } [36mfrom[39m [32m'../analysis/indicators.service'[39m[33m;[39m
+   [90m 4 |[39m
+   [90m 5 |[39m [33m@[39m[33mInjectable[39m()[0m
+
+[1m[31mERROR[39m[22m in [1m./src/strategies/strategies.service.ts:2:42[39m[22m
+TS2724: '"@stockboom/database"' has no exported member named 'Prisma'. Did you mean 'prisma'?
+  [0m [90m 1 |[39m [36mimport[39m { [33mInjectable[39m[33m,[39m [33mNotFoundException[39m } [36mfrom[39m [32m'@nestjs/common'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 2 |[39m [36mimport[39m { prisma[33m,[39m [33mStrategy[39m[33m,[39m [33mStrategyType[39m[33m,[39m [33mPrisma[39m } [36mfrom[39m [32m'@stockboom/database'[39m[33m;[39m
+   [90m   |[39m                                          [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 3 |[39m [36mimport[39m { [33mIndicatorsService[39m } [36mfrom[39m [32m'../analysis/indicators.service'[39m[33m;[39m
+   [90m 4 |[39m
+   [90m 5 |[39m [33m@[39m[33mInjectable[39m()[0m
+
+[1m[31mERROR[39m[22m in [1m./src/strategies/strategies.service.ts:204:37[39m[22m
+TS2345: Argument of type '{ date: any; type: string; price: number; quantity: number; reason: string; }' is not assignable to parameter of type 'never'.
+  [0m [90m 202 |[39m                         positionPrice [33m=[39m price[33m;[39m
+   [90m 203 |[39m                         capital [33m-=[39m quantity [33m*[39m price[33m;[39m
+  [31m[1m>[22m[39m[90m 204 |[39m                         trades[33m.[39mpush({
+   [90m     |[39m                                     [31m[1m^[22m[39m
+  [31m[1m>[22m[39m[90m 205 |[39m                             date[33m:[39m candle[33m.[39mtimestamp[33m,[39m
+   [90m     |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+  [31m[1m>[22m[39m[90m 206 |[39m                             type[33m:[39m [32m'BUY'[39m[33m,[39m
+   [90m     |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+  [31m[1m>[22m[39m[90m 207 |[39m                             price[33m,[39m
+   [90m     |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+  [31m[1m>[22m[39m[90m 208 |[39m                             quantity[33m,[39m
+   [90m     |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+  [31m[1m>[22m[39m[90m 209 |[39m                             reason[33m:[39m evaluation[33m.[39mreason[33m,[39m
+   [90m     |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+  [31m[1m>[22m[39m[90m 210 |[39m                         })[33m;[39m
+   [90m     |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 211 |[39m                     }
+   [90m 212 |[39m                 } [36melse[39m [36mif[39m (evaluation[33m.[39msignal [33m===[39m [32m'SELL'[39m [33m&&[39m position [33m>[39m [35m0[39m) {
+   [90m 213 |[39m                     [90m// Sell[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/strategies/strategies.service.ts:217:33[39m[22m
+TS2345: Argument of type '{ date: any; type: string; price: number; quantity: number; profit: number; reason: string; }' is not assignable to parameter of type 'never'.
+  [0m [90m 215 |[39m                     capital [33m+=[39m sellValue[33m;[39m
+   [90m 216 |[39m                     [36mconst[39m profit [33m=[39m (price [33m-[39m positionPrice) [33m*[39m position[33m;[39m
+  [31m[1m>[22m[39m[90m 217 |[39m                     trades[33m.[39mpush({
+   [90m     |[39m                                 [31m[1m^[22m[39m
+  [31m[1m>[22m[39m[90m 218 |[39m                         date[33m:[39m candle[33m.[39mtimestamp[33m,[39m
+   [90m     |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+  [31m[1m>[22m[39m[90m 219 |[39m                         type[33m:[39m [32m'SELL'[39m[33m,[39m
+   [90m     |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+  [31m[1m>[22m[39m[90m 220 |[39m                         price[33m,[39m
+   [90m     |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+  [31m[1m>[22m[39m[90m 221 |[39m                         quantity[33m:[39m position[33m,[39m
+   [90m     |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+  [31m[1m>[22m[39m[90m 222 |[39m                         profit[33m,[39m
+   [90m     |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+  [31m[1m>[22m[39m[90m 223 |[39m                         reason[33m:[39m evaluation[33m.[39mreason[33m,[39m
+   [90m     |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+  [31m[1m>[22m[39m[90m 224 |[39m                     })[33m;[39m
+   [90m     |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 225 |[39m                     position [33m=[39m [35m0[39m[33m;[39m
+   [90m 226 |[39m                     positionPrice [33m=[39m [35m0[39m[33m;[39m
+   [90m 227 |[39m                 }[0m
+
+[1m[31mERROR[39m[22m in [1m./src/strategies/strategies.service.ts:240:52[39m[22m
+TS2339: Property 'type' does not exist on type 'never'.
+  [0m [90m 238 |[39m         [36mconst[39m totalReturn [33m=[39m capital [33m-[39m initialCapital[33m;[39m
+   [90m 239 |[39m         [36mconst[39m returnPct [33m=[39m (totalReturn [33m/[39m initialCapital) [33m*[39m [35m100[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 240 |[39m         [36mconst[39m winningTrades [33m=[39m trades[33m.[39mfilter(t [33m=>[39m t[33m.[39mtype [33m===[39m [32m'SELL'[39m [33m&&[39m t[33m.[39mprofit [33m>[39m [35m0[39m)[33m.[39mlength[33m;[39m
+   [90m     |[39m                                                    [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 241 |[39m         [36mconst[39m losingTrades [33m=[39m trades[33m.[39mfilter(t [33m=>[39m t[33m.[39mtype [33m===[39m [32m'SELL'[39m [33m&&[39m t[33m.[39mprofit [33m<[39m [35m0[39m)[33m.[39mlength[33m;[39m
+   [90m 242 |[39m         [36mconst[39m winRate [33m=[39m winningTrades [33m/[39m (winningTrades [33m+[39m losingTrades) [33m*[39m [35m100[39m[33m;[39m
+   [90m 243 |[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/strategies/strategies.service.ts:240:73[39m[22m
+TS2339: Property 'profit' does not exist on type 'never'.
+  [0m [90m 238 |[39m         [36mconst[39m totalReturn [33m=[39m capital [33m-[39m initialCapital[33m;[39m
+   [90m 239 |[39m         [36mconst[39m returnPct [33m=[39m (totalReturn [33m/[39m initialCapital) [33m*[39m [35m100[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 240 |[39m         [36mconst[39m winningTrades [33m=[39m trades[33m.[39mfilter(t [33m=>[39m t[33m.[39mtype [33m===[39m [32m'SELL'[39m [33m&&[39m t[33m.[39mprofit [33m>[39m [35m0[39m)[33m.[39mlength[33m;[39m
+   [90m     |[39m                                                                         [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 241 |[39m         [36mconst[39m losingTrades [33m=[39m trades[33m.[39mfilter(t [33m=>[39m t[33m.[39mtype [33m===[39m [32m'SELL'[39m [33m&&[39m t[33m.[39mprofit [33m<[39m [35m0[39m)[33m.[39mlength[33m;[39m
+   [90m 242 |[39m         [36mconst[39m winRate [33m=[39m winningTrades [33m/[39m (winningTrades [33m+[39m losingTrades) [33m*[39m [35m100[39m[33m;[39m
+   [90m 243 |[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/strategies/strategies.service.ts:241:51[39m[22m
+TS2339: Property 'type' does not exist on type 'never'.
+  [0m [90m 239 |[39m         [36mconst[39m returnPct [33m=[39m (totalReturn [33m/[39m initialCapital) [33m*[39m [35m100[39m[33m;[39m
+   [90m 240 |[39m         [36mconst[39m winningTrades [33m=[39m trades[33m.[39mfilter(t [33m=>[39m t[33m.[39mtype [33m===[39m [32m'SELL'[39m [33m&&[39m t[33m.[39mprofit [33m>[39m [35m0[39m)[33m.[39mlength[33m;[39m
+  [31m[1m>[22m[39m[90m 241 |[39m         [36mconst[39m losingTrades [33m=[39m trades[33m.[39mfilter(t [33m=>[39m t[33m.[39mtype [33m===[39m [32m'SELL'[39m [33m&&[39m t[33m.[39mprofit [33m<[39m [35m0[39m)[33m.[39mlength[33m;[39m
+   [90m     |[39m                                                   [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 242 |[39m         [36mconst[39m winRate [33m=[39m winningTrades [33m/[39m (winningTrades [33m+[39m losingTrades) [33m*[39m [35m100[39m[33m;[39m
+   [90m 243 |[39m
+   [90m 244 |[39m         [36mreturn[39m {[0m
+
+[1m[31mERROR[39m[22m in [1m./src/strategies/strategies.service.ts:241:72[39m[22m
+TS2339: Property 'profit' does not exist on type 'never'.
+  [0m [90m 239 |[39m         [36mconst[39m returnPct [33m=[39m (totalReturn [33m/[39m initialCapital) [33m*[39m [35m100[39m[33m;[39m
+   [90m 240 |[39m         [36mconst[39m winningTrades [33m=[39m trades[33m.[39mfilter(t [33m=>[39m t[33m.[39mtype [33m===[39m [32m'SELL'[39m [33m&&[39m t[33m.[39mprofit [33m>[39m [35m0[39m)[33m.[39mlength[33m;[39m
+  [31m[1m>[22m[39m[90m 241 |[39m         [36mconst[39m losingTrades [33m=[39m trades[33m.[39mfilter(t [33m=>[39m t[33m.[39mtype [33m===[39m [32m'SELL'[39m [33m&&[39m t[33m.[39mprofit [33m<[39m [35m0[39m)[33m.[39mlength[33m;[39m
+   [90m     |[39m                                                                        [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 242 |[39m         [36mconst[39m winRate [33m=[39m winningTrades [33m/[39m (winningTrades [33m+[39m losingTrades) [33m*[39m [35m100[39m[33m;[39m
+   [90m 243 |[39m
+   [90m 244 |[39m         [36mreturn[39m {[0m
+
+[1m[31mERROR[39m[22m in [1m./src/trades/dto/trade.dto.ts:3:10[39m[22m
+TS2305: Module '"@stockboom/database"' has no exported member 'OrderType'.
+  [0m [90m 1 |[39m [36mimport[39m { [33mApiProperty[39m } [36mfrom[39m [32m'@nestjs/swagger'[39m[33m;[39m
+   [90m 2 |[39m [36mimport[39m { [33mIsString[39m[33m,[39m [33mIsNumber[39m[33m,[39m [33mIsEnum[39m[33m,[39m [33mIsOptional[39m[33m,[39m [33mIsBoolean[39m[33m,[39m [33mMin[39m } [36mfrom[39m [32m'class-validator'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 3 |[39m [36mimport[39m { [33mOrderType[39m[33m,[39m [33mOrderSide[39m } [36mfrom[39m [32m'@stockboom/database'[39m[33m;[39m
+   [90m   |[39m          [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 4 |[39m
+   [90m 5 |[39m [36mexport[39m [36mclass[39m [33mCreateTradeDto[39m {
+   [90m 6 |[39m     [33m@[39m[33mApiProperty[39m({ example[33m:[39m [32m'broker-account-id'[39m })[0m
+
+[1m[31mERROR[39m[22m in [1m./src/trades/dto/trade.dto.ts:3:21[39m[22m
+TS2305: Module '"@stockboom/database"' has no exported member 'OrderSide'.
+  [0m [90m 1 |[39m [36mimport[39m { [33mApiProperty[39m } [36mfrom[39m [32m'@nestjs/swagger'[39m[33m;[39m
+   [90m 2 |[39m [36mimport[39m { [33mIsString[39m[33m,[39m [33mIsNumber[39m[33m,[39m [33mIsEnum[39m[33m,[39m [33mIsOptional[39m[33m,[39m [33mIsBoolean[39m[33m,[39m [33mMin[39m } [36mfrom[39m [32m'class-validator'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 3 |[39m [36mimport[39m { [33mOrderType[39m[33m,[39m [33mOrderSide[39m } [36mfrom[39m [32m'@stockboom/database'[39m[33m;[39m
+   [90m   |[39m                     [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 4 |[39m
+   [90m 5 |[39m [36mexport[39m [36mclass[39m [33mCreateTradeDto[39m {
+   [90m 6 |[39m     [33m@[39m[33mApiProperty[39m({ example[33m:[39m [32m'broker-account-id'[39m })[0m
+
+[1m[31mERROR[39m[22m in [1m./src/trades/trade-transaction.service.ts:2:29[39m[22m
+TS2307: Cannot find module '@nestjs-modules/ioredis' or its corresponding type declarations.
+  [0m [90m 1 |[39m [36mimport[39m { [33mInjectable[39m[33m,[39m [33mLogger[39m[33m,[39m [33mBadRequestException[39m } [36mfrom[39m [32m'@nestjs/common'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 2 |[39m [36mimport[39m { [33mInjectRedis[39m } [36mfrom[39m [32m'@nestjs-modules/ioredis'[39m[33m;[39m
+   [90m   |[39m                             [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 3 |[39m [36mimport[39m [33mRedis[39m [36mfrom[39m [32m'ioredis'[39m[33m;[39m
+   [90m 4 |[39m [36mimport[39m { prisma } [36mfrom[39m [32m'@stockboom/database'[39m[33m;[39m
+   [90m 5 |[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/trades/trades.controller.ts:6:10[39m[22m
+TS2305: Module '"@stockboom/database"' has no exported member 'OrderStatus'.
+  [0m [90m 4 |[39m [36mimport[39m { [33mJwtAuthGuard[39m } [36mfrom[39m [32m'../auth/guards/jwt-auth.guard'[39m[33m;[39m
+   [90m 5 |[39m [36mimport[39m { [33mCreateTradeDto[39m } [36mfrom[39m [32m'./dto/trade.dto'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 6 |[39m [36mimport[39m { [33mOrderStatus[39m } [36mfrom[39m [32m'@stockboom/database'[39m[33m;[39m
+   [90m   |[39m          [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 7 |[39m
+   [90m 8 |[39m [33m@[39m[33mApiTags[39m([32m'trades'[39m)
+   [90m 9 |[39m [33m@[39m[33mController[39m([32m'trades'[39m)[0m
+
+[1m[31mERROR[39m[22m in [1m./src/trades/trades.module.ts:2:28[39m[22m
+TS2307: Cannot find module '@nestjs/bull' or its corresponding type declarations.
+  [0m [90m 1 |[39m [36mimport[39m { [33mModule[39m } [36mfrom[39m [32m'@nestjs/common'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 2 |[39m [36mimport[39m { [33mBullModule[39m } [36mfrom[39m [32m'@nestjs/bull'[39m[33m;[39m
+   [90m   |[39m                            [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 3 |[39m [36mimport[39m { [33mTradesController[39m } [36mfrom[39m [32m'./trades.controller'[39m[33m;[39m
+   [90m 4 |[39m [36mimport[39m { [33mTradesService[39m } [36mfrom[39m [32m'./trades.service'[39m[33m;[39m
+   [90m 5 |[39m [36mimport[39m { [33mMarketDataModule[39m } [36mfrom[39m [32m'../market-data/market-data.module'[39m[33m;[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/trades/trades.service.ts:2:29[39m[22m
+TS2307: Cannot find module '@nestjs/bull' or its corresponding type declarations.
+  [0m [90m 1 |[39m [36mimport[39m { [33mInjectable[39m[33m,[39m [33mNotFoundException[39m[33m,[39m [33mBadRequestException[39m } [36mfrom[39m [32m'@nestjs/common'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 2 |[39m [36mimport[39m { [33mInjectQueue[39m } [36mfrom[39m [32m'@nestjs/bull'[39m[33m;[39m
+   [90m   |[39m                             [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 3 |[39m [36mimport[39m { [33mQueue[39m } [36mfrom[39m [32m'bull'[39m[33m;[39m
+   [90m 4 |[39m [36mimport[39m { prisma[33m,[39m [33mTrade[39m[33m,[39m [33mOrderStatus[39m[33m,[39m [33mOrderType[39m[33m,[39m [33mOrderSide[39m[33m,[39m [33mPrisma[39m } [36mfrom[39m [32m'@stockboom/database'[39m[33m;[39m
+   [90m 5 |[39m [36mimport[39m { [33mKisApiService[39m } [36mfrom[39m [32m'../market-data/kis-api.service'[39m[33m;[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/trades/trades.service.ts:3:23[39m[22m
+TS2307: Cannot find module 'bull' or its corresponding type declarations.
+  [0m [90m 1 |[39m [36mimport[39m { [33mInjectable[39m[33m,[39m [33mNotFoundException[39m[33m,[39m [33mBadRequestException[39m } [36mfrom[39m [32m'@nestjs/common'[39m[33m;[39m
+   [90m 2 |[39m [36mimport[39m { [33mInjectQueue[39m } [36mfrom[39m [32m'@nestjs/bull'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 3 |[39m [36mimport[39m { [33mQueue[39m } [36mfrom[39m [32m'bull'[39m[33m;[39m
+   [90m   |[39m                       [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 4 |[39m [36mimport[39m { prisma[33m,[39m [33mTrade[39m[33m,[39m [33mOrderStatus[39m[33m,[39m [33mOrderType[39m[33m,[39m [33mOrderSide[39m[33m,[39m [33mPrisma[39m } [36mfrom[39m [32m'@stockboom/database'[39m[33m;[39m
+   [90m 5 |[39m [36mimport[39m { [33mKisApiService[39m } [36mfrom[39m [32m'../market-data/kis-api.service'[39m[33m;[39m
+   [90m 6 |[39m [36mimport[39m { [33mTradeExecutionJob[39m } [36mfrom[39m [32m'@stockboom/types'[39m[33m;[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/trades/trades.service.ts:4:18[39m[22m
+TS2305: Module '"@stockboom/database"' has no exported member 'Trade'.
+  [0m [90m 2 |[39m [36mimport[39m { [33mInjectQueue[39m } [36mfrom[39m [32m'@nestjs/bull'[39m[33m;[39m
+   [90m 3 |[39m [36mimport[39m { [33mQueue[39m } [36mfrom[39m [32m'bull'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 4 |[39m [36mimport[39m { prisma[33m,[39m [33mTrade[39m[33m,[39m [33mOrderStatus[39m[33m,[39m [33mOrderType[39m[33m,[39m [33mOrderSide[39m[33m,[39m [33mPrisma[39m } [36mfrom[39m [32m'@stockboom/database'[39m[33m;[39m
+   [90m   |[39m                  [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 5 |[39m [36mimport[39m { [33mKisApiService[39m } [36mfrom[39m [32m'../market-data/kis-api.service'[39m[33m;[39m
+   [90m 6 |[39m [36mimport[39m { [33mTradeExecutionJob[39m } [36mfrom[39m [32m'@stockboom/types'[39m[33m;[39m
+   [90m 7 |[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/trades/trades.service.ts:4:25[39m[22m
+TS2305: Module '"@stockboom/database"' has no exported member 'OrderStatus'.
+  [0m [90m 2 |[39m [36mimport[39m { [33mInjectQueue[39m } [36mfrom[39m [32m'@nestjs/bull'[39m[33m;[39m
+   [90m 3 |[39m [36mimport[39m { [33mQueue[39m } [36mfrom[39m [32m'bull'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 4 |[39m [36mimport[39m { prisma[33m,[39m [33mTrade[39m[33m,[39m [33mOrderStatus[39m[33m,[39m [33mOrderType[39m[33m,[39m [33mOrderSide[39m[33m,[39m [33mPrisma[39m } [36mfrom[39m [32m'@stockboom/database'[39m[33m;[39m
+   [90m   |[39m                         [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 5 |[39m [36mimport[39m { [33mKisApiService[39m } [36mfrom[39m [32m'../market-data/kis-api.service'[39m[33m;[39m
+   [90m 6 |[39m [36mimport[39m { [33mTradeExecutionJob[39m } [36mfrom[39m [32m'@stockboom/types'[39m[33m;[39m
+   [90m 7 |[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/trades/trades.service.ts:4:38[39m[22m
+TS2305: Module '"@stockboom/database"' has no exported member 'OrderType'.
+  [0m [90m 2 |[39m [36mimport[39m { [33mInjectQueue[39m } [36mfrom[39m [32m'@nestjs/bull'[39m[33m;[39m
+   [90m 3 |[39m [36mimport[39m { [33mQueue[39m } [36mfrom[39m [32m'bull'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 4 |[39m [36mimport[39m { prisma[33m,[39m [33mTrade[39m[33m,[39m [33mOrderStatus[39m[33m,[39m [33mOrderType[39m[33m,[39m [33mOrderSide[39m[33m,[39m [33mPrisma[39m } [36mfrom[39m [32m'@stockboom/database'[39m[33m;[39m
+   [90m   |[39m                                      [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 5 |[39m [36mimport[39m { [33mKisApiService[39m } [36mfrom[39m [32m'../market-data/kis-api.service'[39m[33m;[39m
+   [90m 6 |[39m [36mimport[39m { [33mTradeExecutionJob[39m } [36mfrom[39m [32m'@stockboom/types'[39m[33m;[39m
+   [90m 7 |[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/trades/trades.service.ts:4:49[39m[22m
+TS2305: Module '"@stockboom/database"' has no exported member 'OrderSide'.
+  [0m [90m 2 |[39m [36mimport[39m { [33mInjectQueue[39m } [36mfrom[39m [32m'@nestjs/bull'[39m[33m;[39m
+   [90m 3 |[39m [36mimport[39m { [33mQueue[39m } [36mfrom[39m [32m'bull'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 4 |[39m [36mimport[39m { prisma[33m,[39m [33mTrade[39m[33m,[39m [33mOrderStatus[39m[33m,[39m [33mOrderType[39m[33m,[39m [33mOrderSide[39m[33m,[39m [33mPrisma[39m } [36mfrom[39m [32m'@stockboom/database'[39m[33m;[39m
+   [90m   |[39m                                                 [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 5 |[39m [36mimport[39m { [33mKisApiService[39m } [36mfrom[39m [32m'../market-data/kis-api.service'[39m[33m;[39m
+   [90m 6 |[39m [36mimport[39m { [33mTradeExecutionJob[39m } [36mfrom[39m [32m'@stockboom/types'[39m[33m;[39m
+   [90m 7 |[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/trades/trades.service.ts:4:60[39m[22m
+TS2724: '"@stockboom/database"' has no exported member named 'Prisma'. Did you mean 'prisma'?
+  [0m [90m 2 |[39m [36mimport[39m { [33mInjectQueue[39m } [36mfrom[39m [32m'@nestjs/bull'[39m[33m;[39m
+   [90m 3 |[39m [36mimport[39m { [33mQueue[39m } [36mfrom[39m [32m'bull'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 4 |[39m [36mimport[39m { prisma[33m,[39m [33mTrade[39m[33m,[39m [33mOrderStatus[39m[33m,[39m [33mOrderType[39m[33m,[39m [33mOrderSide[39m[33m,[39m [33mPrisma[39m } [36mfrom[39m [32m'@stockboom/database'[39m[33m;[39m
+   [90m   |[39m                                                            [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 5 |[39m [36mimport[39m { [33mKisApiService[39m } [36mfrom[39m [32m'../market-data/kis-api.service'[39m[33m;[39m
+   [90m 6 |[39m [36mimport[39m { [33mTradeExecutionJob[39m } [36mfrom[39m [32m'@stockboom/types'[39m[33m;[39m
+   [90m 7 |[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/users/users.service.ts:2:18[39m[22m
+TS2305: Module '"@stockboom/database"' has no exported member 'User'.
+  [0m [90m 1 |[39m [36mimport[39m { [33mInjectable[39m } [36mfrom[39m [32m'@nestjs/common'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 2 |[39m [36mimport[39m { prisma[33m,[39m [33mUser[39m[33m,[39m [33mPrisma[39m } [36mfrom[39m [32m'@stockboom/database'[39m[33m;[39m
+   [90m   |[39m                  [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 3 |[39m
+   [90m 4 |[39m [33m@[39m[33mInjectable[39m()
+   [90m 5 |[39m [36mexport[39m [36mclass[39m [33mUsersService[39m {[0m
+
+[1m[31mERROR[39m[22m in [1m./src/users/users.service.ts:2:24[39m[22m
+TS2724: '"@stockboom/database"' has no exported member named 'Prisma'. Did you mean 'prisma'?
+  [0m [90m 1 |[39m [36mimport[39m { [33mInjectable[39m } [36mfrom[39m [32m'@nestjs/common'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 2 |[39m [36mimport[39m { prisma[33m,[39m [33mUser[39m[33m,[39m [33mPrisma[39m } [36mfrom[39m [32m'@stockboom/database'[39m[33m;[39m
+   [90m   |[39m                        [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 3 |[39m
+   [90m 4 |[39m [33m@[39m[33mInjectable[39m()
+   [90m 5 |[39m [36mexport[39m [36mclass[39m [33mUsersService[39m {[0m
+
+[1m[31mERROR[39m[22m in [1m./src/websocket/websocket.gateway.ts:9:8[39m[22m
+TS2307: Cannot find module '@nestjs/websockets' or its corresponding type declarations.
+  [0m [90m  7 |[39m     [33mMessageBody[39m[33m,[39m
+   [90m  8 |[39m     [33mConnectedSocket[39m[33m,[39m
+  [31m[1m>[22m[39m[90m  9 |[39m } [36mfrom[39m [32m'@nestjs/websockets'[39m[33m;[39m
+   [90m    |[39m        [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 10 |[39m [36mimport[39m { [33mLogger[39m } [36mfrom[39m [32m'@nestjs/common'[39m[33m;[39m
+   [90m 11 |[39m [36mimport[39m { [33mServer[39m[33m,[39m [33mSocket[39m } [36mfrom[39m [32m'socket.io'[39m[33m;[39m
+   [90m 12 |[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/websocket/websocket.gateway.ts:11:32[39m[22m
+TS2307: Cannot find module 'socket.io' or its corresponding type declarations.
+  [0m [90m  9 |[39m } [36mfrom[39m [32m'@nestjs/websockets'[39m[33m;[39m
+   [90m 10 |[39m [36mimport[39m { [33mLogger[39m } [36mfrom[39m [32m'@nestjs/common'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 11 |[39m [36mimport[39m { [33mServer[39m[33m,[39m [33mSocket[39m } [36mfrom[39m [32m'socket.io'[39m[33m;[39m
+   [90m    |[39m                                [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 12 |[39m
+   [90m 13 |[39m [90m/**[39m
+   [90m 14 |[39m [90m * WebSocket Gateway for real-time updates[39m[0m
+
+[1m[31mERROR[39m[22m in [1m../../packages/database/index.ts:1:10[39m[22m
+TS2305: Module '"@prisma/client"' has no exported member 'PrismaClient'.
+  [0m[31m[1m>[22m[39m[90m 1 |[39m [36mimport[39m { [33mPrismaClient[39m } [36mfrom[39m [32m'@prisma/client'[39m[33m;[39m
+   [90m   |[39m          [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 2 |[39m
+   [90m 3 |[39m declare global {
+   [90m 4 |[39m     [36mvar[39m prisma[33m:[39m [33mPrismaClient[39m [33m|[39m undefined[33m;[39m[0m
+
+[1m[33m1 error has detailed information that is not shown.
+Use 'stats.errorDetails: true' resp. '--stats-error-details' to show it.[39m[22m
+
+webpack 5.97.1 compiled with [1m[31m75 errors[39m[22m in 2397 ms
+C:\Users\USER\projects\stockboom\apps\api:
+?덭RR_PNPM_RECURSIVE_RUN_FIRST_FAIL??@stockboom/api@1.0.0 build: `nest build`
+Exit status 1

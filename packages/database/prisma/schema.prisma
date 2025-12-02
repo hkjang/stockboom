@@ -1,0 +1,544 @@
+// Prisma Schema for StockBoom
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// User and Authentication
+// ============================================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  name          String?
+  phone         String?
+  
+  // 2FA
+  twoFactorEnabled    Boolean @default(false)
+  twoFactorSecret     String?
+  
+  // Metadata
+  emailVerified Boolean @default(false)
+  isActive      Boolean @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  lastLoginAt   DateTime?
+  
+  // Relations
+  brokerAccounts    BrokerAccount[]
+  portfolios        Portfolio[]
+  strategies        Strategy[]
+  alerts            Alert[]
+  notifications     Notification[]
+  trades            Trade[]
+  pushSubscriptions PushSubscription[]
+  
+  @@map("users")
+}
+
+model BrokerAccount {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Broker Info
+  broker        String    // "kis" for Korean Investment & Securities
+  accountNumber String
+  accountName   String?
+  
+  // Encrypted API Credentials
+  appKey        String    // Encrypted
+  appSecret     String    // Encrypted
+  
+  // OAuth Token
+  accessToken   String?
+  tokenType     String?
+  expiresAt     DateTime?
+  
+  // Status
+  isActive      Boolean   @default(true)
+  isMockMode    Boolean   @default(true)
+  
+  // Metadata
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastSyncedAt  DateTime?
+  
+  // Relations
+  portfolios    Portfolio[]
+  trades        Trade[]
+  
+  @@unique([userId, broker, accountNumber])
+  @@index([userId])
+  @@map("broker_accounts")
+}
+
+// ============================================
+// Stock and Market Data
+// ============================================
+
+model Stock {
+  id            String    @id @default(cuid())
+  
+  // Stock Info
+  symbol        String    @unique  // Stock code (e.g., "005930" for Samsung)
+  name          String
+  market        String    // "KOSPI", "KOSDAQ", etc.
+  sector        String?
+  
+  // Market Data
+  currentPrice  Decimal?  @db.Decimal(15, 2)
+  openPrice     Decimal?  @db.Decimal(15, 2)
+  highPrice     Decimal?  @db.Decimal(15, 2)
+  lowPrice      Decimal?  @db.Decimal(15, 2)
+  volume        BigInt?
+  marketCap     BigInt?
+  
+  // Status
+  isActive      Boolean   @default(true)
+  isTradable    Boolean   @default(true)
+  
+  // Metadata
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastPriceUpdate DateTime?
+  
+  // Relations
+  positions     Position[]
+  candles       Candle[]
+  indicators    Indicator[]
+  news          News[]
+  aiReports     AIReport[]
+  trades        Trade[]
+  
+  @@index([symbol])
+  @@index([market])
+  @@map("stocks")
+}
+
+model Candle {
+  id            String    @id @default(cuid())
+  stockId       String
+  stock         Stock     @relation(fields: [stockId], references: [id], onDelete: Cascade)
+  
+  // Time Frame
+  timeframe     String    // "1m", "5m", "15m", "1h", "1d", "1w"
+  timestamp     DateTime
+  
+  // OHLCV Data
+  open          Decimal   @db.Decimal(15, 2)
+  high          Decimal   @db.Decimal(15, 2)
+  low           Decimal   @db.Decimal(15, 2)
+  close         Decimal   @db.Decimal(15, 2)
+  volume        BigInt
+  
+  // Additional Data
+  amount        Decimal?  @db.Decimal(20, 2)  // Trading amount
+  
+  createdAt     DateTime  @default(now())
+  
+  @@unique([stockId, timeframe, timestamp])
+  @@index([stockId, timeframe, timestamp(sort: Desc)])
+  @@map("candles")
+}
+
+// ============================================
+// Portfolio and Positions
+// ============================================
+
+model Portfolio {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  brokerAccountId String
+  brokerAccount   BrokerAccount @relation(fields: [brokerAccountId], references: [id], onDelete: Cascade)
+  
+  // Portfolio Info
+  name            String
+  description     String?
+  
+  // Balance
+  cashBalance     Decimal   @db.Decimal(20, 2)
+  totalValue      Decimal   @db.Decimal(20, 2)
+  totalReturn     Decimal   @db.Decimal(20, 2)
+  totalReturnPct  Decimal   @db.Decimal(10, 4)
+  
+  // Status
+  isActive        Boolean   @default(true)
+  autoTrade       Boolean   @default(false)
+  
+  // Metadata
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  lastSyncedAt    DateTime?
+  
+  // Relations
+  positions       Position[]
+  strategies      Strategy[]
+  
+  @@index([userId])
+  @@index([brokerAccountId])
+  @@map("portfolios")
+}
+
+model Position {
+  id              String    @id @default(cuid())
+  portfolioId     String
+  portfolio       Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+  stockId         String
+  stock           Stock     @relation(fields: [stockId], references: [id], onDelete: Cascade)
+  
+  // Position Data
+  quantity        Int
+  avgPrice        Decimal   @db.Decimal(15, 2)
+  currentPrice    Decimal   @db.Decimal(15, 2)
+  
+  // P&L
+  totalCost       Decimal   @db.Decimal(20, 2)
+  marketValue     Decimal   @db.Decimal(20, 2)
+  unrealizedPL    Decimal   @db.Decimal(20, 2)
+  unrealizedPLPct Decimal   @db.Decimal(10, 4)
+  
+  // Metadata
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@unique([portfolioId, stockId])
+  @@index([portfolioId])
+  @@index([stockId])
+  @@map("positions")
+}
+
+// ============================================
+// Trading
+// ============================================
+
+enum OrderType {
+  MARKET
+  LIMIT
+  STOP_LOSS
+  TAKE_PROFIT
+}
+
+enum OrderSide {
+  BUY
+  SELL
+}
+
+enum OrderStatus {
+  PENDING
+  SUBMITTED
+  PARTIALLY_FILLED
+  FILLED
+  CANCELLED
+  REJECTED
+  EXPIRED
+}
+
+model Trade {
+  id              String      @id @default(cuid())
+  userId          String
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  brokerAccountId String
+  brokerAccount   BrokerAccount @relation(fields: [brokerAccountId], references: [id], onDelete: Cascade)
+  stockId         String
+  stock           Stock       @relation(fields: [stockId], references: [id], onDelete: Cascade)
+  strategyId      String?
+  strategy        Strategy?   @relation(fields: [strategyId], references: [id], onDelete: SetNull)
+  
+  // Order Info
+  orderType       OrderType
+  orderSide       OrderSide
+  status          OrderStatus @default(PENDING)
+  
+  // Quantities
+  quantity        Int
+  filledQuantity  Int         @default(0)
+  
+  // Prices
+  limitPrice      Decimal?    @db.Decimal(15, 2)
+  stopPrice       Decimal?    @db.Decimal(15, 2)
+  avgFillPrice    Decimal?    @db.Decimal(15, 2)
+  
+  // Execution
+  totalAmount     Decimal?    @db.Decimal(20, 2)
+  commission      Decimal?    @db.Decimal(20, 2)
+  tax             Decimal?    @db.Decimal(20, 2)
+  
+  // External IDs
+  brokerOrderId   String?
+  brokerTradeId   String?
+  
+  // Auto Trade
+  isAutoTrade     Boolean     @default(false)
+  signalSource    String?     // "indicator", "ai", "manual"
+  
+  // Metadata
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  submittedAt     DateTime?
+  filledAt        DateTime?
+  cancelledAt     DateTime?
+  
+  // Audit
+  failureReason   String?
+  retryCount      Int         @default(0)
+  
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([brokerAccountId])
+  @@index([stockId])
+  @@index([strategyId])
+  @@index([status])
+  @@map("trades")
+}
+
+// ============================================
+// Strategy and Analysis
+// ============================================
+
+enum StrategyType {
+  INDICATOR_BASED
+  AI_BASED
+  HYBRID
+}
+
+model Strategy {
+  id              String        @id @default(cuid())
+  userId          String
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  portfolioId     String?
+  portfolio       Portfolio?    @relation(fields: [portfolioId], references: [id], onDelete: SetNull)
+  
+  // Strategy Info
+  name            String
+  description     String?
+  type            StrategyType
+  
+  // Configuration (JSON)
+  config          Json          // Stores strategy parameters
+  
+  // Risk Management
+  stopLossPercent Decimal?      @db.Decimal(5, 2)
+  takeProfitPercent Decimal?    @db.Decimal(5, 2)
+  maxPositionSize Decimal?      @db.Decimal(20, 2)
+  
+  // Status
+  isActive        Boolean       @default(true)
+  isBacktested    Boolean       @default(false)
+  
+  // Performance (if backtested)
+  backtestReturn  Decimal?      @db.Decimal(10, 4)
+  winRate         Decimal?      @db.Decimal(5, 2)
+  sharpeRatio     Decimal?      @db.Decimal(10, 4)
+  
+  // Metadata
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  
+  // Relations
+  trades          Trade[]
+  
+  @@index([userId])
+  @@index([portfolioId])
+  @@map("strategies")
+}
+
+model Indicator {
+  id              String    @id @default(cuid())
+  stockId         String
+  stock           Stock     @relation(fields: [stockId], references: [id], onDelete: Cascade)
+  
+  // Indicator Info
+  type            String    // "SMA", "EMA", "RSI", "MACD", "STOCH", etc.
+  timeframe       String    // "1m", "5m", "1h", "1d"
+  timestamp       DateTime
+  
+  // Values (JSON for flexibility)
+  values          Json
+  
+  // Signal
+  signal          String?   // "BUY", "SELL", "HOLD", "STRONG_BUY", "STRONG_SELL"
+  signalStrength  Decimal?  @db.Decimal(5, 2)  // 0-100
+  
+  createdAt       DateTime  @default(now())
+  
+  @@unique([stockId, type, timeframe, timestamp])
+  @@index([stockId, type, timeframe, timestamp(sort: Desc)])
+  @@map("indicators")
+}
+
+// ============================================
+// News and AI Analysis
+// ============================================
+
+model News {
+  id              String    @id @default(cuid())
+  stockId         String?
+  stock           Stock?    @relation(fields: [stockId], references: [id], onDelete: SetNull)
+  
+  // News Info
+  title           String
+  content         String    @db.Text
+  source          String
+  url             String?
+  author          String?
+  
+  // Sentiment
+  sentiment       String?   // "POSITIVE", "NEGATIVE", "NEUTRAL"
+  sentimentScore  Decimal?  @db.Decimal(5, 2)  // -100 to 100
+  
+  // Published
+  publishedAt     DateTime
+  createdAt       DateTime  @default(now())
+  
+  // Relations
+  aiReports       AIReport[]
+  
+  @@index([stockId, publishedAt(sort: Desc)])
+  @@index([publishedAt(sort: Desc)])
+  @@map("news")
+}
+
+model AIReport {
+  id              String    @id @default(cuid())
+  stockId         String
+  stock           Stock     @relation(fields: [stockId], references: [id], onDelete: Cascade)
+  newsId          String?
+  news            News?     @relation(fields: [newsId], references: [id], onDelete: SetNull)
+  
+  // Analysis Type
+  analysisType    String    // "NEWS_SUMMARY", "RISK_SCORE", "PATTERN_DETECTION", "PORTFOLIO_OPT"
+  
+  // AI Model Info
+  model           String    // "gpt-4", "tensorflow-js", etc.
+  version         String?
+  
+  // Analysis Results (JSON)
+  results         Json
+  
+  // Scores
+  riskScore       Decimal?  @db.Decimal(5, 2)  // 0-100
+  confidence      Decimal?  @db.Decimal(5, 2)  // 0-100
+  
+  // Summary
+  summary         String    @db.Text
+  recommendation  String?   // "BUY", "SELL", "HOLD"
+  
+  // Metadata
+  createdAt       DateTime  @default(now())
+  processingTime  Int?      // milliseconds
+  
+  @@index([stockId, createdAt(sort: Desc)])
+  @@index([analysisType])
+  @@map("ai_reports")
+}
+
+// ============================================
+// Notifications and Alerts
+// ============================================
+
+enum AlertType {
+  PRICE_CHANGE
+  VOLUME_SPIKE
+  INDICATOR_SIGNAL
+  TRADE_EXECUTION
+  RISK_WARNING
+  AI_INSIGHT
+}
+
+model Alert {
+  id              String      @id @default(cuid())
+  userId          String
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Alert Info
+  type            AlertType
+  name            String
+  description     String?
+  
+  // Conditions (JSON)
+  conditions      Json
+  
+  // Channels
+  webPush         Boolean     @default(true)
+  email           Boolean     @default(false)
+  
+  // Status
+  isActive        Boolean     @default(true)
+  
+  // Metadata
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  lastTriggeredAt DateTime?
+  triggerCount    Int         @default(0)
+  
+  // Relations
+  notifications   Notification[]
+  
+  @@index([userId])
+  @@map("alerts")
+}
+
+model Notification {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  alertId         String?
+  alert           Alert?    @relation(fields: [alertId], references: [id], onDelete: SetNull)
+  
+  // Notification Info
+  title           String
+  message         String    @db.Text
+  type            AlertType
+  priority        String    @default("NORMAL")  // "LOW", "NORMAL", "HIGH", "URGENT"
+  
+  // Channels
+  channel         String    // "WEB_PUSH", "EMAIL"
+  
+  // Status
+  isRead          Boolean   @default(false)
+  isSent          Boolean   @default(false)
+  
+  // Metadata
+  createdAt       DateTime  @default(now())
+  sentAt          DateTime?
+  readAt          DateTime?
+  
+  // Data (JSON)
+  data            Json?
+  
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([isRead])
+  @@map("notifications")
+}
+
+// ============================================
+// Push Subscriptions for Web Push Notifications
+// ============================================
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Web Push endpoint
+  endpoint  String   @unique
+  
+  // VAPID keys
+  p256dh    String
+  auth      String
+  
+  // Metadata
+  createdAt DateTime @default(now())
+  
+  @@index([userId])
+  @@map("push_subscriptions")
+}
+

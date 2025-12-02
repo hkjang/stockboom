@@ -1,0 +1,60 @@
+{
+    "common": {
+        "buy": "매수",
+        "sell": "매도",
+        "hold": "보유",
+        "loading": "로딩 중...",
+        "error": "오류",
+        "success": "성공",
+        "cancel": "취소",
+        "save": "저장",
+        "delete": "삭제",
+        "edit": "수정",
+        "search": "검색"
+    },
+    "dashboard": {
+        "title": "대시보드",
+        "portfolio": "포트폴리오",
+        "totalValue": "총 평가액",
+        "cashBalance": "현금 잔고",
+        "profitLoss": "손익",
+        "recentTrades": "최근 거래"
+    },
+    "trades": {
+        "title": "매매 이력",
+        "time": "시간",
+        "stock": "종목",
+        "type": "구분",
+        "quantity": "수량",
+        "price": "가격",
+        "total": "총액",
+        "status": "상태"
+    },
+    "strategy": {
+        "title": "매매 전략",
+        "create": "새 전략 만들기",
+        "name": "전략 이름",
+        "indicators": "기술적 지표",
+        "riskManagement": "리스크 관리",
+        "stopLoss": "손절",
+        "takeProfit": "익절",
+        "maxPosition": "최대 포지션 크기"
+    },
+    "ai": {
+        "reports": "AI 리포트",
+        "riskScore": "리스크 점수",
+        "confidence": "신뢰도",
+        "recommendation": "추천",
+        "summary": "요약"
+    },
+    "admin": {
+        "dashboard": "관리자 대시보드",
+        "users": "사용자 관리",
+        "monitoring": "시스템 모니터링",
+        "queues": "큐 관리",
+        "totalUsers": "총 사용자",
+        "activeTrades": "활성 거래",
+        "queueJobs": "큐 작업",
+        "apiRequests": "API 요청/분"
+    }
+}

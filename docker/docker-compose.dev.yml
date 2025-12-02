@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  postgres:
+    extends:
+      file: docker-compose.yml
+      service: postgres
+
+  redis:
+    extends:
+      file: docker-compose.yml
+      service: redis
+
+  # Development mode - no app containers, run locally with hot reload
+  # Only need databases for local development
+
+  # BullMQ Board for queue monitoring
+  bullmq-board:
+    image: deadly0/bull-board:latest
+    container_name: stockboom-bullmq-board
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    ports:
+      - "3003:3000"
+    depends_on:
+      - redis
+    networks:
+      - stockboom-network
+
+networks:
+  stockboom-network:
+    driver: bridge

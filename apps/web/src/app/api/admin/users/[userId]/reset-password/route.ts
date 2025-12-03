@@ -2,11 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-export async function GET(request: NextRequest) {
+export async function POST(
+    request: NextRequest,
+    { params }: { params: { userId: string } }
+) {
     try {
         const token = request.headers.get('authorization');
+        const userId = params.userId;
 
-        const res = await fetch(`${API_BASE_URL}/api/admin/users`, {
+        const res = await fetch(`${API_BASE_URL}/api/admin/users/${userId}/reset-password`, {
+            method: 'POST',
             headers: token ? { 'Authorization': token } : {},
         });
 
@@ -14,10 +19,8 @@ export async function GET(request: NextRequest) {
         return NextResponse.json(data, { status: res.status });
     } catch (error: any) {
         return NextResponse.json(
-            { error: error.message || 'Failed to fetch users' },
+            { error: error.message || 'Failed to reset password' },
             { status: 500 }
         );
     }
 }
-
-

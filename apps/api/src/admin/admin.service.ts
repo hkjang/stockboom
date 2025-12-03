@@ -3,6 +3,8 @@ import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { prisma } from '@stockboom/database';
 import * as os from 'os';
+import * as bcrypt from 'bcryptjs';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class AdminService {
@@ -144,8 +146,45 @@ export class AdminService {
      * Update user status
      */
     async updateUserStatus(userId: string, isActive: boolean) {
-        // TODO: Implement when isActive field is added to schema
-        return { success: true, userId, isActive };
+        return prisma.user.update({
+            where: { id: userId },
+            data: { isActive },
+        });
+    }
+
+    /**
+     * Update user details
+     */
+    async updateUser(userId: string, data: { name?: string; email?: string }) {
+        return prisma.user.update({
+            where: { id: userId },
+            data,
+        });
+    }
+
+    /**
+     * Delete user
+     */
+    async deleteUser(userId: string) {
+        return prisma.user.delete({
+            where: { id: userId },
+        });
+    }
+
+    /**
+     * Reset user password
+     */
+    async resetUserPassword(userId: string) {
+        // Generate random 8-character password
+        const tempPassword = crypto.randomBytes(4).toString('hex');
+        const hashedPassword = await bcrypt.hash(tempPassword, 10);
+
+        await prisma.user.update({
+            where: { id: userId },
+            data: { passwordHash: hashedPassword },
+        });
+
+        return { success: true, tempPassword };
     }
 
     /**

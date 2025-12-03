@@ -38,12 +38,27 @@ export class AdminController {
     }
 
     @Patch('users/:userId')
-    @ApiOperation({ summary: 'Update user status' })
+    @ApiOperation({ summary: 'Update user' })
     async updateUser(
         @Param('userId') userId: string,
-        @Body() body: { isActive: boolean },
+        @Body() body: { isActive?: boolean; name?: string; email?: string },
     ) {
-        return this.adminService.updateUserStatus(userId, body.isActive);
+        if (body.isActive !== undefined) {
+            return this.adminService.updateUserStatus(userId, body.isActive);
+        }
+        return this.adminService.updateUser(userId, body);
+    }
+
+    @Delete('users/:userId')
+    @ApiOperation({ summary: 'Delete user' })
+    async deleteUser(@Param('userId') userId: string) {
+        return this.adminService.deleteUser(userId);
+    }
+
+    @Post('users/:userId/reset-password')
+    @ApiOperation({ summary: 'Reset user password' })
+    async resetPassword(@Param('userId') userId: string) {
+        return this.adminService.resetUserPassword(userId);
     }
 
     @Get('queues/:queueName/failed')

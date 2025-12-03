@@ -156,9 +156,8 @@ async function main() {
 
     console.log(`✅ Created ${users.length} users`);
 
-    // Create broker accounts and portfolios for regular users (skip admin)
-    const regularUsers = users.slice(1); // Skip admin user
-    for (const [index, user] of regularUsers.entries()) {
+    // Create broker accounts and portfolios for all users (including admin)
+    for (const [index, user] of users.entries()) {
         console.log(`\n💼 Setting up data for ${user.name}...`);
 
         // Create broker account
@@ -390,11 +389,11 @@ async function main() {
     console.log('\n📊 Summary:');
     console.log(`   - Users: ${users.length} (1 admin + ${users.length - 1} regular)`);
     console.log(`   - Stocks: ${stocks.length}`);
-    console.log(`   - Portfolios: ${regularUsers.length}`);
-    console.log(`   - Total positions: ${regularUsers.length * 3}`);
-    console.log(`   - Trades: ${regularUsers.length * 2}`);
-    console.log(`   - Strategies: ${regularUsers.length}`);
-    console.log(`   - Alerts: ${regularUsers.length * 2}`);
+    console.log(`   - Portfolios: ${users.length}`);
+    console.log(`   - Total positions: ${users.length * 3}`);
+    console.log(`   - Trades: ${users.length * 2}`);
+    console.log(`   - Strategies: ${users.length}`);
+    console.log(`   - Alerts: ${users.length * 2}`);
     console.log(`   - News articles: 2`);
     console.log(`   - AI reports: 1`);
     console.log('\n🔐 Test account credentials:');

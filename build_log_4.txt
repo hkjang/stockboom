@@ -1,0 +1,253 @@
+
+> @stockboom/api@1.0.0 build C:\Users\USER\projects\stockboom\apps\api
+> nest build
+
+[1m[31mERROR[39m[22m in [1m./src/ai/ai.service.ts:83:39[39m[22m
+TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
+  Type 'null' is not assignable to type 'string'.
+  [0m [90m 81 |[39m             })[33m;[39m
+   [90m 82 |[39m
+  [31m[1m>[22m[39m[90m 83 |[39m             [36mconst[39m result [33m=[39m [33mJSON[39m[33m.[39mparse(response[33m.[39mchoices[[35m0[39m][33m.[39mmessage[33m.[39mcontent)[33m;[39m
+   [90m    |[39m                                       [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 84 |[39m
+   [90m 85 |[39m             [90m// Save AI report[39m
+   [90m 86 |[39m             [36mawait[39m prisma[33m.[39maIReport[33m.[39mcreate({[0m
+
+[1m[31mERROR[39m[22m in [1m./src/ai/ai.service.ts:88:21[39m[22m
+TS2322: Type 'string | null' is not assignable to type 'string | undefined'.
+  Type 'null' is not assignable to type 'string | undefined'.
+  [0m [90m 86 |[39m             [36mawait[39m prisma[33m.[39maIReport[33m.[39mcreate({
+   [90m 87 |[39m                 data[33m:[39m {
+  [31m[1m>[22m[39m[90m 88 |[39m                     stockId[33m:[39m news[33m.[39mstockId[33m,[39m
+   [90m    |[39m                     [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 89 |[39m                     newsId[33m:[39m news[33m.[39mid[33m,[39m
+   [90m 90 |[39m                     analysisType[33m:[39m [32m'NEWS_SUMMARY'[39m[33m,[39m
+   [90m 91 |[39m                     model[33m:[39m [32m'gpt-4'[39m[33m,[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/ai/ai.service.ts:152:34[39m[22m
+TS2345: Argument of type 'any' is not assignable to parameter of type 'never'.
+  [0m [90m 150 |[39m
+   [90m 151 |[39m                 [36mif[39m (existingReport) {
+  [31m[1m>[22m[39m[90m 152 |[39m                     reports[33m.[39mpush(existingReport [36mas[39m any)[33m;[39m
+   [90m     |[39m                                  [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 153 |[39m                     totalSentimentScore [33m+=[39m [33mNumber[39m(existingReport[33m.[39mresults[[32m'sentimentScore'[39m] [33m||[39m [35m0[39m)[33m;[39m
+   [90m 154 |[39m                     totalRiskScore [33m+=[39m [33mNumber[39m(existingReport[33m.[39mriskScore [33m||[39m [35m0[39m)[33m;[39m
+   [90m 155 |[39m                 } [36melse[39m {[0m
+
+[1m[31mERROR[39m[22m in [1m./src/ai/ai.service.ts:153:51[39m[22m
+TS18047: 'existingReport.results' is possibly 'null'.
+  [0m [90m 151 |[39m                 [36mif[39m (existingReport) {
+   [90m 152 |[39m                     reports[33m.[39mpush(existingReport [36mas[39m any)[33m;[39m
+  [31m[1m>[22m[39m[90m 153 |[39m                     totalSentimentScore [33m+=[39m [33mNumber[39m(existingReport[33m.[39mresults[[32m'sentimentScore'[39m] [33m||[39m [35m0[39m)[33m;[39m
+   [90m     |[39m                                                   [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 154 |[39m                     totalRiskScore [33m+=[39m [33mNumber[39m(existingReport[33m.[39mriskScore [33m||[39m [35m0[39m)[33m;[39m
+   [90m 155 |[39m                 } [36melse[39m {
+   [90m 156 |[39m                     [90m// Analyze new[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/ai/ai.service.ts:158:34[39m[22m
+TS2345: Argument of type 'any' is not assignable to parameter of type 'never'.
+  [0m [90m 156 |[39m                     [90m// Analyze new[39m
+   [90m 157 |[39m                     [36mconst[39m analysis [33m=[39m [36mawait[39m [36mthis[39m[33m.[39manalyzeNews(news[33m.[39mid)[33m;[39m
+  [31m[1m>[22m[39m[90m 158 |[39m                     reports[33m.[39mpush(analysis [36mas[39m any)[33m;[39m
+   [90m     |[39m                                  [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 159 |[39m                     totalSentimentScore [33m+=[39m analysis[33m.[39msentimentScore[33m;[39m
+   [90m 160 |[39m                     totalRiskScore [33m+=[39m analysis[33m.[39mriskScore[33m;[39m
+   [90m 161 |[39m                 }[0m
+
+[1m[31mERROR[39m[22m in [1m./src/ai/ai.service.ts:262:35[39m[22m
+TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
+  Type 'null' is not assignable to type 'string'.
+  [0m [90m 260 |[39m         })[33m;[39m
+   [90m 261 |[39m
+  [31m[1m>[22m[39m[90m 262 |[39m         [36mconst[39m report [33m=[39m [33mJSON[39m[33m.[39mparse(response[33m.[39mchoices[[35m0[39m][33m.[39mmessage[33m.[39mcontent)[33m;[39m
+   [90m     |[39m                                   [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 263 |[39m
+   [90m 264 |[39m         [90m// Save comprehensive report[39m
+   [90m 265 |[39m         [36mconst[39m startTime [33m=[39m [33mDate[39m[33m.[39mnow()[33m;[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/analysis/indicators.service.ts:185:17[39m[22m
+TS18048: 'macdData.MACD' is possibly 'undefined'.
+  [0m [90m 183 |[39m
+   [90m 184 |[39m             [36mlet[39m signal [33m=[39m [32m'HOLD'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 185 |[39m             [36mif[39m (macdData[33m?[39m[33m.[39m[33mMACD[39m [33m>[39m macdData[33m?[39m[33m.[39msignal) {
+   [90m     |[39m                 [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 186 |[39m                 signal [33m=[39m [32m'BUY'[39m[33m;[39m
+   [90m 187 |[39m             } [36melse[39m [36mif[39m (macdData[33m?[39m[33m.[39m[33mMACD[39m [33m<[39m macdData[33m?[39m[33m.[39msignal) {
+   [90m 188 |[39m                 signal [33m=[39m [32m'SELL'[39m[33m;[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/analysis/indicators.service.ts:185:34[39m[22m
+TS18048: 'macdData.signal' is possibly 'undefined'.
+  [0m [90m 183 |[39m
+   [90m 184 |[39m             [36mlet[39m signal [33m=[39m [32m'HOLD'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 185 |[39m             [36mif[39m (macdData[33m?[39m[33m.[39m[33mMACD[39m [33m>[39m macdData[33m?[39m[33m.[39msignal) {
+   [90m     |[39m                                  [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 186 |[39m                 signal [33m=[39m [32m'BUY'[39m[33m;[39m
+   [90m 187 |[39m             } [36melse[39m [36mif[39m (macdData[33m?[39m[33m.[39m[33mMACD[39m [33m<[39m macdData[33m?[39m[33m.[39msignal) {
+   [90m 188 |[39m                 signal [33m=[39m [32m'SELL'[39m[33m;[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/analysis/indicators.service.ts:187:24[39m[22m
+TS18048: 'macdData.MACD' is possibly 'undefined'.
+  [0m [90m 185 |[39m             [36mif[39m (macdData[33m?[39m[33m.[39m[33mMACD[39m [33m>[39m macdData[33m?[39m[33m.[39msignal) {
+   [90m 186 |[39m                 signal [33m=[39m [32m'BUY'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 187 |[39m             } [36melse[39m [36mif[39m (macdData[33m?[39m[33m.[39m[33mMACD[39m [33m<[39m macdData[33m?[39m[33m.[39msignal) {
+   [90m     |[39m                        [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 188 |[39m                 signal [33m=[39m [32m'SELL'[39m[33m;[39m
+   [90m 189 |[39m             }
+   [90m 190 |[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/analysis/indicators.service.ts:187:41[39m[22m
+TS18048: 'macdData.signal' is possibly 'undefined'.
+  [0m [90m 185 |[39m             [36mif[39m (macdData[33m?[39m[33m.[39m[33mMACD[39m [33m>[39m macdData[33m?[39m[33m.[39msignal) {
+   [90m 186 |[39m                 signal [33m=[39m [32m'BUY'[39m[33m;[39m
+  [31m[1m>[22m[39m[90m 187 |[39m             } [36melse[39m [36mif[39m (macdData[33m?[39m[33m.[39m[33mMACD[39m [33m<[39m macdData[33m?[39m[33m.[39msignal) {
+   [90m     |[39m                                         [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 188 |[39m                 signal [33m=[39m [32m'SELL'[39m[33m;[39m
+   [90m 189 |[39m             }
+   [90m 190 |[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/portfolios/portfolios.service.ts:105:42[39m[22m
+TS2339: Property 'positions' does not exist on type '{ name: string; id: string; isActive: boolean; createdAt: Date; updatedAt: Date; lastSyncedAt: Date | null; userId: string; description: string | null; cashBalance: Decimal; ... 4 more ...; brokerAccountId: string; }'.
+  [0m [90m 103 |[39m
+   [90m 104 |[39m         [90m// Update each position with current price[39m
+  [31m[1m>[22m[39m[90m 105 |[39m         [36mfor[39m ([36mconst[39m position [36mof[39m portfolio[33m.[39mpositions) {
+   [90m     |[39m                                          [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 106 |[39m             [36mconst[39m quote [33m=[39m [36mawait[39m [36mthis[39m[33m.[39mmarketDataService[33m.[39mgetQuote(
+   [90m 107 |[39m                 position[33m.[39mstock[33m.[39msymbol[33m,[39m
+   [90m 108 |[39m                 position[33m.[39mstock[33m.[39mmarket[33m,[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/portfolios/portfolios.service.ts:131:28[39m[22m
+TS2365: Operator '+' cannot be applied to types 'Decimal' and 'number'.
+  [0m [90m 129 |[39m
+   [90m 130 |[39m         [90m// Update portfolio[39m
+  [31m[1m>[22m[39m[90m 131 |[39m         [36mconst[39m totalValue [33m=[39m portfolio[33m.[39mcashBalance [33m+[39m totalPositionValue[33m;[39m
+   [90m     |[39m                            [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 132 |[39m         [36mconst[39m initialValue [33m=[39m portfolio[33m.[39mcashBalance[33m;[39m [90m// This should track initial capital[39m
+   [90m 133 |[39m         [36mconst[39m totalReturn [33m=[39m totalValue [33m-[39m initialValue[33m;[39m
+   [90m 134 |[39m         [36mconst[39m totalReturnPct [33m=[39m (totalReturn [33m/[39m initialValue) [33m*[39m [35m100[39m[33m;[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/portfolios/portfolios.service.ts:133:42[39m[22m
+TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+  [0m [90m 131 |[39m         [36mconst[39m totalValue [33m=[39m portfolio[33m.[39mcashBalance [33m+[39m totalPositionValue[33m;[39m
+   [90m 132 |[39m         [36mconst[39m initialValue [33m=[39m portfolio[33m.[39mcashBalance[33m;[39m [90m// This should track initial capital[39m
+  [31m[1m>[22m[39m[90m 133 |[39m         [36mconst[39m totalReturn [33m=[39m totalValue [33m-[39m initialValue[33m;[39m
+   [90m     |[39m                                          [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 134 |[39m         [36mconst[39m totalReturnPct [33m=[39m (totalReturn [33m/[39m initialValue) [33m*[39m [35m100[39m[33m;[39m
+   [90m 135 |[39m
+   [90m 136 |[39m         [36mreturn[39m prisma[33m.[39mportfolio[33m.[39mupdate({[0m
+
+[1m[31mERROR[39m[22m in [1m./src/portfolios/portfolios.service.ts:134:47[39m[22m
+TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+  [0m [90m 132 |[39m         [36mconst[39m initialValue [33m=[39m portfolio[33m.[39mcashBalance[33m;[39m [90m// This should track initial capital[39m
+   [90m 133 |[39m         [36mconst[39m totalReturn [33m=[39m totalValue [33m-[39m initialValue[33m;[39m
+  [31m[1m>[22m[39m[90m 134 |[39m         [36mconst[39m totalReturnPct [33m=[39m (totalReturn [33m/[39m initialValue) [33m*[39m [35m100[39m[33m;[39m
+   [90m     |[39m                                               [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 135 |[39m
+   [90m 136 |[39m         [36mreturn[39m prisma[33m.[39mportfolio[33m.[39mupdate({
+   [90m 137 |[39m             where[33m:[39m { id[33m:[39m portfolioId }[33m,[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/portfolios/portfolios.service.ts:195:34[39m[22m
+TS2365: Operator '+' cannot be applied to types 'Decimal' and 'number'.
+  [0m [90m 193 |[39m             [90m// Update existing position (average price)[39m
+   [90m 194 |[39m             [36mconst[39m newQuantity [33m=[39m existingPosition[33m.[39mquantity [33m+[39m data[33m.[39mquantity[33m;[39m
+  [31m[1m>[22m[39m[90m 195 |[39m             [36mconst[39m newTotalCost [33m=[39m existingPosition[33m.[39mtotalCost [33m+[39m totalCost[33m;[39m
+   [90m     |[39m                                  [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 196 |[39m             [36mconst[39m newAvgPrice [33m=[39m newTotalCost [33m/[39m newQuantity[33m;[39m
+   [90m 197 |[39m
+   [90m 198 |[39m             [36mreturn[39m prisma[33m.[39mposition[33m.[39mupdate({[0m
+
+[1m[31mERROR[39m[22m in [1m./src/portfolios/portfolios.service.ts:251:59[39m[22m
+TS2339: Property 'getPortfolioData' does not exist on type 'MarketDataService'.
+  [0m [90m 249 |[39m
+   [90m 250 |[39m             [90m// Sync balance and positions from broker API[39m
+  [31m[1m>[22m[39m[90m 251 |[39m             [36mconst[39m syncData [33m=[39m [36mawait[39m [36mthis[39m[33m.[39mmarketDataService[33m.[39mgetPortfolioData(
+   [90m     |[39m                                                           [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 252 |[39m                 brokerAccount[33m.[39mbroker[33m,[39m
+   [90m 253 |[39m                 brokerAccount[33m.[39mid[33m,[39m
+   [90m 254 |[39m             )[33m;[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/trades/trade-transaction.service.ts:51:25[39m[22m
+TS2322: Type 'string' is not assignable to type 'OrderSide | EnumOrderSideFilter<"Trade"> | undefined'.
+  [0m [90m 49 |[39m                         stockId[33m:[39m params[33m.[39mstockId[33m,[39m
+   [90m 50 |[39m                         brokerAccountId[33m:[39m params[33m.[39mbrokerAccountId[33m,[39m
+  [31m[1m>[22m[39m[90m 51 |[39m                         orderSide[33m:[39m params[33m.[39morderSide[33m,[39m
+   [90m    |[39m                         [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 52 |[39m                         quantity[33m:[39m params[33m.[39mquantity[33m,[39m
+   [90m 53 |[39m                         createdAt[33m:[39m {
+   [90m 54 |[39m                             gte[33m:[39m [36mnew[39m [33mDate[39m([33mDate[39m[33m.[39mnow() [33m-[39m [35m5000[39m)[33m,[39m [90m// Last 5 seconds[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/trades/trade-transaction.service.ts:103:33[39m[22m
+TS2365: Operator '<' cannot be applied to types 'Decimal' and 'number'.
+  [0m [90m 101 |[39m                             [36mconst[39m estimatedCost [33m=[39m params[33m.[39mlimitPrice [33m*[39m params[33m.[39mquantity[33m;[39m
+   [90m 102 |[39m
+  [31m[1m>[22m[39m[90m 103 |[39m                             [36mif[39m (portfolio[33m.[39mcashBalance [33m<[39m estimatedCost) {
+   [90m     |[39m                                 [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 104 |[39m                                 [36mthrow[39m [36mnew[39m [33mBadRequestException[39m([32m'Insufficient cash balance'[39m)[33m;[39m
+   [90m 105 |[39m                             }
+   [90m 106 |[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/trades/trades.service.ts:153:17[39m[22m
+TS2322: Type 'Decimal | null' is not assignable to type 'number | undefined'.
+  Type 'null' is not assignable to type 'number | undefined'.
+  [0m [90m 151 |[39m                 quantity[33m:[39m trade[33m.[39mquantity[33m,[39m
+   [90m 152 |[39m                 orderType[33m:[39m trade[33m.[39morderType [33m===[39m [32m'MARKET'[39m [33m?[39m [32m'MARKET'[39m [33m:[39m [32m'LIMIT'[39m[33m,[39m
+  [31m[1m>[22m[39m[90m 153 |[39m                 price[33m:[39m trade[33m.[39mlimitPrice[33m,[39m
+   [90m     |[39m                 [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 154 |[39m             })[33m;[39m
+   [90m 155 |[39m
+   [90m 156 |[39m             [36mif[39m (orderResult[33m.[39mstatus [33m===[39m [32m'SUCCESS'[39m) {[0m
+
+[1m[31mERROR[39m[22m in [1m./src/trades/trades.service.ts:240:61[39m[22m
+TS2365: Operator '+' cannot be applied to types 'number' and 'number | Decimal'.
+  [0m [90m 238 |[39m         [36mconst[39m sellTrades [33m=[39m trades[33m.[39mfilter(t [33m=>[39m t[33m.[39morderSide [33m===[39m [32m'SELL'[39m)[33m;[39m
+   [90m 239 |[39m
+  [31m[1m>[22m[39m[90m 240 |[39m         [36mconst[39m totalBuyAmount [33m=[39m buyTrades[33m.[39mreduce((sum[33m,[39m t) [33m=>[39m sum [33m+[39m (t[33m.[39mtotalAmount [33m||[39m [35m0[39m)[33m,[39m [35m0[39m)[33m;[39m
+   [90m     |[39m                                                             [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 241 |[39m         [36mconst[39m totalSellAmount [33m=[39m sellTrades[33m.[39mreduce((sum[33m,[39m t) [33m=>[39m sum [33m+[39m (t[33m.[39mtotalAmount [33m||[39m [35m0[39m)[33m,[39m [35m0[39m)[33m;[39m
+   [90m 242 |[39m
+   [90m 243 |[39m         [36mreturn[39m {[0m
+
+[1m[31mERROR[39m[22m in [1m./src/trades/trades.service.ts:241:63[39m[22m
+TS2365: Operator '+' cannot be applied to types 'number' and 'number | Decimal'.
+  [0m [90m 239 |[39m
+   [90m 240 |[39m         [36mconst[39m totalBuyAmount [33m=[39m buyTrades[33m.[39mreduce((sum[33m,[39m t) [33m=>[39m sum [33m+[39m (t[33m.[39mtotalAmount [33m||[39m [35m0[39m)[33m,[39m [35m0[39m)[33m;[39m
+  [31m[1m>[22m[39m[90m 241 |[39m         [36mconst[39m totalSellAmount [33m=[39m sellTrades[33m.[39mreduce((sum[33m,[39m t) [33m=>[39m sum [33m+[39m (t[33m.[39mtotalAmount [33m||[39m [35m0[39m)[33m,[39m [35m0[39m)[33m;[39m
+   [90m     |[39m                                                               [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 242 |[39m
+   [90m 243 |[39m         [36mreturn[39m {
+   [90m 244 |[39m             totalTrades[33m,[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/trades/trades.service.ts:303:9[39m[22m
+TS2322: Type '({ stock: { symbol: string; name: string; id: string; isActive: boolean; createdAt: Date; updatedAt: Date; currentPrice: Decimal | null; volume: bigint | null; marketCap: bigint | null; ... 6 more ...; lastPriceUpdate: Date | null; }; } & { ...; }) | null' is not assignable to type '{ id: string; createdAt: Date; updatedAt: Date; userId: string; brokerAccountId: string; orderType: OrderType; orderSide: OrderSide; status: OrderStatus; ... 18 more ...; strategyId: string | null; }'.
+  Type 'null' is not assignable to type '{ id: string; createdAt: Date; updatedAt: Date; userId: string; brokerAccountId: string; orderType: OrderType; orderSide: OrderSide; status: OrderStatus; ... 18 more ...; strategyId: string | null; }'.
+  [0m [90m 301 |[39m         )[33m;[39m
+   [90m 302 |[39m
+  [31m[1m>[22m[39m[90m 303 |[39m         [36mreturn[39m prisma[33m.[39mtrade[33m.[39mfindUnique({
+   [90m     |[39m         [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 304 |[39m             where[33m:[39m { id[33m:[39m tradeId }[33m,[39m
+   [90m 305 |[39m             include[33m:[39m { stock[33m:[39m [36mtrue[39m }[33m,[39m
+   [90m 306 |[39m         })[33m;[39m[0m
+
+[1m[31mERROR[39m[22m in [1m./src/users/users.controller.ts:17:17[39m[22m
+TS2339: Property 'passwordHash' does not exist on type '{ name: string | null; id: string; email: string; passwordHash: string; phone: string | null; twoFactorEnabled: boolean; twoFactorSecret: string | null; emailVerified: boolean; isActive: boolean; createdAt: Date; updatedAt: Date; lastLoginAt: Date | null; } | null'.
+  [0m [90m 15 |[39m     [36masync[39m getMe([33m@[39m[33mRequest[39m() req) {
+   [90m 16 |[39m         [36mconst[39m user [33m=[39m [36mawait[39m [36mthis[39m[33m.[39musersService[33m.[39mfindById(req[33m.[39muser[33m.[39muserId)[33m;[39m
+  [31m[1m>[22m[39m[90m 17 |[39m         [36mconst[39m { passwordHash[33m,[39m twoFactorSecret[33m,[39m [33m...[39mresult } [33m=[39m user[33m;[39m
+   [90m    |[39m                 [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 18 |[39m         [36mreturn[39m result[33m;[39m
+   [90m 19 |[39m     }
+   [90m 20 |[39m }[0m
+
+[1m[31mERROR[39m[22m in [1m./src/users/users.controller.ts:17:31[39m[22m
+TS2339: Property 'twoFactorSecret' does not exist on type '{ name: string | null; id: string; email: string; passwordHash: string; phone: string | null; twoFactorEnabled: boolean; twoFactorSecret: string | null; emailVerified: boolean; isActive: boolean; createdAt: Date; updatedAt: Date; lastLoginAt: Date | null; } | null'.
+  [0m [90m 15 |[39m     [36masync[39m getMe([33m@[39m[33mRequest[39m() req) {
+   [90m 16 |[39m         [36mconst[39m user [33m=[39m [36mawait[39m [36mthis[39m[33m.[39musersService[33m.[39mfindById(req[33m.[39muser[33m.[39muserId)[33m;[39m
+  [31m[1m>[22m[39m[90m 17 |[39m         [36mconst[39m { passwordHash[33m,[39m twoFactorSecret[33m,[39m [33m...[39mresult } [33m=[39m user[33m;[39m
+   [90m    |[39m                               [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+   [90m 18 |[39m         [36mreturn[39m result[33m;[39m
+   [90m 19 |[39m     }
+   [90m 20 |[39m }[0m
+
+webpack 5.97.1 compiled with [1m[31m24 errors[39m[22m in 3098 ms
+C:\Users\USER\projects\stockboom\apps\api:
+?덭RR_PNPM_RECURSIVE_RUN_FIRST_FAIL??@stockboom/api@1.0.0 build: `nest build`
+Exit status 1

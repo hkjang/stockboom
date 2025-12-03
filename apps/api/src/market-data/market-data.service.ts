@@ -175,4 +175,28 @@ export class MarketDataService {
             throw error;
         }
     }
+    /**
+     * Get portfolio data from broker
+     */
+    async getPortfolioData(broker: string, accountId: string) {
+        try {
+            if (broker === 'kis') {
+                // Get account number from DB
+                const brokerAccount = await prisma.brokerAccount.findUnique({
+                    where: { id: accountId },
+                });
+
+                if (!brokerAccount) {
+                    throw new Error('Broker account not found');
+                }
+
+                return this.kisApiService.getPortfolioData(brokerAccount.accountNumber);
+            }
+
+            throw new Error(`Unsupported broker: ${broker}`);
+        } catch (error) {
+            this.logger.error(`Failed to get portfolio data for account ${accountId}`, error);
+            throw error;
+        }
+    }
 }

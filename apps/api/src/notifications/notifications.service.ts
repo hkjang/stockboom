@@ -9,7 +9,7 @@ export class NotificationsService {
 
     constructor(private configService: ConfigService) {
         // Initialize email transporter
-        this.transporter = nodemailer.createTransporter({
+        this.transporter = nodemailer.createTransport({
             host: this.configService.get('SMTP_HOST'),
             port: this.configService.get('SMTP_PORT'),
             secure: false,

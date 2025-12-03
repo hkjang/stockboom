@@ -8,12 +8,16 @@
         "db:generate": "prisma generate",
         "db:push": "prisma db push",
         "db:migrate": "prisma migrate dev",
-        "db:studio": "prisma studio"
+        "db:studio": "prisma studio",
+        "db:seed": "tsx prisma/seed.ts"
     },
     "dependencies": {
         "@prisma/client": "^5.7.1"
     },
     "devDependencies": {
-        "prisma": "^5.7.1"
+        "@types/bcrypt": "^6.0.0",
+        "bcrypt": "^6.0.0",
+        "prisma": "^5.7.1",
+        "tsx": "^4.21.0"
     }
 }

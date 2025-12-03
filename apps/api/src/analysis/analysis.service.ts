@@ -65,7 +65,7 @@ export class AnalysisService {
      * Batch analyze multiple stocks
      */
     async analyzeMultipleStocks(stockIds: string[], timeframe: string = '1d') {
-        const results = [];
+        const results: any[] = [];
 
         for (const stockId of stockIds) {
             try {

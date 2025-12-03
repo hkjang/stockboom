@@ -182,9 +182,9 @@ export class IndicatorsService {
             if (!macdData) continue;
 
             let signal = 'HOLD';
-            if (macdData.MACD > macdData.signal) {
+            if ((macdData as any)?.MACD > (macdData as any)?.signal) {
                 signal = 'BUY';
-            } else if (macdData.MACD < macdData.signal) {
+            } else if ((macdData as any)?.MACD < (macdData as any)?.signal) {
                 signal = 'SELL';
             }
 

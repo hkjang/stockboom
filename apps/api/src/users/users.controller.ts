@@ -14,7 +14,7 @@ export class UsersController {
     @ApiOperation({ summary: 'Get current user information' })
     async getMe(@Request() req) {
         const user = await this.usersService.findById(req.user.userId);
-        const { passwordHash, twoFactorSecret, ...result } = user;
+        const { passwordHash, twoFactorSecret, ...result } = user as any;
         return result;
     }
 }

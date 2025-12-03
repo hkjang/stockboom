@@ -50,6 +50,7 @@ export class AiService {
         }
 
         try {
+            const startTime = Date.now();
             const prompt = this.buildAnalysisPrompt(news);
 
             const response = await this.openai.chat.completions.create({
@@ -79,12 +80,12 @@ Response format:
                 response_format: { type: 'json_object' },
             });
 
-            const result = JSON.parse(response.choices[0].message.content);
+            const result = JSON.parse(response.choices[0].message.content || '{}');
 
             // Save AI report
             await prisma.aIReport.create({
                 data: {
-                    stockId: news.stockId,
+                    stockId: news.stockId!,
                     newsId: news.id,
                     analysisType: 'NEWS_SUMMARY',
                     model: 'gpt-4',
@@ -133,7 +134,7 @@ Response format:
             take: limit,
         });
 
-        const reports = [];
+        const reports: any[] = [];
         let totalSentimentScore = 0;
         let totalRiskScore = 0;
 
@@ -148,13 +149,13 @@ Response format:
                 });
 
                 if (existingReport) {
-                    reports.push(existingReport);
-                    totalSentimentScore += Number(existingReport.results['sentimentScore'] || 0);
+                    reports.push(existingReport as any);
+                    totalSentimentScore += Number((existingReport.results as any)['sentimentScore'] || 0);
                     totalRiskScore += Number(existingReport.riskScore || 0);
                 } else {
                     // Analyze new
                     const analysis = await this.analyzeNews(news.id);
-                    reports.push(analysis);
+                    reports.push(analysis as any);
                     totalSentimentScore += analysis.sentimentScore;
                     totalRiskScore += analysis.riskScore;
                 }
@@ -258,7 +259,7 @@ ${latestIndicator ? JSON.stringify(latestIndicator.values, null, 2) : '데이터
             response_format: { type: 'json_object' },
         });
 
-        const report = JSON.parse(response.choices[0].message.content);
+        const report = JSON.parse(response.choices[0].message.content || '{}');
 
         // Save comprehensive report
         const startTime = Date.now();

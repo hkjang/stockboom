@@ -48,7 +48,7 @@ export class TradeTransactionService {
                         userId: params.userId,
                         stockId: params.stockId,
                         brokerAccountId: params.brokerAccountId,
-                        orderSide: params.orderSide,
+                        orderSide: params.orderSide as any,
                         quantity: params.quantity,
                         createdAt: {
                             gte: new Date(Date.now() - 5000), // Last 5 seconds
@@ -100,7 +100,7 @@ export class TradeTransactionService {
                         if (params.orderSide === 'BUY' && params.limitPrice) {
                             const estimatedCost = params.limitPrice * params.quantity;
 
-                            if (portfolio.cashBalance < estimatedCost) {
+                            if (portfolio.cashBalance.toNumber() < estimatedCost) {
                                 throw new BadRequestException('Insufficient cash balance');
                             }
 

@@ -1,0 +1,29 @@
+[32m[Nest] 8812  - [39m2025. 12. 03. ?ㅼ쟾 7:49:30 [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+[32m[Nest] 8812  - [39m2025. 12. 03. ?ㅼ쟾 7:49:30 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAppModule dependencies initialized[39m[38;5;3m +15ms[39m
+[32m[Nest] 8812  - [39m2025. 12. 03. ?ㅼ쟾 7:49:30 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mBullModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 8812  - [39m2025. 12. 03. ?ㅼ쟾 7:49:30 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPassportModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 8812  - [39m2025. 12. 03. ?ㅼ쟾 7:49:30 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mQueueModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 8812  - [39m2025. 12. 03. ?ㅼ쟾 7:49:30 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mBullBoardModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 8812  - [39m2025. 12. 03. ?ㅼ쟾 7:49:30 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mThrottlerModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 8812  - [39m2025. 12. 03. ?ㅼ쟾 7:49:30 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mHttpModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 8812  - [39m2025. 12. 03. ?ㅼ쟾 7:49:30 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigHostModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 8812  - [39m2025. 12. 03. ?ㅼ쟾 7:49:30 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mDiscoveryModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 8812  - [39m2025. 12. 03. ?ㅼ쟾 7:49:30 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mBullBoardRootModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 8812  - [39m2025. 12. 03. ?ㅼ쟾 7:49:30 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigModule dependencies initialized[39m[38;5;3m +4ms[39m
+[32m[Nest] 8812  - [39m2025. 12. 03. ?ㅼ쟾 7:49:30 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mBullModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 8812  - [39m2025. 12. 03. ?ㅼ쟾 7:49:30 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mScheduleModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 8812  - [39m2025. 12. 03. ?ㅼ쟾 7:49:30 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mBullModule dependencies initialized[39m[38;5;3m +3ms[39m
+[32m[Nest] 8812  - [39m2025. 12. 03. ?ㅼ쟾 7:49:30 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mBullModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 8812  - [39m2025. 12. 03. ?ㅼ쟾 7:49:30 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mBullModule dependencies initialized[39m[38;5;3m +0ms[39m
+[Nest] 8812  - 2025. 12. 03. ?ㅼ쟾 7:49:30   ERROR [ExceptionHandler] JwtStrategy requires a secret or key
+TypeError: JwtStrategy requires a secret or key
+    at new JwtStrategy (C:\Users\USER\projects\stockboom\node_modules\.pnpm\passport-jwt@4.0.1\node_modules\passport-jwt\lib\strategy.js:45:15)
+    at new MixinStrategy (C:\Users\USER\projects\stockboom\node_modules\.pnpm\@nestjs+passport@10.0.3_@ne_840f89bc494484ca153e4057c0a22327\node_modules\@nestjs\passport\dist\passport\passport.strategy.js:32:13)
+    at new JwtStrategy (C:\Users\USER\projects\stockboom\apps\api\dist\main.js:750:9)
+    at Injector.instantiateClass (C:\Users\USER\projects\stockboom\node_modules\.pnpm\@nestjs+core@10.4.20_@nestj_444d0da76b590789993eca3c0031d061\node_modules\@nestjs\core\injector\injector.js:373:19)
+    at callback (C:\Users\USER\projects\stockboom\node_modules\.pnpm\@nestjs+core@10.4.20_@nestj_444d0da76b590789993eca3c0031d061\node_modules\@nestjs\core\injector\injector.js:65:45)
+    at async Injector.resolveConstructorParams (C:\Users\USER\projects\stockboom\node_modules\.pnpm\@nestjs+core@10.4.20_@nestj_444d0da76b590789993eca3c0031d061\node_modules\@nestjs\core\injector\injector.js:145:24)
+    at async Injector.loadInstance (C:\Users\USER\projects\stockboom\node_modules\.pnpm\@nestjs+core@10.4.20_@nestj_444d0da76b590789993eca3c0031d061\node_modules\@nestjs\core\injector\injector.js:70:13)
+    at async Injector.loadProvider (C:\Users\USER\projects\stockboom\node_modules\.pnpm\@nestjs+core@10.4.20_@nestj_444d0da76b590789993eca3c0031d061\node_modules\@nestjs\core\injector\injector.js:98:9)
+    at async C:\Users\USER\projects\stockboom\node_modules\.pnpm\@nestjs+core@10.4.20_@nestj_444d0da76b590789993eca3c0031d061\node_modules\@nestjs\core\injector\instance-loader.js:56:13
+    at async Promise.all (index 4)

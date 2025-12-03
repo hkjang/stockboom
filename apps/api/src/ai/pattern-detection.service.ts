@@ -37,7 +37,7 @@ export class PatternDetectionService {
             };
         }
 
-        const anomalies = [];
+        const anomalies: any[] = [];
 
         // 1. Volume Anomaly Detection (Z-score method)
         const volumeAnomaly = this.detectVolumeAnomaly(candles);
@@ -69,7 +69,7 @@ export class PatternDetectionService {
 
         const hasAnomaly = anomalies.length > 0;
         const description = hasAnomaly
-            ? `Detected ${anomalies.length} anomalies: ${anomalies.map(a => a.type).join(', ')}`
+            ? `Detected ${anomalies.length} anomalies: ${anomalies.map((a: any) => a.type).join(', ')}`
             : 'No anomalies detected';
 
         return {
@@ -140,7 +140,7 @@ export class PatternDetectionService {
      */
     private detectVolatilitySpike(candles: any[]): any | null {
         // Calculate daily returns
-        const returns = [];
+        const returns: number[] = [];
         for (let i = 0; i < candles.length - 1; i++) {
             const currentClose = Number(candles[i].close);
             const previousClose = Number(candles[i + 1].close);
@@ -195,7 +195,7 @@ export class PatternDetectionService {
             };
         }
 
-        const patterns = [];
+        const patterns: any[] = [];
 
         // Detect Double Top/Bottom
         const doublePattern = this.detectDoublePattern(candles);
@@ -324,7 +324,7 @@ export class PatternDetectionService {
     }
 
     private findLocalMaxima(values: number[], window: number = 5): number[] {
-        const maxima = [];
+        const maxima: number[] = [];
         for (let i = window; i < values.length - window; i++) {
             let isMaxima = true;
             for (let j = i - window; j <= i + window; j++) {
@@ -341,7 +341,7 @@ export class PatternDetectionService {
     }
 
     private findLocalMinima(values: number[], window: number = 5): number[] {
-        const minima = [];
+        const minima: number[] = [];
         for (let i = window; i < values.length - window; i++) {
             let isMinima = true;
             for (let j = i - window; j <= i + window; j++) {

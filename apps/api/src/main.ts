@@ -8,6 +8,12 @@ import { AppModule } from './app.module';
 async function bootstrap() {
     const logger = new Logger('Bootstrap');
 
+    // Fix BigInt serialization for JSON responses
+    // @ts-ignore
+    BigInt.prototype.toJSON = function () {
+        return this.toString();
+    };
+
     const app = await NestFactory.create(AppModule, {
         logger: ['error', 'warn', 'log', 'debug', 'verbose'],
     });

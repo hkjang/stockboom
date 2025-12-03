@@ -204,7 +204,7 @@ export class AlertsService {
 
                     const isTriggered = await this.checkAlert(alert, {
                         symbol: conditions.symbol,
-                        changePercent: quote.changeRate,
+                        changePercent: (quote as any).changeRate || (quote as any).changePercent,
                         volume: quote.volume,
                     });
 

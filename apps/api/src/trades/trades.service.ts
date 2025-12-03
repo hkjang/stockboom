@@ -150,7 +150,7 @@ export class TradesService {
                 side: trade.orderSide,
                 quantity: trade.quantity,
                 orderType: trade.orderType === 'MARKET' ? 'MARKET' : 'LIMIT',
-                price: trade.limitPrice,
+                price: trade.limitPrice?.toNumber(),
             });
 
             if (orderResult.status === 'SUCCESS') {
@@ -237,8 +237,8 @@ export class TradesService {
         const buyTrades = trades.filter(t => t.orderSide === 'BUY');
         const sellTrades = trades.filter(t => t.orderSide === 'SELL');
 
-        const totalBuyAmount = buyTrades.reduce((sum, t) => sum + (t.totalAmount || 0), 0);
-        const totalSellAmount = sellTrades.reduce((sum, t) => sum + (t.totalAmount || 0), 0);
+        const totalBuyAmount = buyTrades.reduce((sum, t) => sum + (t.totalAmount?.toNumber() || 0), 0);
+        const totalSellAmount = sellTrades.reduce((sum, t) => sum + (t.totalAmount?.toNumber() || 0), 0);
 
         return {
             totalTrades,
@@ -303,7 +303,7 @@ export class TradesService {
         return prisma.trade.findUnique({
             where: { id: tradeId },
             include: { stock: true },
-        });
+        }) as Promise<Trade>;
     }
 
     /**

@@ -102,7 +102,7 @@ export class PortfoliosService {
         let totalPositionValue = 0;
 
         // Update each position with current price
-        for (const position of portfolio.positions) {
+        for (const position of (portfolio as any).positions) {
             const quote = await this.marketDataService.getQuote(
                 position.stock.symbol,
                 position.stock.market,
@@ -128,10 +128,10 @@ export class PortfoliosService {
         }
 
         // Update portfolio
-        const totalValue = portfolio.cashBalance + totalPositionValue;
+        const totalValue = portfolio.cashBalance.add(totalPositionValue);
         const initialValue = portfolio.cashBalance; // This should track initial capital
-        const totalReturn = totalValue - initialValue;
-        const totalReturnPct = (totalReturn / initialValue) * 100;
+        const totalReturn = totalValue.sub(initialValue);
+        const totalReturnPct = totalReturn.div(initialValue).mul(100);
 
         return prisma.portfolio.update({
             where: { id: portfolioId },
@@ -192,8 +192,8 @@ export class PortfoliosService {
         if (existingPosition) {
             // Update existing position (average price)
             const newQuantity = existingPosition.quantity + data.quantity;
-            const newTotalCost = existingPosition.totalCost + totalCost;
-            const newAvgPrice = newTotalCost / newQuantity;
+            const newTotalCost = existingPosition.totalCost.add(totalCost);
+            const newAvgPrice = newTotalCost.div(newQuantity);
 
             return prisma.position.update({
                 where: { id: existingPosition.id },
@@ -203,8 +203,8 @@ export class PortfoliosService {
                     totalCost: newTotalCost,
                     currentPrice,
                     marketValue: currentPrice * newQuantity,
-                    unrealizedPL: (currentPrice * newQuantity) - newTotalCost,
-                    unrealizedPLPct: ((currentPrice * newQuantity) - newTotalCost) / newTotalCost * 100,
+                    unrealizedPL: new Prisma.Decimal(currentPrice).mul(newQuantity).sub(newTotalCost),
+                    unrealizedPLPct: new Prisma.Decimal(currentPrice).mul(newQuantity).sub(newTotalCost).div(newTotalCost).mul(100),
                 },
                 include: {
                     stock: true,

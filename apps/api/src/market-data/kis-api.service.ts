@@ -230,4 +230,27 @@ export class KisApiService {
             throw error;
         }
     }
+    /**
+     * Get portfolio balance and positions
+     */
+    async getPortfolioData(accountNumber: string): Promise<{
+        cashBalance: number;
+        positions: Array<{
+            symbol: string;
+            name: string;
+            quantity: number;
+            avgPrice: number;
+            currentPrice: number;
+            market: string;
+        }>;
+    }> {
+        // TODO: Implement actual KIS API call for balance
+        // Endpoint: /uapi/domestic-stock/v1/trading/inquire-balance
+
+        // Return mock data for now to fix build
+        return {
+            cashBalance: 10000000,
+            positions: []
+        };
+    }
 }

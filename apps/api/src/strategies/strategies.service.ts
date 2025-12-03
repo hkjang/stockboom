@@ -187,7 +187,7 @@ export class StrategiesService {
         let capital = initialCapital;
         let position = 0;
         let positionPrice = 0;
-        const trades = [];
+        const trades: any[] = [];
 
         for (const candle of candles) {
             const evaluation = await this.evaluateStrategy(strategyId, stockId);
@@ -237,8 +237,8 @@ export class StrategiesService {
 
         const totalReturn = capital - initialCapital;
         const returnPct = (totalReturn / initialCapital) * 100;
-        const winningTrades = trades.filter(t => t.type === 'SELL' && t.profit > 0).length;
-        const losingTrades = trades.filter(t => t.type === 'SELL' && t.profit < 0).length;
+        const winningTrades = trades.filter((t: any) => t.type === 'SELL' && t.profit > 0).length;
+        const losingTrades = trades.filter((t: any) => t.type === 'SELL' && t.profit < 0).length;
         const winRate = winningTrades / (winningTrades + losingTrades) * 100;
 
         return {

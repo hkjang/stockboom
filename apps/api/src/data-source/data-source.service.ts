@@ -55,9 +55,16 @@ export class DataSourceService {
             config?: any;
         }
     ): Promise<DataSourceConfig> {
-        const updated = await prisma.dataSourceConfig.update({
+        const updated = await prisma.dataSourceConfig.upsert({
             where: { metricType },
-            data,
+            update: data,
+            create: {
+                metricType,
+                primarySource: data.primarySource || 'kis',
+                fallbackSources: data.fallbackSources || [],
+                isActive: data.isActive ?? true,
+                config: data.config,
+            },
         });
 
         // Invalidate cache

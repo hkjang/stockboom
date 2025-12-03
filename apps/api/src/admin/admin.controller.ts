@@ -1,6 +1,7 @@
 import { Controller, Get, Patch, Post, Put, Delete, Param, Body, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { AdminService } from './admin.service';
+import { DataSourceService } from '../data-source/data-source.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 // import { AdminGuard } from '../auth/guards/admin.guard'; // TODO: Implement admin role guard
 
@@ -9,7 +10,10 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 @UseGuards(JwtAuthGuard) // TODO: Add AdminGuard
 @ApiBearerAuth()
 export class AdminController {
-    constructor(private adminService: AdminService) { }
+    constructor(
+        private adminService: AdminService,
+        private dataSourceService: DataSourceService,
+    ) { }
 
     @Get('stats')
     @ApiOperation({ summary: 'Get system statistics' })
@@ -135,5 +139,33 @@ export class AdminController {
     @ApiOperation({ summary: 'Delete user API keys' })
     async deleteUserApiKeys(@Param('userId') userId: string) {
         return this.adminService.deleteUserApiKeys(userId);
+    }
+
+    // Data Sources Management
+    @Get('data-sources')
+    @ApiOperation({ summary: 'Get all data source configurations' })
+    async getDataSources() {
+        return this.dataSourceService.getAllConfigs();
+    }
+
+    @Put('data-sources/:metricType')
+    @ApiOperation({ summary: 'Update data source configuration' })
+    async updateDataSource(
+        @Param('metricType') metricType: string,
+        @Body() data: {
+            primarySource?: string;
+            fallbackSources?: string[];
+            isActive?: boolean;
+            config?: any;
+        }
+    ) {
+        return this.dataSourceService.updateConfig(metricType, data);
+    }
+
+    @Post('data-sources/initialize')
+    @ApiOperation({ summary: 'Initialize default data source configurations' })
+    async initializeDataSources() {
+        await this.dataSourceService.initializeDefaults();
+        return { success: true };
     }
 }

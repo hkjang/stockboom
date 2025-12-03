@@ -2,11 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
+import EditStrategyModal from '@/components/EditStrategyModal';
 import { Play, Pause, Trash2, Edit, TrendingUp } from 'lucide-react';
 
 export default function StrategiesPage() {
     const [loading, setLoading] = useState(true);
     const [strategies, setStrategies] = useState<any[]>([]);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [strategyToEdit, setStrategyToEdit] = useState<any>(null);
 
     useEffect(() => {
         fetchStrategies();
@@ -82,8 +85,8 @@ export default function StrategiesPage() {
                                         <p className="text-blue-300 text-sm">{strategy.description}</p>
                                     </div>
                                     <div className={`px-3 py-1 rounded-full text-xs font-semibold ${strategy.isActive
-                                            ? 'bg-green-600/20 text-green-400'
-                                            : 'bg-gray-600/20 text-gray-400'
+                                        ? 'bg-green-600/20 text-green-400'
+                                        : 'bg-gray-600/20 text-gray-400'
                                         }`}>
                                         {strategy.isActive ? '활성' : '비활성'}
                                     </div>
@@ -122,6 +125,16 @@ export default function StrategiesPage() {
 
                                 <div className="flex gap-2 pt-4 border-t border-white/10">
                                     <button
+                                        onClick={() => {
+                                            setStrategyToEdit(strategy);
+                                            setIsEditModalOpen(true);
+                                        }}
+                                        className="flex-1 px-4 py-2 bg-blue-600/20 text-blue-300 rounded-lg hover:bg-blue-600/30 transition flex items-center justify-center gap-2"
+                                    >
+                                        <Edit size={16} />
+                                        수정
+                                    </button>
+                                    <button
                                         onClick={() => handleDelete(strategy.id)}
                                         className="flex-1 px-4 py-2 bg-red-600/20 text-red-300 rounded-lg hover:bg-red-600/30 transition flex items-center justify-center gap-2"
                                     >
@@ -134,6 +147,20 @@ export default function StrategiesPage() {
                     </div>
                 )}
             </div>
+
+            <EditStrategyModal
+                isOpen={isEditModalOpen}
+                onClose={() => {
+                    setIsEditModalOpen(false);
+                    setStrategyToEdit(null);
+                }}
+                onSuccess={() => {
+                    fetchStrategies();
+                    setIsEditModalOpen(false);
+                    setStrategyToEdit(null);
+                }}
+                strategy={strategyToEdit}
+            />
         </DashboardLayout>
     );
 }

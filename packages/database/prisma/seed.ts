@@ -110,6 +110,18 @@ async function main() {
     const passwordHash = await bcrypt.hash('password123', 10);
 
     const users = await Promise.all([
+        // Admin user
+        prisma.user.create({
+            data: {
+                email: 'admin@stockboom.com',
+                passwordHash,
+                name: '관리자',
+                phone: '010-0000-0000',
+                emailVerified: true,
+                isActive: true,
+            },
+        }),
+        // Regular users
         prisma.user.create({
             data: {
                 email: 'trader1@example.com',
@@ -144,8 +156,9 @@ async function main() {
 
     console.log(`✅ Created ${users.length} users`);
 
-    // Create broker accounts and portfolios for each user
-    for (const [index, user] of users.entries()) {
+    // Create broker accounts and portfolios for regular users (skip admin)
+    const regularUsers = users.slice(1); // Skip admin user
+    for (const [index, user] of regularUsers.entries()) {
         console.log(`\n💼 Setting up data for ${user.name}...`);
 
         // Create broker account
@@ -375,18 +388,18 @@ async function main() {
 
     console.log('\n✅ Database seeding completed successfully!');
     console.log('\n📊 Summary:');
-    console.log(`   - Users: ${users.length}`);
+    console.log(`   - Users: ${users.length} (1 admin + ${users.length - 1} regular)`);
     console.log(`   - Stocks: ${stocks.length}`);
-    console.log(`   - Portfolios: ${users.length}`);
-    console.log(`   - Total positions: ${users.length * 3}`);
-    console.log(`   - Trades: ${users.length * 2}`);
-    console.log(`   - Strategies: ${users.length}`);
-    console.log(`   - Alerts: ${users.length * 2}`);
+    console.log(`   - Portfolios: ${regularUsers.length}`);
+    console.log(`   - Total positions: ${regularUsers.length * 3}`);
+    console.log(`   - Trades: ${regularUsers.length * 2}`);
+    console.log(`   - Strategies: ${regularUsers.length}`);
+    console.log(`   - Alerts: ${regularUsers.length * 2}`);
     console.log(`   - News articles: 2`);
     console.log(`   - AI reports: 1`);
     console.log('\n🔐 Test account credentials:');
-    console.log('   Email: trader1@example.com, trader2@example.com, trader3@example.com');
-    console.log('   Password: password123');
+    console.log('   Admin: admin@stockboom.com / password123');
+    console.log('   Users: trader1@example.com, trader2@example.com, trader3@example.com / password123');
 }
 
 main()

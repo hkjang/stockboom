@@ -2,11 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
+import EditAlertModal from '@/components/EditAlertModal';
 import { Bell, BellOff, Trash2, Edit } from 'lucide-react';
 
 export default function AlertsPage() {
     const [loading, setLoading] = useState(true);
     const [alerts, setAlerts] = useState<any[]>([]);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [alertToEdit, setAlertToEdit] = useState<any>(null);
 
     useEffect(() => {
         fetchAlerts();
@@ -99,8 +102,8 @@ export default function AlertsPage() {
                                         </div>
                                     </div>
                                     <div className={`px-3 py-1 rounded-full text-xs font-semibold ${alert.isActive
-                                            ? 'bg-green-600/20 text-green-400'
-                                            : 'bg-gray-600/20 text-gray-400'
+                                        ? 'bg-green-600/20 text-green-400'
+                                        : 'bg-gray-600/20 text-gray-400'
                                         }`}>
                                         {alert.isActive ? '활성' : '비활성'}
                                     </div>
@@ -127,6 +130,16 @@ export default function AlertsPage() {
 
                                 <div className="flex gap-2 pt-4 border-t border-white/10">
                                     <button
+                                        onClick={() => {
+                                            setAlertToEdit(alert);
+                                            setIsEditModalOpen(true);
+                                        }}
+                                        className="flex-1 px-4 py-2 bg-blue-600/20 text-blue-300 rounded-lg hover:bg-blue-600/30 transition flex items-center justify-center gap-2"
+                                    >
+                                        <Edit size={16} />
+                                        수정
+                                    </button>
+                                    <button
                                         onClick={() => handleDelete(alert.id)}
                                         className="flex-1 px-4 py-2 bg-red-600/20 text-red-300 rounded-lg hover:bg-red-600/30 transition flex items-center justify-center gap-2"
                                     >
@@ -139,6 +152,20 @@ export default function AlertsPage() {
                     </div>
                 )}
             </div>
+
+            <EditAlertModal
+                isOpen={isEditModalOpen}
+                onClose={() => {
+                    setIsEditModalOpen(false);
+                    setAlertToEdit(null);
+                }}
+                onSuccess={() => {
+                    fetchAlerts();
+                    setIsEditModalOpen(false);
+                    setAlertToEdit(null);
+                }}
+                alert={alertToEdit}
+            />
         </DashboardLayout>
     );
 }

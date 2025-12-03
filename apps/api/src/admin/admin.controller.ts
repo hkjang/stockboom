@@ -5,6 +5,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 // import { AdminGuard } from '../auth/guards/admin.guard'; // TODO: Implement admin role guard
 
 @ApiTags('Admin')
+@ApiTags('Admin')
 @Controller('admin')
 @UseGuards(JwtAuthGuard) // TODO: Add AdminGuard
 @ApiBearerAuth()
@@ -26,6 +27,7 @@ export class AdminController {
     @Get('queues')
     @ApiOperation({ summary: 'Get queue status' })
     async getQueues() {
+        console.log('AdminController.getQueues called');
         return this.adminService.getQueueStatus();
     }
 

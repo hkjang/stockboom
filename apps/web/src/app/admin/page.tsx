@@ -3,7 +3,17 @@
 import useSWR from 'swr';
 import { Card } from '@/components/ui/Card';
 
-const fetcher = (url: string) => fetch(url).then(res => res.json());
+const fetcher = (url: string) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    return fetch(url, {
+        headers: {
+            'Authorization': token ? `Bearer ${token}` : '',
+        }
+    }).then(res => {
+        if (!res.ok) throw new Error('Failed to fetch');
+        return res.json();
+    });
+};
 
 function StatCard({ title, value, icon }: { title: string; value: string | number; icon: string }) {
     return (
@@ -81,8 +91,8 @@ export default function AdminDashboard() {
                                     </p>
                                 </div>
                                 <span className={`text-sm font-semibold ${trade.status === 'FILLED' ? 'text-green-600' :
-                                        trade.status === 'REJECTED' ? 'text-red-600' :
-                                            'text-yellow-600'
+                                    trade.status === 'REJECTED' ? 'text-red-600' :
+                                        'text-yellow-600'
                                     }`}>
                                     {trade.status}
                                 </span>

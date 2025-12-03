@@ -14,6 +14,7 @@ import { AlertsModule } from './alerts/alerts.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { MarketDataModule } from './market-data/market-data.module';
 import { QueueModule } from './queue/queue.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
     imports: [
@@ -55,6 +56,7 @@ import { QueueModule } from './queue/queue.module';
         NotificationsModule,
         MarketDataModule,
         QueueModule,
+        AdminModule,
     ],
 })
 export class AppModule { }

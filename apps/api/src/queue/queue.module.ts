@@ -23,10 +23,11 @@ import { BullAdapter } from '@bull-board/api/bullAdapter';
         ),
 
         // Bull Board for monitoring
-        BullBoardModule.forRoot({
-            route: '/queues',
-            adapter: ExpressAdapter,
-        }),
+        // BullBoardModule.forRoot({
+        //     route: '/monitor/queues',
+        //     adapter: ExpressAdapter,
+        // }),
     ],
+    exports: [BullModule], // Export BullModule so other modules can inject queues
 })
 export class QueueModule { }

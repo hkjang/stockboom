@@ -57,7 +57,7 @@ export default function QueueManagement() {
 
             {/* Queue Overview */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {queues?.map((queue: any) => (
+                {Array.isArray(queues) && queues.map((queue: any) => (
                     <Card key={queue.name}>
                         <div className="mb-3">
                             <div className="flex justify-between items-start">

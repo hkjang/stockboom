@@ -132,10 +132,9 @@ export class AdminService {
                 email: true,
                 name: true,
                 twoFactorEnabled: true,
+                isActive: true,
                 createdAt: true,
                 lastLoginAt: true,
-                // isActive field doesn't exist in schema, using placeholder
-                // TODO: Add isActive field to User model
             },
             orderBy: { createdAt: 'desc' },
         });

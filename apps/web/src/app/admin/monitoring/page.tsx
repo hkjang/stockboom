@@ -1,19 +1,124 @@
 'use client';
 
+import { useState } from 'react';
 import useSWR from 'swr';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 
-const fetcher = (url: string) => fetch(url).then(res => res.json());
+const fetcher = async (url: string) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const res = await fetch(url, {
+        headers: {
+            'Authorization': token ? `Bearer ${token}` : '',
+        }
+    });
+
+    if (res.status === 401) {
+        if (typeof window !== 'undefined') {
+            window.location.href = '/auth/login';
+        }
+        throw new Error('Unauthorized');
+    }
+
+    if (!res.ok) throw new Error('Failed to fetch');
+    return res.json();
+};
+
+function FailedJobsModal({ queueName, isOpen, onClose }: { queueName: string | null, isOpen: boolean, onClose: () => void }) {
+    const { data: failedJobs, mutate } = useSWR(
+        isOpen && queueName ? `/api/admin/queues/${queueName}/failed` : null,
+        fetcher
+    );
+
+    const handleRetry = async (jobId: string) => {
+        try {
+            const token = localStorage.getItem('token');
+            await fetch(`/api/admin/queues/${queueName}/jobs/${jobId}/retry`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': token ? `Bearer ${token}` : '',
+                }
+            });
+            mutate(); // Refresh list
+            alert('작업이 재시도 큐에 추가되었습니다.');
+        } catch (error) {
+            console.error('Retry failed:', error);
+            alert('재시도 요청 실패');
+        }
+    };
+
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[80vh] flex flex-col">
+                <div className="p-4 border-b flex justify-between items-center">
+                    <h2 className="text-xl font-bold">실패한 작업 목록: {queueName}</h2>
+                    <button onClick={onClose} className="text-gray-500 hover:text-gray-700">✕</button>
+                </div>
+                <div className="p-4 overflow-y-auto flex-1">
+                    {!failedJobs ? (
+                        <p>로딩 중...</p>
+                    ) : failedJobs.length === 0 ? (
+                        <p className="text-center text-gray-500">실패한 작업이 없습니다.</p>
+                    ) : (
+                        <div className="space-y-4">
+                            {failedJobs.map((job: any) => (
+                                <div key={job.id} className="border rounded p-4 bg-red-50">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <div>
+                                            <span className="font-bold text-lg">Job #{job.id}</span>
+                                            <span className="text-sm text-gray-500 ml-2">
+                                                {new Date(job.timestamp).toLocaleString()}
+                                            </span>
+                                        </div>
+                                        <button
+                                            onClick={() => handleRetry(job.id)}
+                                            className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+                                        >
+                                            재시도
+                                        </button>
+                                    </div>
+                                    <div className="bg-white p-2 rounded border text-sm font-mono overflow-x-auto">
+                                        <p className="font-bold text-red-600 mb-1">{job.failedReason}</p>
+                                        <pre className="text-xs text-gray-600 whitespace-pre-wrap">
+                                            {job.stacktrace ? job.stacktrace[0] : 'No stacktrace'}
+                                        </pre>
+                                    </div>
+                                    <div className="mt-2 text-xs text-gray-500">
+                                        Data: {JSON.stringify(job.data)}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+                <div className="p-4 border-t text-right">
+                    <button onClick={onClose} className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
+                        닫기
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
 
 export default function AdminMonitoring() {
     const { data: metrics } = useSWR('/api/admin/metrics', fetcher, {
-        refreshInterval: 5000, // 5초마다 갱신
+        refreshInterval: 5000,
     });
 
     const { data: queues } = useSWR('/api/admin/queues', fetcher, {
-        refreshInterval: 3000, // 3초마다 갱신
+        refreshInterval: 3000,
     });
+
+    const [selectedQueue, setSelectedQueue] = useState<string | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const openFailedJobs = (queueName: string) => {
+        setSelectedQueue(queueName);
+        setIsModalOpen(true);
+    };
 
     return (
         <div className="space-y-6">
@@ -27,8 +132,8 @@ export default function AdminMonitoring() {
                         <div className="w-full bg-gray-200 rounded-full h-2 mt-4">
                             <div
                                 className={`h-2 rounded-full ${(metrics?.cpu || 0) > 80 ? 'bg-red-500' :
-                                        (metrics?.cpu || 0) > 60 ? 'bg-yellow-500' :
-                                            'bg-green-500'
+                                    (metrics?.cpu || 0) > 60 ? 'bg-yellow-500' :
+                                        'bg-green-500'
                                     }`}
                                 style={{ width: `${metrics?.cpu || 0}%` }}
                             />
@@ -42,8 +147,8 @@ export default function AdminMonitoring() {
                         <div className="w-full bg-gray-200 rounded-full h-2 mt-4">
                             <div
                                 className={`h-2 rounded-full ${(metrics?.memory || 0) > 80 ? 'bg-red-500' :
-                                        (metrics?.memory || 0) > 60 ? 'bg-yellow-500' :
-                                            'bg-green-500'
+                                    (metrics?.memory || 0) > 60 ? 'bg-yellow-500' :
+                                        'bg-green-500'
                                     }`}
                                 style={{ width: `${metrics?.memory || 0}%` }}
                             />
@@ -57,8 +162,8 @@ export default function AdminMonitoring() {
                         <div className="w-full bg-gray-200 rounded-full h-2 mt-4">
                             <div
                                 className={`h-2 rounded-full ${(metrics?.disk || 0) > 80 ? 'bg-red-500' :
-                                        (metrics?.disk || 0) > 60 ? 'bg-yellow-500' :
-                                            'bg-green-500'
+                                    (metrics?.disk || 0) > 60 ? 'bg-yellow-500' :
+                                        'bg-green-500'
                                     }`}
                                 style={{ width: `${metrics?.disk || 0}%` }}
                             />
@@ -70,13 +175,13 @@ export default function AdminMonitoring() {
             {/* Queue Monitoring */}
             <Card title="큐 상태">
                 <div className="space-y-4">
-                    {queues?.map((queue: any) => (
+                    {Array.isArray(queues) && queues.map((queue: any) => (
                         <div key={queue.name} className="border-b pb-4 last:border-0">
                             <div className="flex justify-between items-start mb-2">
                                 <div>
                                     <h3 className="font-semibold text-lg">{queue.name}</h3>
                                     <p className="text-sm text-gray-500">
-                                        총 작업: {queue.waiting + queue.active + queue.completed + queue.failed}
+                                        총 작업: {(queue.waiting || 0) + (queue.active || 0) + (queue.completed || 0) + (queue.failed || 0)}
                                     </p>
                                 </div>
                                 <Badge
@@ -90,30 +195,33 @@ export default function AdminMonitoring() {
                             <div className="grid grid-cols-4 gap-3 text-sm">
                                 <div className="text-center">
                                     <p className="text-gray-600">대기</p>
-                                    <p className="text-xl font-bold text-yellow-600">{queue.waiting}</p>
+                                    <p className="text-xl font-bold text-yellow-600">{queue.waiting || 0}</p>
                                 </div>
                                 <div className="text-center">
                                     <p className="text-gray-600">처리 중</p>
-                                    <p className="text-xl font-bold text-blue-600">{queue.active}</p>
+                                    <p className="text-xl font-bold text-blue-600">{queue.active || 0}</p>
                                 </div>
                                 <div className="text-center">
                                     <p className="text-gray-600">완료</p>
-                                    <p className="text-xl font-bold text-green-600">{queue.completed}</p>
+                                    <p className="text-xl font-bold text-green-600">{queue.completed || 0}</p>
                                 </div>
-                                <div className="text-center">
-                                    <p className="text-gray-600">실패</p>
-                                    <p className="text-xl font-bold text-red-600">{queue.failed}</p>
+                                <div className="text-center cursor-pointer hover:bg-red-50 rounded p-1 transition" onClick={() => openFailedJobs(queue.name)}>
+                                    <p className="text-gray-600">실패 (클릭)</p>
+                                    <p className="text-xl font-bold text-red-600">{queue.failed || 0}</p>
                                 </div>
                             </div>
                         </div>
                     ))}
+                    {(!Array.isArray(queues) || queues.length === 0) && (
+                        <p className="text-center text-gray-500 py-4">큐 데이터가 없습니다.</p>
+                    )}
                 </div>
             </Card>
 
             {/* Error Logs */}
             <Card title="최근 에러 로그">
                 <div className="space-y-2 max-h-96 overflow-y-auto">
-                    {metrics?.errorLogs?.map((log: any, index: number) => (
+                    {Array.isArray(metrics?.errorLogs) && metrics.errorLogs.map((log: any, index: number) => (
                         <div key={index} className="p-3 bg-red-50 border-l-4 border-red-500 rounded">
                             <div className="flex justify-between items-start">
                                 <div className="flex-1">
@@ -126,11 +234,17 @@ export default function AdminMonitoring() {
                             </div>
                         </div>
                     ))}
-                    {(!metrics?.errorLogs || metrics.errorLogs.length === 0) && (
+                    {(!Array.isArray(metrics?.errorLogs) || metrics.errorLogs.length === 0) && (
                         <p className="text-center text-gray-500 py-4">에러 로그가 없습니다.</p>
                     )}
                 </div>
             </Card>
+
+            <FailedJobsModal
+                queueName={selectedQueue}
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+            />
         </div>
     );
 }

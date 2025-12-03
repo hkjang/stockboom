@@ -5,22 +5,38 @@ import useSWR from 'swr';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 
-const fetcher = (url: string) => fetch(url).then(res => res.json());
+const fetcher = (url: string) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    return fetch(url, {
+        headers: {
+            'Authorization': token ? `Bearer ${token}` : '',
+        }
+    }).then(res => {
+        if (!res.ok) throw new Error('Failed to fetch');
+        return res.json();
+    });
+};
 
 export default function AdminUsers() {
     const [searchTerm, setSearchTerm] = useState('');
     const { data: users, mutate } = useSWR('/api/admin/users', fetcher);
 
-    const filteredUsers = users?.filter((user: any) =>
-        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.name?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredUsers = Array.isArray(users)
+        ? users.filter((user: any) =>
+            user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.name?.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        : [];
 
     const handleToggleStatus = async (userId: string, isActive: boolean) => {
         try {
+            const token = localStorage.getItem('token');
             await fetch(`/api/admin/users/${userId}`, {
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token ? `Bearer ${token}` : '',
+                },
                 body: JSON.stringify({ isActive: !isActive }),
             });
             mutate();

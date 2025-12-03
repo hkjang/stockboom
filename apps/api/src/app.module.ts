@@ -15,6 +15,9 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { MarketDataModule } from './market-data/market-data.module';
 import { QueueModule } from './queue/queue.module';
 import { AdminModule } from './admin/admin.module';
+import { DataSourceModule } from './data-source/data-source.module';
+import { CommonModule } from './common/common.module';
+import { UserApiKeysModule } from './user-api-keys/user-api-keys.module';
 
 @Module({
     imports: [
@@ -44,6 +47,9 @@ import { AdminModule } from './admin/admin.module';
             }),
         }),
 
+        // Common modules
+        CommonModule,
+
         // Feature modules
         AuthModule,
         UsersModule,
@@ -57,6 +63,8 @@ import { AdminModule } from './admin/admin.module';
         MarketDataModule,
         QueueModule,
         AdminModule,
+        DataSourceModule,
+        UserApiKeysModule,
     ],
 })
 export class AppModule { }

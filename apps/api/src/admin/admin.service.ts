@@ -5,6 +5,7 @@ import { prisma } from '@stockboom/database';
 import * as os from 'os';
 import * as bcrypt from 'bcryptjs';
 import * as crypto from 'crypto';
+import { UserApiKeysService, UserApiKeysDto } from '../user-api-keys/user-api-keys.service';
 
 @Injectable()
 export class AdminService {
@@ -13,6 +14,7 @@ export class AdminService {
         @InjectQueue('analysis') private analysisQueue: Queue,
         @InjectQueue('data-collection') private dataCollectionQueue: Queue,
         @InjectQueue('notification') private notificationQueue: Queue,
+        private userApiKeysService: UserApiKeysService,
     ) { }
 
     /**
@@ -291,5 +293,171 @@ export class AdminService {
     private async getRecentErrors(since: Date) {
         // Placeholder - implement with proper logging system
         return [];
+    }
+
+    /**
+     * Bulk create stocks
+     */
+    async bulkCreateStocks(stocks: any[]) {
+        const results: {
+            success: any[];
+            failed: Array<{ data: any; error: string }>;
+        } = {
+            success: [],
+            failed: [],
+        };
+
+        for (const stockData of stocks) {
+            try {
+                const stock = await prisma.stock.upsert({
+                    where: { symbol: stockData.symbol },
+                    update: stockData,
+                    create: stockData,
+                });
+                results.success.push(stock);
+            } catch (error: any) {
+                results.failed.push({
+                    data: stockData,
+                    error: error.message,
+                });
+            }
+        }
+
+        return results;
+    }
+
+    /**
+     * Sync stocks from OpenDart
+     * TODO: Implement actual OpenDart integration
+     */
+    async syncStocksFromOpenDart(corpCodes?: string[]) {
+        // This will be implemented when OpenDartService is integrated
+        return {
+            message: 'OpenDart sync not yet implemented',
+            corpCodes: corpCodes || [],
+        };
+    }
+
+    /**
+     * Get all stocks for admin management
+     */
+    /**
+     * Get all stocks for admin management with data collection stats
+     */
+    async getAllStocks(params?: {
+        skip?: number;
+        take?: number;
+        search?: string;
+    }) {
+        const { skip, take, search } = params || {};
+
+        const where = search ? {
+            OR: [
+                { symbol: { contains: search, mode: 'insensitive' as any } },
+                { name: { contains: search, mode: 'insensitive' as any } },
+                { corpName: { contains: search, mode: 'insensitive' as any } },
+            ],
+        } : {};
+
+        const [stocks, total] = await Promise.all([
+            prisma.stock.findMany({
+                where,
+                skip,
+                take: take || 50,
+                orderBy: { createdAt: 'desc' },
+            }),
+            prisma.stock.count({ where }),
+        ]);
+
+        // Fetch stats for each stock (in parallel)
+        const stocksWithStats = await Promise.all(stocks.map(async (stock) => {
+            const [
+                candleStats,
+                indicatorStats,
+                newsStats,
+                aiReportStats
+            ] = await Promise.all([
+                // Candles
+                prisma.candle.aggregate({
+                    where: { stockId: stock.id },
+                    _count: true,
+                    _max: { timestamp: true }
+                }),
+                // Indicators
+                prisma.indicator.aggregate({
+                    where: { stockId: stock.id },
+                    _count: true,
+                    _max: { timestamp: true }
+                }),
+                // News
+                prisma.news.aggregate({
+                    where: { stockId: stock.id },
+                    _count: true,
+                    _max: { publishedAt: true }
+                }),
+                // AI Reports
+                prisma.aIReport.aggregate({
+                    where: { stockId: stock.id },
+                    _count: true,
+                    _max: { createdAt: true }
+                })
+            ]);
+
+            return {
+                ...stock,
+                stats: {
+                    candles: {
+                        count: candleStats._count,
+                        lastUpdated: candleStats._max.timestamp
+                    },
+                    indicators: {
+                        count: indicatorStats._count,
+                        lastUpdated: indicatorStats._max.timestamp
+                    },
+                    news: {
+                        count: newsStats._count,
+                        lastUpdated: newsStats._max.publishedAt
+                    },
+                    aiReports: {
+                        count: aiReportStats._count,
+                        lastUpdated: aiReportStats._max.createdAt
+                    }
+                }
+            };
+        }));
+
+        return { stocks: stocksWithStats, total };
+    }
+
+    /**
+     * Delete stock
+     */
+    async deleteStock(stockId: string) {
+        return prisma.stock.delete({
+            where: { id: stockId },
+        });
+    }
+
+    /**
+     * Get user API keys (masked)
+     */
+    async getUserApiKeys(userId: string) {
+        return this.userApiKeysService.getMaskedKeys(userId, userId, true);
+    }
+
+    /**
+     * Update user API keys
+     */
+    async updateUserApiKeys(userId: string, data: UserApiKeysDto) {
+        await this.userApiKeysService.updateKeys(userId, data, userId, true);
+        return { success: true, message: 'User API keys updated' };
+    }
+
+    /**
+     * Delete user API keys
+     */
+    async deleteUserApiKeys(userId: string) {
+        await this.userApiKeysService.deleteKeys(userId, userId, true);
+        return { success: true, message: 'User API keys deleted' };
     }
 }

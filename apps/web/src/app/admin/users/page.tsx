@@ -115,11 +115,19 @@ function EditUserModal({ user, isOpen, onClose, onSave }: { user: any, isOpen: b
     );
 }
 
+import AdminUserApiKeysDialog from './AdminUserApiKeysDialog';
+
+// ... (existing imports)
+
 export default function AdminUsers() {
     const [searchTerm, setSearchTerm] = useState('');
     const { data: users, mutate } = useSWR('/api/admin/users', fetcher);
     const [editingUser, setEditingUser] = useState<any>(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+    // API Key Dialog State
+    const [apiKeyUser, setApiKeyUser] = useState<any>(null);
+    const [isApiKeyDialogOpen, setIsApiKeyDialogOpen] = useState(false);
 
     const filteredUsers = Array.isArray(users)
         ? users.filter((user: any) =>
@@ -129,6 +137,7 @@ export default function AdminUsers() {
         : [];
 
     const handleToggleStatus = async (userId: string, isActive: boolean) => {
+        // ... (existing implementation)
         try {
             const token = localStorage.getItem('token');
             await fetch(`/api/admin/users/${userId}`, {
@@ -147,6 +156,7 @@ export default function AdminUsers() {
     };
 
     const handleDelete = async (userId: string) => {
+        // ... (existing implementation)
         if (!confirm('정말로 이 사용자를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
 
         try {
@@ -170,7 +180,13 @@ export default function AdminUsers() {
         setIsEditModalOpen(true);
     };
 
+    const handleApiKeyClick = (user: any) => {
+        setApiKeyUser(user);
+        setIsApiKeyDialogOpen(true);
+    };
+
     const handleSaveUser = async (data: any) => {
+        // ... (existing implementation)
         if (!editingUser) return;
         try {
             const token = localStorage.getItem('token');
@@ -271,6 +287,12 @@ export default function AdminUsers() {
                                     </td>
                                     <td className="px-6 py-4 text-right text-sm font-medium space-x-2">
                                         <button
+                                            onClick={() => handleApiKeyClick(user)}
+                                            className="text-green-600 hover:text-green-900"
+                                        >
+                                            API Key
+                                        </button>
+                                        <button
                                             onClick={() => handleToggleStatus(user.id, user.isActive)}
                                             className="text-blue-600 hover:text-blue-900"
                                         >
@@ -301,6 +323,12 @@ export default function AdminUsers() {
                 isOpen={isEditModalOpen}
                 onClose={() => setIsEditModalOpen(false)}
                 onSave={handleSaveUser}
+            />
+
+            <AdminUserApiKeysDialog
+                userId={apiKeyUser?.id || null}
+                isOpen={isApiKeyDialogOpen}
+                onClose={() => setIsApiKeyDialogOpen(false)}
             />
         </div>
     );

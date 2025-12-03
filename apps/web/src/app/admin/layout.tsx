@@ -14,6 +14,8 @@ export default function AdminLayout({
     const navigation = [
         { name: '대시보드', href: '/admin', icon: '📊' },
         { name: '사용자 관리', href: '/admin/users', icon: '👥' },
+        { name: '종목 관리', href: '/admin/stocks', icon: '📈' },
+        { name: '데이터 소스', href: '/admin/data-sources', icon: '🔌' },
         { name: '시스템 모니터링', href: '/admin/monitoring', icon: '🖥️' },
         { name: '큐 관리', href: '/admin/queues', icon: '📋' },
     ];
@@ -44,8 +46,8 @@ export default function AdminLayout({
                                         key={item.name}
                                         href={item.href}
                                         className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${isActive
-                                                ? 'bg-blue-50 text-blue-700'
-                                                : 'text-gray-700 hover:bg-gray-50'
+                                            ? 'bg-blue-50 text-blue-700'
+                                            : 'text-gray-700 hover:bg-gray-50'
                                             }`}
                                     >
                                         <span className="mr-3 text-xl">{item.icon}</span>

@@ -1,10 +1,9 @@
-import { Controller, Get, Patch, Post, Delete, Param, Body, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Patch, Post, Put, Delete, Param, Body, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { AdminService } from './admin.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 // import { AdminGuard } from '../auth/guards/admin.guard'; // TODO: Implement admin role guard
 
-@ApiTags('Admin')
 @ApiTags('Admin')
 @Controller('admin')
 @UseGuards(JwtAuthGuard) // TODO: Add AdminGuard
@@ -83,5 +82,58 @@ export class AdminController {
     @ApiOperation({ summary: 'Clear completed jobs from queue' })
     async clearCompleted(@Param('queueName') queueName: string) {
         return this.adminService.clearCompletedJobs(queueName);
+    }
+
+    @Get('stocks')
+    @ApiOperation({ summary: 'Get all stocks' })
+    async getStocks(
+        @Query('skip') skip?: string,
+        @Query('take') take?: string,
+        @Query('search') search?: string,
+    ) {
+        return this.adminService.getAllStocks({
+            skip: skip ? parseInt(skip) : undefined,
+            take: take ? parseInt(take) : undefined,
+            search,
+        });
+    }
+
+    @Post('stocks/bulk')
+    @ApiOperation({ summary: 'Bulk create stocks' })
+    async bulkCreateStocks(@Body() data: { stocks: any[] }) {
+        return this.adminService.bulkCreateStocks(data.stocks);
+    }
+
+    @Post('stocks/sync-opendart')
+    @ApiOperation({ summary: 'Sync stocks from OpenDart' })
+    async syncFromOpenDart(@Body() data: { corpCodes?: string[] }) {
+        return this.adminService.syncStocksFromOpenDart(data.corpCodes);
+    }
+
+    @Delete('stocks/:stockId')
+    @ApiOperation({ summary: 'Delete stock' })
+    async deleteStock(@Param('stockId') stockId: string) {
+        return this.adminService.deleteStock(stockId);
+    }
+
+    @Get('users/:userId/api-keys')
+    @ApiOperation({ summary: 'Get user API keys (masked)' })
+    async getUserApiKeys(@Param('userId') userId: string) {
+        return this.adminService.getUserApiKeys(userId);
+    }
+
+    @Put('users/:userId/api-keys')
+    @ApiOperation({ summary: 'Update user API keys' })
+    async updateUserApiKeys(
+        @Param('userId') userId: string,
+        @Body() data: any
+    ) {
+        return this.adminService.updateUserApiKeys(userId, data);
+    }
+
+    @Delete('users/:userId/api-keys')
+    @ApiOperation({ summary: 'Delete user API keys' })
+    async deleteUserApiKeys(@Param('userId') userId: string) {
+        return this.adminService.deleteUserApiKeys(userId);
     }
 }

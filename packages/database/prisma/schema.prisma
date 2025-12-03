@@ -39,6 +39,7 @@ model User {
   notifications     Notification[]
   trades            Trade[]
   pushSubscriptions PushSubscription[]
+  apiKeys           UserApiKeys?
   
   @@map("users")
 }
@@ -93,6 +94,24 @@ model Stock {
   market        String    // "KOSPI", "KOSDAQ", etc.
   sector        String?
   
+  // OpenDart Company Information
+  corpCode      String?   // OpenDart unique corporation code
+  stockCode     String?   // OpenDart standard stock code
+  corpName      String?   // Official corporation name
+  corpNameEng   String?   // English corporation name
+  ceoName       String?   // CEO name
+  corpCls       String?   // Corporation class (Y: KOSPI, K: KOSDAQ, N: KONEX, E: ETC)
+  jurir         String?   // Corporate registration number
+  bizr          String?   // Business registration number
+  address       String?   // HQ address
+  homePage      String?   // Website
+  irUrl         String?   // IR page URL
+  phoneNumber   String?   // Phone number
+  faxNumber     String?   // Fax number
+  indutyCode    String?   // Industry code
+  estDate       String?   // Establishment date
+  accMonth      String?   // Fiscal month
+  
   // Market Data
   currentPrice  Decimal?  @db.Decimal(15, 2)
   openPrice     Decimal?  @db.Decimal(15, 2)
@@ -120,6 +139,7 @@ model Stock {
   
   @@index([symbol])
   @@index([market])
+  @@index([corpCode])
   @@map("stocks")
 }
 
@@ -540,5 +560,65 @@ model PushSubscription {
   
   @@index([userId])
   @@map("push_subscriptions")
+}
+
+// ============================================
+// User API Keys (Encrypted)
+// ============================================
+
+model UserApiKeys {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // KIS API Keys (Encrypted)
+  kisAppKey       String?  // Encrypted
+  kisAppSecret    String?  // Encrypted
+  kisAccountNumber String?
+  kisMockMode     Boolean  @default(true)
+  
+  // OpenDart API Key (Encrypted)
+  openDartApiKey  String?  // Encrypted
+  
+  // Yahoo Finance (보통 API 키 불필요, future use)
+  yahooApiKey     String?  // Encrypted
+  
+  // Status
+  isActive        Boolean  @default(true)
+  
+  // Metadata
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  lastUsedAt      DateTime?
+  
+  @@index([userId])
+  @@map("user_api_keys")
+}
+
+// ============================================
+// Data Source Configuration
+// ============================================
+
+model DataSourceConfig {
+  id              String   @id @default(cuid())
+  
+  // Metric Type
+  metricType      String   @unique  // 'price', 'volume', 'candles', 'financials', 'company_info'
+  
+  // Data Sources
+  primarySource   String   // 'kis', 'yahoo', 'opendart'
+  fallbackSources String[] // Ordered list of backup sources
+  
+  // Status
+  isActive        Boolean  @default(true)
+  
+  // Additional configuration (JSON)
+  config          Json?    // API keys, parameters, custom settings
+  
+  // Metadata
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("data_source_configs")
 }
 

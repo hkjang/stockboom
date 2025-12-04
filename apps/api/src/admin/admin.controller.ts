@@ -115,6 +115,18 @@ export class AdminController {
         return this.adminService.syncStocksFromOpenDart(data.corpCodes);
     }
 
+    @Get('stocks/:stockId')
+    @ApiOperation({ summary: 'Get stock by ID with all fields' })
+    async getStockById(@Param('stockId') stockId: string) {
+        return this.adminService.getStockById(stockId);
+    }
+
+    @Patch('stocks/:stockId')
+    @ApiOperation({ summary: 'Update stock' })
+    async updateStock(@Param('stockId') stockId: string, @Body() data: any) {
+        return this.adminService.updateStock(stockId, data);
+    }
+
     @Delete('stocks/:stockId')
     @ApiOperation({ summary: 'Delete stock' })
     async deleteStock(@Param('stockId') stockId: string) {

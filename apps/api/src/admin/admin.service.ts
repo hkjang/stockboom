@@ -436,6 +436,31 @@ export class AdminService {
     }
 
     /**
+     * Get stock by ID with all fields
+     */
+    async getStockById(stockId: string) {
+        const stock = await prisma.stock.findUnique({
+            where: { id: stockId },
+        });
+
+        if (!stock) {
+            throw new Error(`Stock with ID ${stockId} not found`);
+        }
+
+        return stock;
+    }
+
+    /**
+     * Update stock
+     */
+    async updateStock(stockId: string, data: Partial<any>) {
+        return prisma.stock.update({
+            where: { id: stockId },
+            data,
+        });
+    }
+
+    /**
      * Delete stock
      */
     async deleteStock(stockId: string) {

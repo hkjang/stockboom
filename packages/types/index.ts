@@ -1,6 +1,9 @@
 // Re-export Prisma types
 export * from '@stockboom/database';
 
+// Re-export Stock types
+export * from './stock.types';
+
 // API Response Types
 export interface ApiResponse<T = any> {
     success: boolean;

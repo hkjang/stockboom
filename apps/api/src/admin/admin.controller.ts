@@ -1,5 +1,6 @@
-import { Controller, Get, Patch, Post, Put, Delete, Param, Body, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Patch, Post, Put, Delete, Param, Body, Query, UseGuards, Request, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { AdminService } from './admin.service';
 import { DataSourceService } from '../data-source/data-source.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -167,5 +168,90 @@ export class AdminController {
     async initializeDataSources() {
         await this.dataSourceService.initializeDefaults();
         return { success: true };
+    }
+
+    // Manual Data Collection Endpoints
+    @Post('data-collection/opendart/corp-codes')
+    @ApiOperation({ summary: 'Sync corporation codes from OpenDart' })
+    async syncCorpCodes(@Request() req: any) {
+        return this.adminService.syncCorpCodesFromOpenDart(req.user.userId);
+    }
+
+    @Post('data-collection/opendart/upload-corp-codes')
+    @ApiOperation({ summary: 'Upload corporation codes from XML/ZIP file' })
+    @UseInterceptors(FileInterceptor('file', {
+        limits: { fileSize: 50 * 1024 * 1024 }, // 50MB limit
+        fileFilter: (req, file, cb) => {
+            const allowedMimes = [
+                'application/xml',
+                'text/xml',
+                'application/zip',
+                'application/x-zip-compressed',
+            ];
+            const allowedExts = ['.xml', '.zip'];
+            const ext = file.originalname.toLowerCase().substring(file.originalname.lastIndexOf('.'));
+
+            if (allowedMimes.includes(file.mimetype) || allowedExts.includes(ext)) {
+                cb(null, true);
+            } else {
+                cb(new Error('Only XML and ZIP files are allowed'), false);
+            }
+        },
+    }))
+    async uploadCorpCodes(
+        @UploadedFile() file: Express.Multer.File,
+        @Body() body: { deleteExisting?: string },
+    ) {
+        if (!file) {
+            throw new Error('No file uploaded');
+        }
+
+        const deleteExisting = body.deleteExisting === 'true';
+        return this.adminService.processUploadedCorpCodes(file.buffer, file.originalname, deleteExisting);
+    }
+
+    @Post('data-collection/opendart/company-info')
+    @ApiOperation({ summary: 'Collect company info from OpenDart' })
+    async collectCompanyInfo(@Request() req: any, @Body() data: { corpCode: string }) {
+        return this.adminService.collectCompanyInfo(data.corpCode, req.user.userId);
+    }
+
+    @Post('data-collection/stocks/price')
+    @ApiOperation({ summary: 'Manually update stock price' })
+    async updateStockPrice(
+        @Request() req: any,
+        @Body() data: { symbol: string; market?: string }
+    ) {
+        return this.adminService.manuallyUpdateStockPrice(
+            data.symbol,
+            data.market,
+            req.user.userId
+        );
+    }
+
+    @Post('data-collection/stocks/candles')
+    @ApiOperation({ summary: 'Manually collect candle data' })
+    async collectCandles(
+        @Request() req: any,
+        @Body() data: {
+            symbol: string;
+            timeframe?: string;
+            market?: string;
+        }
+    ) {
+        return this.adminService.manuallyCollectCandles(
+            data.symbol,
+            data.timeframe || '1d',
+            data.market,
+            req.user.userId
+        );
+    }
+
+    @Get('data-collection/jobs')
+    @ApiOperation({ summary: 'Get recent data collection jobs' })
+    async getDataCollectionJobs(@Query('limit') limit?: string) {
+        return this.adminService.getDataCollectionJobs(
+            limit ? parseInt(limit) : 20
+        );
     }
 }

@@ -15,6 +15,7 @@ export default function AdminLayout({
         { name: '대시보드', href: '/admin', icon: '📊' },
         { name: '사용자 관리', href: '/admin/users', icon: '👥' },
         { name: '종목 관리', href: '/admin/stocks', icon: '📈' },
+        { name: '데이터 수집', href: '/admin/data-collection', icon: '💾' },
         { name: '데이터 소스', href: '/admin/data-sources', icon: '🔌' },
         { name: '시스템 모니터링', href: '/admin/monitoring', icon: '🖥️' },
         { name: '큐 관리', href: '/admin/queues', icon: '📋' },

@@ -1,0 +1,22 @@
+완전한 opendart.service.ts 파일입니다.
+
+주요 수정사항:
+1. adm-zip import 추가
+2. syncCorpCodes ToDatabase 메서드 추가 (ZIP 지원 포함)
+3. collectCompanyInfo 메서드 추가
+4. getFinancialStatements 메서드 추가
+5. getDisclosureList 메서드 추가
+6. fetchXml에 ZIP 압축 해제 로직 추가
+7. URL에 API키 포함 확인
+
+사용자님, 파일 편집이 계속 실패하고 있습니다.  
+다음 중 하나를 선택해주세요:
+
+옵션 1: 제가 완성된 파일 내용을 여기 메시지로 보내드리면, 
+        사용자님이 직접 opendart.service.ts 파일에 복사/붙여넣기
+
+옵션 2: 제가 파일을 한 번 더 작성 시도 (하지만 계속 손상될 위험 있음)
+
+옵션 3: 작은 부분씩 수정 (시간이 더 걸리지만 안전함)
+
+어떤 방법을 선호하시나요?

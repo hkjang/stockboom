@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { prisma } from '@stockboom/database';
@@ -6,15 +6,21 @@ import * as os from 'os';
 import * as bcrypt from 'bcryptjs';
 import * as crypto from 'crypto';
 import { UserApiKeysService, UserApiKeysDto } from '../user-api-keys/user-api-keys.service';
+import { OpenDartService } from '../market-data/opendart.service';
+import { MarketDataService } from '../market-data/market-data.service';
 
 @Injectable()
 export class AdminService {
+    private readonly logger = new Logger(AdminService.name);
+
     constructor(
         @InjectQueue('trading') private tradingQueue: Queue,
         @InjectQueue('analysis') private analysisQueue: Queue,
         @InjectQueue('data-collection') private dataCollectionQueue: Queue,
         @InjectQueue('notification') private notificationQueue: Queue,
         private userApiKeysService: UserApiKeysService,
+        private openDartService: OpenDartService,
+        private marketDataService: MarketDataService,
     ) { }
 
     /**
@@ -459,5 +465,152 @@ export class AdminService {
     async deleteUserApiKeys(userId: string) {
         await this.userApiKeysService.deleteKeys(userId, userId, true);
         return { success: true, message: 'User API keys deleted' };
+    }
+
+    /**
+     * Sync corporation codes from OpenDart
+     */
+    async syncCorpCodesFromOpenDart(userId?: string) {
+        try {
+            const count = await this.openDartService.syncCorpCodesToDatabase(userId);
+            return {
+                success: true,
+                message: `Successfully synced ${count} corporations from OpenDart`,
+                count
+            };
+        } catch (error: any) {
+            this.logger.error('Failed to sync corp codes from OpenDart', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Process uploaded corporation codes file (ZIP or XML)
+     */
+    async processUploadedCorpCodes(fileBuffer: Buffer, filename: string, deleteExisting: boolean = false) {
+        try {
+            this.logger.log(`Processing uploaded file: ${filename}, deleteExisting: ${deleteExisting}`);
+            const AdmZip = require('adm-zip');
+            const iconv = require('iconv-lite');
+
+            let xmlString: string;
+
+            // Check if file is ZIP (PK header)
+            if (fileBuffer[0] === 0x50 && fileBuffer[1] === 0x4B) {
+                this.logger.log('File is ZIP, extracting XML...');
+                const zip = new AdmZip(fileBuffer);
+                const entries = zip.getEntries();
+                const xmlEntry = entries.find((e: any) => e.entryName.toLowerCase().endsWith('.xml'));
+
+                if (!xmlEntry) {
+                    throw new Error('No XML file found in ZIP archive');
+                }
+
+                const xmlBuffer = xmlEntry.getData();
+                xmlString = iconv.decode(xmlBuffer, 'utf-8');
+                this.logger.log(`Extracted ${xmlEntry.entryName} from ZIP`);
+            } else {
+                // Assume it's XML, decode as UTF-8
+                xmlString = iconv.decode(fileBuffer, 'utf-8');
+                this.logger.log('Processing XML file directly');
+            }
+
+            // Delete existing data if requested
+            if (deleteExisting) {
+                this.logger.log('Deleting existing corporation codes...');
+                await this.openDartService.deleteAllCorpCodes();
+            }
+
+            // Use OpenDartService to parse and sync
+            const count = await this.openDartService.syncCorpCodesFromXml(xmlString);
+
+            this.logger.log(`Successfully processed uploaded file: ${count} corporations synced`);
+            return {
+                success: true,
+                count,
+                message: `Successfully synced ${count} corporation codes from uploaded file`,
+                filename,
+            };
+        } catch (error: any) {
+            this.logger.error(`Failed to process uploaded file: ${filename}`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * Collect company info from OpenDart for a specific corp code
+     */
+    async collectCompanyInfo(corpCode: string, userId?: string) {
+        try {
+            const result = await this.openDartService.collectCompanyInfo(corpCode, userId);
+            return result;
+        } catch (error: any) {
+            this.logger.error(`Failed to collect company info for ${corpCode}`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * Manually update stock price for a symbol
+     */
+    async manuallyUpdateStockPrice(symbol: string, market?: string, userId?: string) {
+        try {
+            const quote = await this.marketDataService.updateStockPrice(symbol, market);
+            return {
+                success: true,
+                message: `Successfully updated price for ${symbol}`,
+                data: quote
+            };
+        } catch (error: any) {
+            this.logger.error(`Failed to update stock price for ${symbol}`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * Manually collect candle data for a symbol
+     */
+    async manuallyCollectCandles(
+        symbol: string,
+        timeframe: string = '1d',
+        market?: string,
+        userId?: string
+    ) {
+        try {
+            const candles = await this.marketDataService.syncCandles(symbol, timeframe, market);
+            return {
+                success: true,
+                message: `Successfully collected ${candles.length} candles for ${symbol}`,
+                count: candles.length,
+                data: candles
+            };
+        } catch (error: any) {
+            this.logger.error(`Failed to collect candles for ${symbol}`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * Get recent data collection jobs
+     * TODO: Implement proper job tracking system
+     */
+    async getDataCollectionJobs(limit: number = 20) {
+        // Placeholder - in a real system, this would track job history
+        // For now, return queue jobs related to data collection
+        const dataCollectionJobs = await this.dataCollectionQueue.getJobs(
+            ['completed', 'failed', 'active', 'waiting'],
+            0,
+            limit - 1
+        );
+
+        return await Promise.all(dataCollectionJobs.map(async job => ({
+            id: job.id,
+            name: job.name,
+            status: await job.getState(),
+            data: job.data,
+            timestamp: job.timestamp,
+            finishedOn: job.finishedOn,
+            failedReason: job.failedReason,
+        })));
     }
 }

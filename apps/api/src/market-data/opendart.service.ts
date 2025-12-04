@@ -4,11 +4,9 @@ import * as https from 'https';
 import { parseStringPromise } from 'xml2js';
 import * as iconv from 'iconv-lite';
 import { UserApiKeysService } from '../user-api-keys/user-api-keys.service';
+import { prisma } from '@stockboom/database';
+import * as AdmZip from 'adm-zip';
 
-/**
- * OpenDart API Service
- * https://opendart.fss.or.kr/
- */
 @Injectable()
 export class OpenDartService {
     private readonly logger = new Logger(OpenDartService.name);
@@ -19,11 +17,7 @@ export class OpenDartService {
         private userApiKeysService: UserApiKeysService,
     ) { }
 
-    /**
-     * Get API key with priority: user key > environment variable
-     */
     private async getApiKey(userId?: string): Promise<string> {
-        // Try user-specific key first
         if (userId) {
             try {
                 const userKeys = await this.userApiKeysService.getKeys(userId, userId, true);
@@ -36,7 +30,6 @@ export class OpenDartService {
             }
         }
 
-        // Fallback to environment variable
         const envKey = this.configService.get<string>('OPENDART_API_KEY') || '';
         if (!envKey) {
             throw new Error('OpenDart API key not configured');
@@ -44,22 +37,14 @@ export class OpenDartService {
         return envKey;
     }
 
-    /**
-     * Get company overview information
-     * @param corpCode OpenDart corporation code
-     * @param userId Optional user ID for user-specific API key
-     */
     async getCompanyOverview(corpCode: string, userId?: string) {
         const apiKey = await this.getApiKey(userId);
-
         try {
             const url = `${this.baseUrl}/company.json?crtfc_key=${apiKey}&corp_code=${corpCode}`;
             const response = await this.fetchJson(url);
-
             if (response.status !== '000') {
                 throw new Error(`OpenDart API error: ${response.message}`);
             }
-
             return response;
         } catch (error) {
             this.logger.error(`Failed to get company overview for ${corpCode}`, error);
@@ -67,22 +52,13 @@ export class OpenDartService {
         }
     }
 
-    /**
-     * Download corporation code list (XML format)
-     * Returns a map of corporation names to corp codes
-     * @param userId Optional user ID for user-specific API key
-     */
     async getCorpCodeList(userId?: string): Promise<Map<string, string>> {
         const apiKey = await this.getApiKey(userId);
-
         try {
             const url = `${this.baseUrl}/corpCode.xml?crtfc_key=${apiKey}`;
             const xmlData = await this.fetchXml(url);
-
-            // Parse XML to get corp list
             const parsed = await parseStringPromise(xmlData);
             const corpList = parsed.result.list[0].list || [];
-
             const corpCodeMap = new Map<string, string>();
 
             for (const corp of corpList) {
@@ -92,7 +68,6 @@ export class OpenDartService {
 
                 if (corpName && corpCode) {
                     corpCodeMap.set(corpName, corpCode);
-                    // Also map by stock code if available
                     if (stockCode && stockCode !== ' ') {
                         corpCodeMap.set(stockCode, corpCode);
                     }
@@ -107,11 +82,6 @@ export class OpenDartService {
         }
     }
 
-    /**
-     * Search for corporation code by name or stock code
-     * @param query Company name or stock code
-     * @param userId Optional user ID for user-specific API key
-     */
     async searchCorpCode(query: string, userId?: string): Promise<string | null> {
         try {
             const corpCodeMap = await this.getCorpCodeList(userId);
@@ -122,9 +92,142 @@ export class OpenDartService {
         }
     }
 
+    async getFinancialStatements(corpCode: string, year: string, reportCode: string = '11011', userId?: string) {
+        const apiKey = await this.getApiKey(userId);
+        try {
+            const url = `${this.baseUrl}/fnlttSinglAcntAll.json?crtfc_key=${apiKey}&corp_code=${corpCode}&bsns_year=${year}&reprt_code=${reportCode}`;
+            const response = await this.fetchJson(url);
+            if (response.status !== '000') {
+                throw new Error(`OpenDart API error: ${response.message}`);
+            }
+            return response.list || [];
+        } catch (error) {
+            this.logger.error(`Failed to get financial statements for ${corpCode}`, error);
+            throw error;
+        }
+    }
+
+    async getDisclosureList(beginDate: string, endDate: string, corpCode?: string, userId?: string) {
+        const apiKey = await this.getApiKey(userId);
+        try {
+            let url = `${this.baseUrl}/list.json?crtfc_key=${apiKey}&bgn_de=${beginDate}&end_de=${endDate}`;
+            if (corpCode) {
+                url += `&corp_code=${corpCode}`;
+            }
+            const response = await this.fetchJson(url);
+            if (response.status !== '000') {
+                throw new Error(`OpenDart API error: ${response.message}`);
+            }
+            return response.list || [];
+        } catch (error) {
+            this.logger.error('Failed to get disclosure list', error);
+            throw error;
+        }
+    }
+
+    async syncCorpCodesToDatabase(userId?: string): Promise<number> {
+        try {
+            const apiKey = await this.getApiKey(userId);
+            this.logger.log(`API key: ${apiKey.substring(0, 8)}...`);
+
+            const url = `${this.baseUrl}/corpCode.xml?crtfc_key=${apiKey}`;
+            this.logger.log(`Full URL: ${url.substring(0, 60)}...`);
+
+            const xmlData = await this.fetchXml(url);
+            return await this.syncCorpCodesFromXml(xmlData);
+        } catch (error) {
+            this.logger.error('Failed to sync corp codes', error);
+            throw error;
+        }
+    }
+
     /**
-     * Fetch JSON data from OpenDart API
+     * Process and sync corporation codes from XML string (useful for uploaded files)
      */
+    async syncCorpCodesFromXml(xmlData: string): Promise<number> {
+        try {
+            let syncedCount = 0;
+
+            if (!xmlData || xmlData.length === 0) {
+                throw new Error('Empty XML data');
+            }
+
+            const parsed = await parseStringPromise(xmlData);
+            const corpList = parsed.result.list || [];
+
+            this.logger.log(`Found ${corpList.length} corporations in XML`);
+
+            for (const corp of corpList) {
+                const corpName = corp.corp_name?.[0];
+                const corpCode = corp.corp_code?.[0];
+                const stockCode = corp.stock_code?.[0];
+
+                if (stockCode && stockCode.trim() && stockCode !== ' ') {
+                    try {
+                        await prisma.stock.upsert({
+                            where: { symbol: stockCode },
+                            update: { corpName, corpCode },
+                            create: {
+                                symbol: stockCode,
+                                name: corpName,
+                                corpName,
+                                corpCode,
+                                market: 'KOSPI',
+                            },
+                        });
+                        syncedCount++;
+                    } catch (error) {
+                        this.logger.warn(`Failed to sync ${corpName}`);
+                    }
+                }
+            }
+
+            this.logger.log(`Synced ${syncedCount} corporations`);
+            return syncedCount;
+        } catch (error) {
+            this.logger.error('Failed to process XML data', error);
+            throw error;
+        }
+    }
+
+    async deleteAllCorpCodes(): Promise<number> {
+        try {
+            const result = await prisma.stock.deleteMany({
+                where: {
+                    market: { in: ['KOSPI', 'KOSDAQ', 'KONEX'] }
+                }
+            });
+            this.logger.log(`Deleted ${result.count} stocks`);
+            return result.count;
+        } catch (error) {
+            this.logger.error('Failed to delete all corp codes', error);
+            throw error;
+        }
+    }
+
+    async collectCompanyInfo(corpCode: string, userId?: string): Promise<any> {
+        try {
+            const companyInfo = await this.getCompanyOverview(corpCode, userId);
+            const stock = await prisma.stock.findFirst({ where: { corpCode } });
+
+            if (stock) {
+                await prisma.stock.update({
+                    where: { id: stock.id },
+                    data: {
+                        corpName: companyInfo.corp_name,
+                        sector: companyInfo.induty_code,
+                    },
+                });
+                return { success: true, stock, companyInfo };
+            } else {
+                return { success: false, message: 'Stock not found' };
+            }
+        } catch (error) {
+            this.logger.error(`Failed to collect company info for ${corpCode}`, error);
+            throw error;
+        }
+    }
+
     private async fetchJson(url: string): Promise<any> {
         return new Promise((resolve, reject) => {
             https.get(url, (res) => {
@@ -134,28 +237,75 @@ export class OpenDartService {
                     try {
                         resolve(JSON.parse(data));
                     } catch (error) {
-                        reject(new Error('Failed to parse JSON response'));
+                        reject(new Error('Failed to parse JSON'));
                     }
                 });
             }).on('error', reject);
         });
     }
 
-    /**
-     * Fetch XML data from OpenDart API (with EUC-KR encoding)
-     */
     private async fetchXml(url: string): Promise<string> {
         return new Promise((resolve, reject) => {
             https.get(url, (res) => {
-                const chunks: Buffer[] = [];
-                res.on('data', (chunk: Buffer) => chunks.push(chunk));
-                res.on('end', () => {
-                    const buffer = Buffer.concat(chunks);
-                    // OpenDart XML is encoded in EUC-KR
-                    const xmlString = iconv.decode(buffer, 'euc-kr');
-                    resolve(xmlString);
-                });
+                this.logger.log(`HTTP Status: ${res.statusCode}`);
+
+                // Handle redirects (302)
+                if (res.statusCode === 302 || res.statusCode === 301) {
+                    const redirectUrl = res.headers.location;
+                    this.logger.log(`Following redirect to: ${redirectUrl}`);
+
+                    if (redirectUrl) {
+                        // Follow redirect
+                        https.get(redirectUrl, (redirectRes) => {
+                            this.logger.log(`Redirect response status: ${redirectRes.statusCode}`);
+                            this.processXmlResponse(redirectRes, resolve, reject);
+                        }).on('error', reject);
+                        return;
+                    }
+                }
+
+                this.processXmlResponse(res, resolve, reject);
             }).on('error', reject);
+        });
+    }
+
+    private processXmlResponse(res: any, resolve: (value: string) => void, reject: (reason?: any) => void): void {
+        const chunks: Buffer[] = [];
+        res.on('data', (chunk: Buffer) => chunks.push(chunk));
+        res.on('end', () => {
+            try {
+                const buffer = Buffer.concat(chunks);
+                this.logger.log(`Buffer length: ${buffer.length}`);
+
+                if (buffer.length === 0) {
+                    reject(new Error('Empty response'));
+                    return;
+                }
+
+                // Check for ZIP file (PK header)
+                if (buffer[0] === 0x50 && buffer[1] === 0x4B) {
+                    this.logger.log('ZIP file detected, extracting...');
+                    const zip = new AdmZip(buffer);
+                    const entries = zip.getEntries();
+                    const xmlEntry = entries.find(e => e.entryName.endsWith('.xml'));
+
+                    if (!xmlEntry) {
+                        reject(new Error('No XML in ZIP'));
+                        return;
+                    }
+
+                    const xmlBuffer = xmlEntry.getData();
+                    const xmlString = iconv.decode(xmlBuffer, 'utf-8');
+                    this.logger.log(`Extracted XML: ${xmlString.length} chars`);
+                    resolve(xmlString);
+                } else {
+                    const xmlString = iconv.decode(buffer, 'utf-8');
+                    resolve(xmlString);
+                }
+            } catch (error) {
+                this.logger.error('XML processing failed', error);
+                reject(error);
+            }
         });
     }
 }

@@ -230,17 +230,41 @@ export class OpenDartService {
 
     private async fetchJson(url: string): Promise<any> {
         return new Promise((resolve, reject) => {
-            https.get(url, (res) => {
-                let data = '';
-                res.on('data', (chunk) => data += chunk);
-                res.on('end', () => {
-                    try {
-                        resolve(JSON.parse(data));
-                    } catch (error) {
-                        reject(new Error('Failed to parse JSON'));
+            const getRequest = (currentUrl: string) => {
+                https.get(currentUrl, (res) => {
+                    // Handle redirects
+                    if (res.statusCode === 301 || res.statusCode === 302) {
+                        if (res.headers.location) {
+                            this.logger.log(`Following redirect to: ${res.headers.location}`);
+                            getRequest(res.headers.location);
+                            return;
+                        }
                     }
-                });
-            }).on('error', reject);
+
+                    if (res.statusCode !== 200) {
+                        reject(new Error(`Request failed with status code ${res.statusCode}`));
+                        return;
+                    }
+
+                    let data = '';
+                    res.on('data', (chunk) => data += chunk);
+                    res.on('end', () => {
+                        try {
+                            if (!data) {
+                                reject(new Error('Empty response received'));
+                                return;
+                            }
+                            resolve(JSON.parse(data));
+                        } catch (error) {
+                            this.logger.error(`Failed to parse JSON. Status: ${res.statusCode}, URL: ${currentUrl}`);
+                            this.logger.error(`Raw data (first 500 chars): ${data.substring(0, 500)}`);
+                            reject(new Error('Failed to parse JSON'));
+                        }
+                    });
+                }).on('error', reject);
+            };
+
+            getRequest(url);
         });
     }
 

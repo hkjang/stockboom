@@ -15,7 +15,7 @@ interface KisCredentials {
 @Injectable()
 export class KisApiService {
     private readonly logger = new Logger(KisApiService.name);
-    private readonly baseUrl = 'https://openapi.koreainvestment.com:9443';
+    // private readonly baseUrl = 'https://openapi.koreainvestment.com:9443'; // Removed hardcoded URL
     private accessToken: string | null = null;
     private tokenExpiresAt: Date | null = null;
 
@@ -63,6 +63,12 @@ export class KisApiService {
         };
     }
 
+    private getBaseUrl(isMockMode: boolean): string {
+        return isMockMode
+            ? 'https://openapivts.koreainvestment.com:29443'
+            : 'https://openapi.koreainvestment.com:9443';
+    }
+
     /**
      * Get OAuth token from Korean Investment & Securities
      * Automatically refreshes token if it's about to expire
@@ -92,8 +98,9 @@ export class KisApiService {
 
             this.logger.log('Refreshing KIS access token...');
 
+            const baseUrl = this.getBaseUrl(credentials.isMockMode);
             const response = await firstValueFrom(
-                this.httpService.post<KISTokenResponse>(`${this.baseUrl}/oauth2/tokenP`, {
+                this.httpService.post<KISTokenResponse>(`${baseUrl}/oauth2/tokenP`, {
                     grant_type: 'client_credentials',
                     appkey: credentials.appKey,
                     appsecret: credentials.appSecret,
@@ -152,8 +159,9 @@ export class KisApiService {
         const credentials = await this.getApiCredentials(userId);
 
         try {
+            const baseUrl = this.getBaseUrl(credentials.isMockMode);
             const response = await firstValueFrom(
-                this.httpService.get(`${this.baseUrl}/uapi/domestic-stock/v1/quotations/inquire-price`, {
+                this.httpService.get(`${baseUrl}/uapi/domestic-stock/v1/quotations/inquire-price`, {
                     headers: {
                         'Content-Type': 'application/json',
                         'authorization': `Bearer ${token}`,
@@ -203,8 +211,9 @@ export class KisApiService {
             (orderRequest.side === 'BUY' ? 'TTTC0802U' : 'TTTC0801U');
 
         try {
+            const baseUrl = this.getBaseUrl(credentials.isMockMode);
             const response = await firstValueFrom(
-                this.httpService.post(`${this.baseUrl}/uapi/domestic-stock/v1/trading/order-cash`, {
+                this.httpService.post(`${baseUrl}/uapi/domestic-stock/v1/trading/order-cash`, {
                     CANO: credentials.accountNumber.substring(0, 8),
                     ACNT_PRDT_CD: credentials.accountNumber.substring(8),
                     PDNO: orderRequest.symbol,
@@ -242,8 +251,9 @@ export class KisApiService {
         const credentials = await this.getApiCredentials(userId);
 
         try {
+            const baseUrl = this.getBaseUrl(credentials.isMockMode);
             const response = await firstValueFrom(
-                this.httpService.get(`${this.baseUrl}/uapi/domestic-stock/v1/quotations/inquire-daily-price`, {
+                this.httpService.get(`${baseUrl}/uapi/domestic-stock/v1/quotations/inquire-daily-price`, {
                     headers: {
                         'Content-Type': 'application/json',
                         'authorization': `Bearer ${token}`,

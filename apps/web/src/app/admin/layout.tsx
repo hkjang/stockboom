@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -13,45 +12,52 @@ export default function AdminLayout({
 
     const navigation = [
         { name: '대시보드', href: '/admin', icon: '📊' },
-        { name: '사용자 관리', href: '/admin/users', icon: '👥' },
-        { name: '종목 관리', href: '/admin/stocks', icon: '📈' },
+        { name: '사용자', href: '/admin/users', icon: '👥' },
+        { name: '종목', href: '/admin/stocks', icon: '📈' },
         { name: '데이터 수집', href: '/admin/data-collection', icon: '💾' },
         { name: '데이터 소스', href: '/admin/data-sources', icon: '🔌' },
-        { name: '시스템 모니터링', href: '/admin/monitoring', icon: '🖥️' },
-        { name: '큐 관리', href: '/admin/queues', icon: '📋' },
+        { name: '모니터링', href: '/admin/monitoring', icon: '🖥️' },
+        { name: '큐', href: '/admin/queues', icon: '📋' },
     ];
 
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className="min-h-screen bg-gray-900 text-sm">
             {/* Header */}
-            <header className="bg-white shadow">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <header className="bg-gray-800/80 backdrop-blur-sm border-b border-gray-700 sticky top-0 z-40">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5">
                     <div className="flex justify-between items-center">
-                        <h1 className="text-2xl font-bold text-gray-900">관리자 패널</h1>
-                        <Link href="/dashboard" className="text-sm text-blue-600 hover:text-blue-800">
-                            ← 사용자 대시보드로
+                        <div className="flex items-center gap-2">
+                            <span className="text-lg">⚙️</span>
+                            <h1 className="text-base font-semibold text-white">관리자</h1>
+                        </div>
+                        <Link
+                            href="/dashboard"
+                            className="px-3 py-1.5 text-xs text-gray-300 hover:text-white bg-gray-700/50 hover:bg-gray-700 rounded-md transition-colors"
+                        >
+                            ← 대시보드
                         </Link>
                     </div>
                 </div>
             </header>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="flex gap-6">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <div className="flex gap-4">
                     {/* Sidebar */}
-                    <aside className="w-64 flex-shrink-0">
-                        <nav className="bg-white rounded-lg shadow p-4 space-y-1">
+                    <aside className="w-48 flex-shrink-0">
+                        <nav className="bg-gray-800/50 rounded-lg border border-gray-700 p-2 space-y-0.5 sticky top-14">
                             {navigation.map((item) => {
-                                const isActive = pathname === item.href;
+                                const isActive = pathname === item.href ||
+                                    (item.href !== '/admin' && pathname.startsWith(item.href));
                                 return (
                                     <Link
                                         key={item.name}
                                         href={item.href}
-                                        className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${isActive
-                                            ? 'bg-blue-50 text-blue-700'
-                                            : 'text-gray-700 hover:bg-gray-50'
+                                        className={`flex items-center px-3 py-2 text-xs font-medium rounded-md transition-all ${isActive
+                                            ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white'
+                                            : 'text-gray-400 hover:bg-gray-700/50 hover:text-white'
                                             }`}
                                     >
-                                        <span className="mr-3 text-xl">{item.icon}</span>
+                                        <span className="mr-2 text-sm">{item.icon}</span>
                                         {item.name}
                                     </Link>
                                 );
@@ -60,7 +66,7 @@ export default function AdminLayout({
                     </aside>
 
                     {/* Main Content */}
-                    <main className="flex-1">
+                    <main className="flex-1 min-w-0">
                         {children}
                     </main>
                 </div>

@@ -2,101 +2,49 @@
 
 import { useState } from 'react';
 import useSWR from 'swr';
-import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 
 const fetcher = async (url: string) => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    const res = await fetch(url, {
-        headers: {
-            'Authorization': token ? `Bearer ${token}` : '',
-        }
-    });
-
-    if (res.status === 401) {
-        if (typeof window !== 'undefined') {
-            window.location.href = '/auth/login';
-        }
-        throw new Error('Unauthorized');
-    }
-
+    const res = await fetch(url, { headers: { 'Authorization': token ? `Bearer ${token}` : '' } });
+    if (res.status === 401) { window.location.href = '/auth/login'; throw new Error('Unauthorized'); }
     if (!res.ok) throw new Error('Failed to fetch');
     return res.json();
 };
 
 function FailedJobsModal({ queueName, isOpen, onClose }: { queueName: string | null, isOpen: boolean, onClose: () => void }) {
-    const { data: failedJobs, mutate } = useSWR(
-        isOpen && queueName ? `/api/admin/queues/${queueName}/failed` : null,
-        fetcher
-    );
+    const { data: failedJobs, mutate } = useSWR(isOpen && queueName ? `/api/admin/queues/${queueName}/failed` : null, fetcher);
 
     const handleRetry = async (jobId: string) => {
-        try {
-            const token = localStorage.getItem('token');
-            await fetch(`/api/admin/queues/${queueName}/jobs/${jobId}/retry`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': token ? `Bearer ${token}` : '',
-                }
-            });
-            mutate(); // Refresh list
-            alert('작업이 재시도 큐에 추가되었습니다.');
-        } catch (error) {
-            console.error('Retry failed:', error);
-            alert('재시도 요청 실패');
-        }
+        const token = localStorage.getItem('token');
+        await fetch(`/api/admin/queues/${queueName}/jobs/${jobId}/retry`, {
+            method: 'POST', headers: { 'Authorization': token ? `Bearer ${token}` : '' }
+        });
+        mutate();
     };
 
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[80vh] flex flex-col">
-                <div className="p-4 border-b flex justify-between items-center">
-                    <h2 className="text-xl font-bold">실패한 작업 목록: {queueName}</h2>
-                    <button onClick={onClose} className="text-gray-500 hover:text-gray-700">✕</button>
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+            <div className="bg-gray-800 border border-gray-700 rounded-lg shadow-xl max-w-2xl w-full max-h-[70vh] flex flex-col">
+                <div className="p-3 border-b border-gray-700 flex justify-between items-center">
+                    <h2 className="text-sm font-semibold text-white">실패한 작업: {queueName}</h2>
+                    <button onClick={onClose} className="text-gray-400 hover:text-white text-xs">✕</button>
                 </div>
-                <div className="p-4 overflow-y-auto flex-1">
-                    {!failedJobs ? (
-                        <p>로딩 중...</p>
-                    ) : failedJobs.length === 0 ? (
-                        <p className="text-center text-gray-500">실패한 작업이 없습니다.</p>
-                    ) : (
-                        <div className="space-y-4">
-                            {failedJobs.map((job: any) => (
-                                <div key={job.id} className="border rounded p-4 bg-red-50">
-                                    <div className="flex justify-between items-start mb-2">
-                                        <div>
-                                            <span className="font-bold text-lg">Job #{job.id}</span>
-                                            <span className="text-sm text-gray-500 ml-2">
-                                                {new Date(job.timestamp).toLocaleString()}
-                                            </span>
-                                        </div>
-                                        <button
-                                            onClick={() => handleRetry(job.id)}
-                                            className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
-                                        >
-                                            재시도
-                                        </button>
+                <div className="p-3 overflow-y-auto flex-1 space-y-2">
+                    {!failedJobs ? <p className="text-xs text-gray-400">로딩 중...</p> :
+                        failedJobs.length === 0 ? <p className="text-xs text-gray-500 text-center py-3">실패한 작업 없음</p> :
+                            failedJobs.map((job: any) => (
+                                <div key={job.id} className="bg-red-900/20 border border-red-800/50 rounded p-2 text-xs">
+                                    <div className="flex justify-between items-start">
+                                        <span className="text-white">#{job.id}</span>
+                                        <button onClick={() => handleRetry(job.id)}
+                                            className="px-2 py-0.5 bg-blue-600 hover:bg-blue-700 text-white rounded">재시도</button>
                                     </div>
-                                    <div className="bg-white p-2 rounded border text-sm font-mono overflow-x-auto">
-                                        <p className="font-bold text-red-600 mb-1">{job.failedReason}</p>
-                                        <pre className="text-xs text-gray-600 whitespace-pre-wrap">
-                                            {job.stacktrace ? job.stacktrace[0] : 'No stacktrace'}
-                                        </pre>
-                                    </div>
-                                    <div className="mt-2 text-xs text-gray-500">
-                                        Data: {JSON.stringify(job.data)}
-                                    </div>
+                                    <p className="text-red-400 mt-1 truncate">{job.failedReason}</p>
                                 </div>
                             ))}
-                        </div>
-                    )}
-                </div>
-                <div className="p-4 border-t text-right">
-                    <button onClick={onClose} className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
-                        닫기
-                    </button>
                 </div>
             </div>
         </div>
@@ -104,147 +52,105 @@ function FailedJobsModal({ queueName, isOpen, onClose }: { queueName: string | n
 }
 
 export default function AdminMonitoring() {
-    const { data: metrics } = useSWR('/api/admin/metrics', fetcher, {
-        refreshInterval: 5000,
-    });
-
-    const { data: queues } = useSWR('/api/admin/queues', fetcher, {
-        refreshInterval: 3000,
-    });
-
+    const { data: metrics } = useSWR('/api/admin/metrics', fetcher, { refreshInterval: 5000 });
+    const { data: queues } = useSWR('/api/admin/queues', fetcher, { refreshInterval: 3000 });
     const [selectedQueue, setSelectedQueue] = useState<string | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const openFailedJobs = (queueName: string) => {
-        setSelectedQueue(queueName);
-        setIsModalOpen(true);
+    const getProgressColor = (value: number) => {
+        if (value > 80) return 'bg-red-500';
+        if (value > 60) return 'bg-amber-500';
+        return 'bg-emerald-500';
     };
 
     return (
-        <div className="space-y-6">
-            <h1 className="text-3xl font-bold">시스템 모니터링</h1>
+        <div className="space-y-4">
+            <div>
+                <h1 className="text-xl font-bold text-white">시스템 모니터링</h1>
+                <p className="text-xs text-gray-400 mt-0.5">실시간 시스템 상태</p>
+            </div>
 
             {/* System Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card title="CPU 사용률">
-                    <div className="text-center">
-                        <p className="text-4xl font-bold">{metrics?.cpu || 0}%</p>
-                        <div className="w-full bg-gray-200 rounded-full h-2 mt-4">
-                            <div
-                                className={`h-2 rounded-full ${(metrics?.cpu || 0) > 80 ? 'bg-red-500' :
-                                    (metrics?.cpu || 0) > 60 ? 'bg-yellow-500' :
-                                        'bg-green-500'
-                                    }`}
-                                style={{ width: `${metrics?.cpu || 0}%` }}
-                            />
+            <div className="grid grid-cols-3 gap-3">
+                {[
+                    { title: 'CPU', value: metrics?.cpu || 0, icon: '⚡' },
+                    { title: '메모리', value: metrics?.memory || 0, icon: '💾' },
+                    { title: '디스크', value: metrics?.disk || 0, icon: '💿' },
+                ].map((item) => (
+                    <div key={item.title} className="bg-gray-800/50 border border-gray-700 rounded-lg p-3">
+                        <div className="flex items-center justify-between mb-2">
+                            <span className="text-xs text-gray-400">{item.title}</span>
+                            <span className="text-sm">{item.icon}</span>
+                        </div>
+                        <p className="text-2xl font-bold text-white mb-2">{item.value}%</p>
+                        <div className="w-full bg-gray-700 rounded-full h-1.5">
+                            <div className={`h-1.5 rounded-full ${getProgressColor(item.value)}`}
+                                style={{ width: `${item.value}%` }} />
                         </div>
                     </div>
-                </Card>
-
-                <Card title="메모리 사용률">
-                    <div className="text-center">
-                        <p className="text-4xl font-bold">{metrics?.memory || 0}%</p>
-                        <div className="w-full bg-gray-200 rounded-full h-2 mt-4">
-                            <div
-                                className={`h-2 rounded-full ${(metrics?.memory || 0) > 80 ? 'bg-red-500' :
-                                    (metrics?.memory || 0) > 60 ? 'bg-yellow-500' :
-                                        'bg-green-500'
-                                    }`}
-                                style={{ width: `${metrics?.memory || 0}%` }}
-                            />
-                        </div>
-                    </div>
-                </Card>
-
-                <Card title="디스크 사용률">
-                    <div className="text-center">
-                        <p className="text-4xl font-bold">{metrics?.disk || 0}%</p>
-                        <div className="w-full bg-gray-200 rounded-full h-2 mt-4">
-                            <div
-                                className={`h-2 rounded-full ${(metrics?.disk || 0) > 80 ? 'bg-red-500' :
-                                    (metrics?.disk || 0) > 60 ? 'bg-yellow-500' :
-                                        'bg-green-500'
-                                    }`}
-                                style={{ width: `${metrics?.disk || 0}%` }}
-                            />
-                        </div>
-                    </div>
-                </Card>
+                ))}
             </div>
 
             {/* Queue Monitoring */}
-            <Card title="큐 상태">
-                <div className="space-y-4">
+            <div className="bg-gray-800/50 border border-gray-700 rounded-lg overflow-hidden">
+                <div className="px-3 py-2 border-b border-gray-700">
+                    <h3 className="text-xs font-medium text-white">큐 상태</h3>
+                </div>
+                <div className="p-3 space-y-3">
                     {Array.isArray(queues) && queues.map((queue: any) => (
-                        <div key={queue.name} className="border-b pb-4 last:border-0">
-                            <div className="flex justify-between items-start mb-2">
-                                <div>
-                                    <h3 className="font-semibold text-lg">{queue.name}</h3>
-                                    <p className="text-sm text-gray-500">
-                                        총 작업: {(queue.waiting || 0) + (queue.active || 0) + (queue.completed || 0) + (queue.failed || 0)}
-                                    </p>
-                                </div>
-                                <Badge
-                                    variant={queue.active > 0 ? 'info' : 'default'}
-                                    size="sm"
-                                >
-                                    {queue.active > 0 ? '처리 중' : '대기'}
+                        <div key={queue.name} className="border-b border-gray-700/50 pb-2 last:border-0">
+                            <div className="flex justify-between items-center mb-2">
+                                <span className="text-xs font-medium text-white">{queue.name}</span>
+                                <Badge variant={queue.active > 0 ? 'info' : 'default'} size="sm">
+                                    {queue.active > 0 ? '처리중' : '대기'}
                                 </Badge>
                             </div>
-
-                            <div className="grid grid-cols-4 gap-3 text-sm">
-                                <div className="text-center">
-                                    <p className="text-gray-600">대기</p>
-                                    <p className="text-xl font-bold text-yellow-600">{queue.waiting || 0}</p>
+                            <div className="grid grid-cols-4 gap-2 text-xs">
+                                <div className="text-center p-1.5 bg-gray-700/30 rounded">
+                                    <p className="text-gray-500">대기</p>
+                                    <p className="font-semibold text-amber-400">{queue.waiting || 0}</p>
                                 </div>
-                                <div className="text-center">
-                                    <p className="text-gray-600">처리 중</p>
-                                    <p className="text-xl font-bold text-blue-600">{queue.active || 0}</p>
+                                <div className="text-center p-1.5 bg-gray-700/30 rounded">
+                                    <p className="text-gray-500">처리중</p>
+                                    <p className="font-semibold text-blue-400">{queue.active || 0}</p>
                                 </div>
-                                <div className="text-center">
-                                    <p className="text-gray-600">완료</p>
-                                    <p className="text-xl font-bold text-green-600">{queue.completed || 0}</p>
+                                <div className="text-center p-1.5 bg-gray-700/30 rounded">
+                                    <p className="text-gray-500">완료</p>
+                                    <p className="font-semibold text-emerald-400">{queue.completed || 0}</p>
                                 </div>
-                                <div className="text-center cursor-pointer hover:bg-red-50 rounded p-1 transition" onClick={() => openFailedJobs(queue.name)}>
-                                    <p className="text-gray-600">실패 (클릭)</p>
-                                    <p className="text-xl font-bold text-red-600">{queue.failed || 0}</p>
+                                <div className="text-center p-1.5 bg-gray-700/30 rounded cursor-pointer hover:bg-gray-700/50"
+                                    onClick={() => { setSelectedQueue(queue.name); setIsModalOpen(true); }}>
+                                    <p className="text-gray-500">실패</p>
+                                    <p className="font-semibold text-red-400">{queue.failed || 0}</p>
                                 </div>
                             </div>
                         </div>
                     ))}
                     {(!Array.isArray(queues) || queues.length === 0) && (
-                        <p className="text-center text-gray-500 py-4">큐 데이터가 없습니다.</p>
+                        <p className="text-xs text-gray-500 text-center py-3">큐 데이터 없음</p>
                     )}
                 </div>
-            </Card>
+            </div>
 
             {/* Error Logs */}
-            <Card title="최근 에러 로그">
-                <div className="space-y-2 max-h-96 overflow-y-auto">
-                    {Array.isArray(metrics?.errorLogs) && metrics.errorLogs.map((log: any, index: number) => (
-                        <div key={index} className="p-3 bg-red-50 border-l-4 border-red-500 rounded">
-                            <div className="flex justify-between items-start">
-                                <div className="flex-1">
-                                    <p className="font-medium text-red-900">{log.message}</p>
-                                    <p className="text-sm text-red-700 mt-1">{log.stack}</p>
-                                </div>
-                                <span className="text-xs text-red-600 whitespace-nowrap ml-4">
-                                    {new Date(log.timestamp).toLocaleString('ko-KR')}
-                                </span>
-                            </div>
+            <div className="bg-gray-800/50 border border-gray-700 rounded-lg overflow-hidden">
+                <div className="px-3 py-2 border-b border-gray-700">
+                    <h3 className="text-xs font-medium text-white">최근 에러</h3>
+                </div>
+                <div className="p-3 space-y-1.5 max-h-48 overflow-y-auto">
+                    {Array.isArray(metrics?.errorLogs) && metrics.errorLogs.map((log: any, i: number) => (
+                        <div key={i} className="p-2 bg-red-900/20 border-l-2 border-red-500 rounded text-xs">
+                            <p className="text-red-300 truncate">{log.message}</p>
+                            <span className="text-red-400/70">{new Date(log.timestamp).toLocaleString('ko-KR')}</span>
                         </div>
                     ))}
                     {(!Array.isArray(metrics?.errorLogs) || metrics.errorLogs.length === 0) && (
-                        <p className="text-center text-gray-500 py-4">에러 로그가 없습니다.</p>
+                        <p className="text-xs text-gray-500 text-center py-3">에러 없음</p>
                     )}
                 </div>
-            </Card>
+            </div>
 
-            <FailedJobsModal
-                queueName={selectedQueue}
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-            />
+            <FailedJobsModal queueName={selectedQueue} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
         </div>
     );
 }

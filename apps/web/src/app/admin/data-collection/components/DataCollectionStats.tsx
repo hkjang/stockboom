@@ -7,10 +7,6 @@ interface StatsCardProps {
     value: number | string;
     description?: string;
     icon: React.ReactNode;
-    trend?: {
-        value: number;
-        direction: 'up' | 'down';
-    };
     variant?: 'default' | 'success' | 'warning' | 'danger' | 'info';
     loading?: boolean;
 }
@@ -31,59 +27,25 @@ const iconBgStyles = {
     info: 'bg-blue-500/20 text-blue-400',
 };
 
-export function StatsCard({
-    title,
-    value,
-    description,
-    icon,
-    trend,
-    variant = 'default',
-    loading = false,
-}: StatsCardProps) {
+export function StatsCard({ title, value, description, icon, variant = 'default', loading = false }: StatsCardProps) {
     return (
         <Card className={`relative overflow-hidden bg-gradient-to-br ${variantStyles[variant]} border`}>
-            <div className="p-5">
+            <div className="p-3">
                 <div className="flex items-start justify-between">
                     <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-400 mb-1">{title}</p>
+                        <p className="text-xs font-medium text-gray-400">{title}</p>
                         {loading ? (
-                            <div className="h-8 w-20 bg-gray-700/50 rounded animate-pulse" />
+                            <div className="h-5 w-16 bg-gray-700/50 rounded animate-pulse mt-1" />
                         ) : (
-                            <p className="text-2xl font-bold text-white">
+                            <p className="text-lg font-bold text-white mt-0.5">
                                 {typeof value === 'number' ? value.toLocaleString() : value}
                             </p>
                         )}
-                        {description && (
-                            <p className="text-xs text-gray-500 mt-1">{description}</p>
-                        )}
+                        {description && <p className="text-xs text-gray-500 mt-0.5">{description}</p>}
                     </div>
-                    <div className={`p-3 rounded-xl ${iconBgStyles[variant]}`}>
-                        {icon}
-                    </div>
+                    <div className={`p-2 rounded-lg ${iconBgStyles[variant]}`}>{icon}</div>
                 </div>
-
-                {trend && (
-                    <div className="mt-3 flex items-center gap-1">
-                        <span
-                            className={`text-sm font-medium ${trend.direction === 'up' ? 'text-emerald-400' : 'text-red-400'
-                                }`}
-                        >
-                            {trend.direction === 'up' ? '↑' : '↓'} {Math.abs(trend.value)}%
-                        </span>
-                        <span className="text-xs text-gray-500">vs yesterday</span>
-                    </div>
-                )}
             </div>
-
-            {/* Decorative gradient blob */}
-            <div
-                className={`absolute -right-4 -top-4 w-24 h-24 rounded-full blur-2xl opacity-20 ${variant === 'success' ? 'bg-emerald-500' :
-                        variant === 'warning' ? 'bg-amber-500' :
-                            variant === 'danger' ? 'bg-red-500' :
-                                variant === 'info' ? 'bg-blue-500' :
-                                    'bg-slate-500'
-                    }`}
-            />
         </Card>
     );
 }
@@ -106,7 +68,7 @@ interface DataCollectionStatsProps {
 
 export function DataCollectionStats({ stats, loading }: DataCollectionStatsProps) {
     const formatTime = (dateString: string | null) => {
-        if (!dateString) return '수집 기록 없음';
+        if (!dateString) return '기록 없음';
         const date = new Date(dateString);
         const now = new Date();
         const diffMs = now.getTime() - date.getTime();
@@ -128,25 +90,25 @@ export function DataCollectionStats({ stats, loading }: DataCollectionStatsProps
     };
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             <StatsCard
                 title="총 등록 종목"
                 value={stats?.totalStocks ?? 0}
-                description={`활성: ${stats?.activeStocks ?? 0}개`}
+                description={`활성: ${stats?.activeStocks ?? 0}`}
                 icon={<StockIcon />}
                 variant="info"
                 loading={loading}
             />
             <StatsCard
-                title="오늘 수집된 데이터"
+                title="오늘 수집"
                 value={stats?.todayCollected ?? 0}
-                description={`전체: ${(stats?.totalCandles ?? 0).toLocaleString()}개`}
+                description={`전체: ${(stats?.totalCandles ?? 0).toLocaleString()}`}
                 icon={<ChartIcon />}
                 variant="success"
                 loading={loading}
             />
             <StatsCard
-                title="대기 중 작업"
+                title="대기 작업"
                 value={(stats?.pendingJobs ?? 0) + (stats?.activeJobs ?? 0)}
                 description={`활성: ${stats?.activeJobs ?? 0} / 대기: ${stats?.pendingJobs ?? 0}`}
                 icon={<QueueIcon />}
@@ -156,7 +118,7 @@ export function DataCollectionStats({ stats, loading }: DataCollectionStatsProps
             <StatsCard
                 title="마지막 수집"
                 value={stats ? formatTime(stats.lastCollectionTime) : '-'}
-                description={stats?.failedJobs ? `실패: ${stats.failedJobs}건` : '정상 운영'}
+                description={stats?.failedJobs ? `실패: ${stats.failedJobs}건` : '정상'}
                 icon={<ClockIcon />}
                 variant={stats ? getQueueHealthVariant(stats.queueHealth) : 'default'}
                 loading={loading}
@@ -165,19 +127,17 @@ export function DataCollectionStats({ stats, loading }: DataCollectionStatsProps
     );
 }
 
-// Icons
 function StockIcon() {
     return (
-        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
         </svg>
     );
 }
 
 function ChartIcon() {
     return (
-        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                 d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
         </svg>
@@ -186,18 +146,16 @@ function ChartIcon() {
 
 function QueueIcon() {
     return (
-        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
         </svg>
     );
 }
 
 function ClockIcon() {
     return (
-        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
     );
 }

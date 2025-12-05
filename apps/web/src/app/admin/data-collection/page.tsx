@@ -11,9 +11,7 @@ import { JobHistoryTab } from './components/JobHistoryTab';
 const fetcher = (url: string) => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     return fetch(url, {
-        headers: {
-            'Authorization': token ? `Bearer ${token}` : '',
-        }
+        headers: { 'Authorization': token ? `Bearer ${token}` : '' }
     }).then(res => {
         if (!res.ok) throw new Error('Failed to fetch');
         return res.json();
@@ -23,10 +21,10 @@ const fetcher = (url: string) => {
 type TabType = 'opendart' | 'stocks' | 'scheduler' | 'history';
 
 const tabs = [
-    { id: 'opendart' as TabType, label: 'OpenDart', icon: '🏢', description: '기업코드 및 공시 데이터' },
-    { id: 'stocks' as TabType, label: '주가 데이터', icon: '📈', description: '가격 및 캔들 수집' },
-    { id: 'scheduler' as TabType, label: '스케줄러', icon: '⏰', description: '자동 수집 관리' },
-    { id: 'history' as TabType, label: '작업 히스토리', icon: '📋', description: '수집 작업 로그' },
+    { id: 'opendart' as TabType, label: 'OpenDart', icon: '🏢' },
+    { id: 'stocks' as TabType, label: '주가 데이터', icon: '📈' },
+    { id: 'scheduler' as TabType, label: '스케줄러', icon: '⏰' },
+    { id: 'history' as TabType, label: '히스토리', icon: '📋' },
 ];
 
 export default function AdminDataCollection() {
@@ -38,30 +36,21 @@ export default function AdminDataCollection() {
         { refreshInterval: 10000 }
     );
 
-    const handleRefresh = () => {
-        mutateStats();
-    };
+    const handleRefresh = () => mutateStats();
 
     return (
-        <div className="space-y-6 pb-12">
+        <div className="space-y-4 pb-8">
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-                        <span className="p-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl">
-                            📊
-                        </span>
-                        데이터 수동 수집
-                    </h1>
-                    <p className="text-gray-400 mt-1">
-                        주식 데이터 수동 수집 및 관리
-                    </p>
+                    <h1 className="text-xl font-bold text-white">데이터 수집</h1>
+                    <p className="text-xs text-gray-400 mt-0.5">주식 데이터 수동 수집 및 관리</p>
                 </div>
                 <button
                     onClick={handleRefresh}
-                    className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg transition-colors flex items-center gap-2 self-start"
+                    className="px-3 py-1.5 text-xs bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-md transition-colors flex items-center gap-1.5"
                 >
-                    <RefreshIcon className="w-4 h-4" />
+                    <RefreshIcon className="w-3 h-3" />
                     새로고침
                 </button>
             </div>
@@ -70,43 +59,28 @@ export default function AdminDataCollection() {
             <DataCollectionStats stats={stats} loading={statsLoading} />
 
             {/* Tab Navigation */}
-            <div className="flex flex-wrap gap-2 p-1 bg-gray-800/50 rounded-xl border border-gray-700">
+            <div className="flex gap-1 p-1 bg-gray-800/50 rounded-lg border border-gray-700">
                 {tabs.map(tab => (
                     <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`flex-1 min-w-[180px] px-4 py-3 rounded-lg font-medium transition-all ${activeTab === tab.id
-                                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/25'
-                                : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+                        className={`flex-1 px-3 py-2 rounded-md text-xs font-medium transition-all ${activeTab === tab.id
+                            ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white'
+                            : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
                             }`}
                     >
-                        <div className="flex items-center justify-center gap-2">
-                            <span className="text-lg">{tab.icon}</span>
-                            <span>{tab.label}</span>
-                        </div>
-                        {activeTab === tab.id && (
-                            <p className="text-xs text-indigo-200 mt-1 hidden md:block">
-                                {tab.description}
-                            </p>
-                        )}
+                        <span className="mr-1.5">{tab.icon}</span>
+                        {tab.label}
                     </button>
                 ))}
             </div>
 
             {/* Tab Content */}
-            <div className="min-h-[400px]">
-                {activeTab === 'opendart' && (
-                    <OpenDartTab onRefresh={handleRefresh} />
-                )}
-                {activeTab === 'stocks' && (
-                    <StockDataTab onRefresh={handleRefresh} />
-                )}
-                {activeTab === 'scheduler' && (
-                    <SchedulerTab onRefresh={handleRefresh} />
-                )}
-                {activeTab === 'history' && (
-                    <JobHistoryTab onRefresh={handleRefresh} />
-                )}
+            <div className="min-h-[300px]">
+                {activeTab === 'opendart' && <OpenDartTab onRefresh={handleRefresh} />}
+                {activeTab === 'stocks' && <StockDataTab onRefresh={handleRefresh} />}
+                {activeTab === 'scheduler' && <SchedulerTab onRefresh={handleRefresh} />}
+                {activeTab === 'history' && <JobHistoryTab onRefresh={handleRefresh} />}
             </div>
         </div>
     );

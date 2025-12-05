@@ -49,8 +49,31 @@ model User {
   trades            Trade[]
   pushSubscriptions PushSubscription[]
   apiKeys           UserApiKeys?
+  watchlists        Watchlist[]
   
   @@map("users")
+}
+
+// ============================================
+// Watchlist - User's Favorite Stocks
+// ============================================
+
+model Watchlist {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stockId   String
+  stock     Stock    @relation(fields: [stockId], references: [id], onDelete: Cascade)
+  
+  // Optional note for the stock
+  note      String?
+  
+  // Metadata
+  createdAt DateTime @default(now())
+  
+  @@unique([userId, stockId])
+  @@index([userId])
+  @@map("watchlists")
 }
 
 model BrokerAccount {
@@ -149,6 +172,7 @@ model Stock {
   outsideDirectors OutsideDirector[]
   majorShareholders MajorShareholder[]
   dividends     Dividend[]
+  watchlists    Watchlist[]
   
   @@index([symbol])
   @@index([market])

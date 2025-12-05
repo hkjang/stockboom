@@ -19,6 +19,7 @@ import { AdminModule } from './admin/admin.module';
 import { DataSourceModule } from './data-source/data-source.module';
 import { CommonModule } from './common/common.module';
 import { UserApiKeysModule } from './user-api-keys/user-api-keys.module';
+import { WatchlistModule } from './watchlist/watchlist.module';
 
 @Module({
     imports: [
@@ -66,6 +67,7 @@ import { UserApiKeysModule } from './user-api-keys/user-api-keys.module';
         AdminModule,
         DataSourceModule,
         UserApiKeysModule,
+        WatchlistModule,
     ],
     providers: [
         // Global Rate Limiting Guard

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Sidebar from './Sidebar';
+import NotificationBell from './NotificationBell';
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
@@ -53,6 +54,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 <nav className="bg-white/5 backdrop-blur-lg border-b border-white/10 sticky top-0 z-10">
                     <div className="px-6 py-4">
                         <div className="flex items-center justify-end gap-4">
+                            <NotificationBell />
                             <span className="text-blue-200">{user?.email}</span>
                             <button
                                 onClick={handleLogout}

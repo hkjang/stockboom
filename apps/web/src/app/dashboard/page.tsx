@@ -1,39 +1,88 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import CreatePortfolioModal from '@/components/CreatePortfolioModal';
 
+interface Portfolio {
+    id: string;
+    name: string;
+    description: string;
+    totalValue: string | number;
+    totalReturn: string | number;
+    totalReturnPct: string | number;
+    cashBalance: string | number;
+}
+
+interface Strategy {
+    id: string;
+    isActive: boolean;
+}
+
 export default function DashboardPage() {
     const [loading, setLoading] = useState(true);
-    const [portfolios, setPortfolios] = useState([]);
+    const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
+    const [strategies, setStrategies] = useState<Strategy[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
+    const getAuthHeader = () => {
+        const token = localStorage.getItem('token');
+        return { 'Authorization': `Bearer ${token}` };
+    };
+
     useEffect(() => {
-        fetchPortfolios();
+        fetchData();
     }, []);
 
-    const fetchPortfolios = async () => {
+    const fetchData = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const res = await fetch('/api/portfolios', {
-                headers: { 'Authorization': `Bearer ${token}` },
-            });
+            const [portfoliosRes, strategiesRes] = await Promise.all([
+                fetch('/api/portfolios', { headers: getAuthHeader() }),
+                fetch('/api/strategies', { headers: getAuthHeader() }),
+            ]);
 
-            if (res.ok) {
-                const data = await res.json();
+            if (portfoliosRes.ok) {
+                const data = await portfoliosRes.json();
                 setPortfolios(data);
             }
+
+            if (strategiesRes.ok) {
+                const data = await strategiesRes.json();
+                setStrategies(data);
+            }
         } catch (error) {
-            console.error('Failed to fetch portfolios:', error);
+            console.error('Failed to fetch data:', error);
         } finally {
             setLoading(false);
         }
     };
 
     const handlePortfolioCreated = () => {
-        fetchPortfolios();
+        fetchData();
     };
+
+    // Calculate aggregated stats
+    const stats = useMemo(() => {
+        const totalValue = portfolios.reduce((sum, p) => sum + Number(p.totalValue || 0), 0);
+        const totalCash = portfolios.reduce((sum, p) => sum + Number(p.cashBalance || 0), 0);
+        const totalReturn = portfolios.reduce((sum, p) => sum + Number(p.totalReturn || 0), 0);
+
+        // Calculate weighted average return percentage
+        let totalReturnPct = 0;
+        if (totalValue > 0) {
+            totalReturnPct = (totalReturn / (totalValue - totalReturn)) * 100;
+        }
+
+        const activeStrategies = strategies.filter(s => s.isActive).length;
+
+        return {
+            totalPortfolios: portfolios.length,
+            totalValue,
+            totalReturnPct,
+            activeStrategies,
+            isPositive: totalReturnPct >= 0,
+        };
+    }, [portfolios, strategies]);
 
     if (loading) {
         return (
@@ -57,19 +106,23 @@ export default function DashboardPage() {
                 <div className="grid md:grid-cols-4 gap-6 mb-8">
                     <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
                         <div className="text-blue-300 text-sm mb-1">총 포트폴리오</div>
-                        <div className="text-3xl font-bold text-white">{portfolios.length}</div>
+                        <div className="text-3xl font-bold text-white">{stats.totalPortfolios}</div>
                     </div>
                     <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
                         <div className="text-blue-300 text-sm mb-1">총 평가액</div>
-                        <div className="text-3xl font-bold text-white">₩0</div>
+                        <div className="text-3xl font-bold text-white">
+                            ₩{stats.totalValue.toLocaleString()}
+                        </div>
                     </div>
                     <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
                         <div className="text-blue-300 text-sm mb-1">총 수익률</div>
-                        <div className="text-3xl font-bold text-green-400">+0%</div>
+                        <div className={`text-3xl font-bold ${stats.isPositive ? 'text-green-400' : 'text-red-400'}`}>
+                            {stats.isPositive ? '+' : ''}{stats.totalReturnPct.toFixed(2)}%
+                        </div>
                     </div>
                     <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
                         <div className="text-blue-300 text-sm mb-1">활성 전략</div>
-                        <div className="text-3xl font-bold text-white">0</div>
+                        <div className="text-3xl font-bold text-white">{stats.activeStrategies}</div>
                     </div>
                 </div>
 

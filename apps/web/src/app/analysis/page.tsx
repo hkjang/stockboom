@@ -5,7 +5,7 @@ import DashboardLayout from '@/components/DashboardLayout';
 import TechnicalAnalysisTab from '@/components/analysis/TechnicalAnalysisTab';
 import AIAnalysisTab from '@/components/analysis/AIAnalysisTab';
 import NewsTab from '@/components/analysis/NewsTab';
-import { Search, TrendingUp, Newspaper, Brain, RefreshCw, Star } from 'lucide-react';
+import { Search, TrendingUp, Newspaper, Brain, RefreshCw, Star, Loader2 } from 'lucide-react';
 
 type TabType = 'technical' | 'ai' | 'news';
 
@@ -25,6 +25,10 @@ export default function AnalysisPage() {
     const [selectedStock, setSelectedStock] = useState<Stock | null>(null);
     const [isSearching, setIsSearching] = useState(false);
 
+    // Watchlist state
+    const [isInWatchlist, setIsInWatchlist] = useState(false);
+    const [watchlistLoading, setWatchlistLoading] = useState(false);
+
     // Data states
     const [technicalData, setTechnicalData] = useState<any>(null);
     const [aiData, setAiData] = useState<any>(null);
@@ -43,6 +47,51 @@ export default function AnalysisPage() {
     const getAuthHeader = () => {
         const token = localStorage.getItem('token');
         return token ? `Bearer ${token}` : '';
+    };
+
+    // Check if stock is in watchlist
+    const checkWatchlistStatus = useCallback(async (stockId: string) => {
+        try {
+            const res = await fetch(`/api/watchlist/${stockId}/check`, {
+                headers: { 'Authorization': getAuthHeader() }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setIsInWatchlist(data.inWatchlist);
+            }
+        } catch (error) {
+            console.error('Failed to check watchlist status:', error);
+        }
+    }, []);
+
+    // Toggle watchlist
+    const toggleWatchlist = async () => {
+        if (!selectedStock || watchlistLoading) return;
+
+        setWatchlistLoading(true);
+        try {
+            if (isInWatchlist) {
+                await fetch(`/api/watchlist/${selectedStock.id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': getAuthHeader() }
+                });
+                setIsInWatchlist(false);
+            } else {
+                await fetch(`/api/watchlist/${selectedStock.id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': getAuthHeader(),
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({})
+                });
+                setIsInWatchlist(true);
+            }
+        } catch (error) {
+            console.error('Failed to toggle watchlist:', error);
+        } finally {
+            setWatchlistLoading(false);
+        }
     };
 
     // Debounced search
@@ -186,8 +235,9 @@ export default function AnalysisPage() {
             fetchTechnicalData(selectedStock.id);
             fetchAiData(selectedStock.id);
             fetchNewsData(selectedStock.id);
+            checkWatchlistStatus(selectedStock.id);
         }
-    }, [selectedStock, fetchTechnicalData, fetchAiData, fetchNewsData]);
+    }, [selectedStock, fetchTechnicalData, fetchAiData, fetchNewsData, checkWatchlistStatus]);
 
     const handleStockSelect = (stock: Stock) => {
         setSelectedStock(stock);
@@ -289,8 +339,17 @@ export default function AnalysisPage() {
                         <div className="mb-6 bg-gradient-to-r from-blue-600/20 to-purple-600/20 backdrop-blur-lg rounded-xl p-6 border border-white/20">
                             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                                 <div className="flex items-center gap-4">
-                                    <button className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors">
-                                        <Star className="w-5 h-5 text-yellow-400" />
+                                    <button
+                                        onClick={toggleWatchlist}
+                                        disabled={watchlistLoading}
+                                        className={`p-2 rounded-lg transition-colors ${isInWatchlist ? 'bg-yellow-500/20 hover:bg-yellow-500/30' : 'bg-white/10 hover:bg-white/20'}`}
+                                        title={isInWatchlist ? '관심종목에서 제거' : '관심종목에 추가'}
+                                    >
+                                        {watchlistLoading ? (
+                                            <Loader2 className="w-5 h-5 text-yellow-400 animate-spin" />
+                                        ) : (
+                                            <Star className={`w-5 h-5 ${isInWatchlist ? 'text-yellow-400 fill-yellow-400' : 'text-yellow-400'}`} />
+                                        )}
                                     </button>
                                     <div>
                                         <h3 className="text-2xl font-bold text-white">{selectedStock.name}</h3>

@@ -2,11 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Briefcase, TrendingUp, Zap, BarChart3, Bell, Shield } from 'lucide-react';
+import { Home, Briefcase, Star, TrendingUp, Zap, BarChart3, Bell, Shield } from 'lucide-react';
 
 const menuItems = [
     { name: '대시보드', path: '/dashboard', icon: Home },
     { name: '포트폴리오', path: '/portfolios', icon: Briefcase },
+    { name: '관심종목', path: '/watchlist', icon: Star },
     { name: '거래내역', path: '/trades', icon: TrendingUp },
     { name: '전략관리', path: '/strategies', icon: Zap },
     { name: '종목분석', path: '/analysis', icon: BarChart3 },

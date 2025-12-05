@@ -266,4 +266,71 @@ export class AdminController {
             limit ? parseInt(limit) : 20
         );
     }
+
+    // =====================================
+    // NEW: Data Collection Dashboard Endpoints
+    // =====================================
+
+    @Get('data-collection/stats')
+    @ApiOperation({ summary: 'Get data collection dashboard statistics' })
+    async getDataCollectionStats() {
+        return this.adminService.getDataCollectionStats();
+    }
+
+    @Post('data-collection/bulk-collect')
+    @ApiOperation({ summary: 'Bulk collect stock data for multiple symbols' })
+    async bulkCollectStockData(
+        @Body() data: {
+            symbols: string[];
+            timeframe?: string;
+            market?: string;
+        }
+    ) {
+        return this.adminService.bulkCollectStockData(data.symbols, {
+            timeframe: data.timeframe,
+            market: data.market
+        });
+    }
+
+    @Post('data-collection/collect-all')
+    @ApiOperation({ summary: 'Collect data for all active stocks' })
+    async collectAllStockData(
+        @Body() data: { timeframe?: string; batchSize?: number }
+    ) {
+        return this.adminService.collectAllStockData(data);
+    }
+
+    @Get('scheduler/status')
+    @ApiOperation({ summary: 'Get scheduler status and configuration' })
+    async getSchedulerStatus() {
+        return this.adminService.getSchedulerStatus();
+    }
+
+    @Get('data-collection/jobs-v2')
+    @ApiOperation({ summary: 'Get job history with pagination and filtering' })
+    async getDataCollectionJobsV2(
+        @Query('page') page?: string,
+        @Query('limit') limit?: string,
+        @Query('status') status?: string,
+        @Query('type') type?: string
+    ) {
+        return this.adminService.getDataCollectionJobsV2({
+            page: page ? parseInt(page) : 1,
+            limit: limit ? parseInt(limit) : 20,
+            status,
+            type
+        });
+    }
+
+    @Post('data-collection/jobs/:jobId/retry')
+    @ApiOperation({ summary: 'Retry a failed collection job' })
+    async retryCollectionJob(@Param('jobId') jobId: string) {
+        return this.adminService.retryCollectionJob(jobId);
+    }
+
+    @Delete('data-collection/jobs/:jobId')
+    @ApiOperation({ summary: 'Cancel a pending collection job' })
+    async cancelCollectionJob(@Param('jobId') jobId: string) {
+        return this.adminService.cancelCollectionJob(jobId);
+    }
 }

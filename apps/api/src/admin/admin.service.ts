@@ -638,4 +638,310 @@ export class AdminService {
             failedReason: job.failedReason,
         })));
     }
+
+    // =====================================
+    // NEW: Data Collection Dashboard Methods
+    // =====================================
+
+    /**
+     * Get data collection dashboard statistics
+     */
+    async getDataCollectionStats() {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const [
+            totalStocks,
+            activeStocks,
+            totalCandles,
+            todayCandles,
+            pendingJobs,
+            activeJobs,
+            completedJobs,
+            failedJobs,
+            lastCandle
+        ] = await Promise.all([
+            prisma.stock.count(),
+            prisma.stock.count({ where: { isActive: true } }),
+            prisma.candle.count(),
+            prisma.candle.count({
+                where: { createdAt: { gte: today } }
+            }),
+            this.dataCollectionQueue.getWaitingCount(),
+            this.dataCollectionQueue.getActiveCount(),
+            this.dataCollectionQueue.getCompletedCount(),
+            this.dataCollectionQueue.getFailedCount(),
+            prisma.candle.findFirst({
+                orderBy: { createdAt: 'desc' },
+                select: { createdAt: true }
+            })
+        ]);
+
+        return {
+            totalStocks,
+            activeStocks,
+            totalCandles,
+            todayCollected: todayCandles,
+            pendingJobs,
+            activeJobs,
+            completedJobs,
+            failedJobs,
+            lastCollectionTime: lastCandle?.createdAt || null,
+            queueHealth: failedJobs > 10 ? 'warning' : pendingJobs > 100 ? 'busy' : 'healthy'
+        };
+    }
+
+    /**
+     * Bulk collect stock data for multiple symbols
+     */
+    async bulkCollectStockData(
+        symbols: string[],
+        options: { timeframe?: string; market?: string } = {}
+    ) {
+        const { timeframe = '1d', market = 'KOSPI' } = options;
+        const results: { queued: string[]; failed: { symbol: string; error: string }[] } = {
+            queued: [],
+            failed: []
+        };
+
+        for (const symbol of symbols) {
+            try {
+                // Find stock in database
+                const stock = await prisma.stock.findUnique({ where: { symbol } });
+
+                if (!stock) {
+                    results.failed.push({ symbol, error: 'Stock not found' });
+                    continue;
+                }
+
+                // Queue data collection job
+                await this.dataCollectionQueue.add(
+                    'collect-candles',
+                    {
+                        stockId: stock.id,
+                        symbol: stock.symbol,
+                        timeframe,
+                        market: stock.market || market,
+                    },
+                    {
+                        attempts: 3,
+                        backoff: { type: 'exponential', delay: 2000 },
+                    }
+                );
+
+                results.queued.push(symbol);
+            } catch (error: any) {
+                results.failed.push({ symbol, error: error.message });
+            }
+        }
+
+        return {
+            success: true,
+            totalQueued: results.queued.length,
+            totalFailed: results.failed.length,
+            ...results
+        };
+    }
+
+    /**
+     * Collect data for all active stocks
+     */
+    async collectAllStockData(options: { timeframe?: string; batchSize?: number } = {}) {
+        const { timeframe = '1d', batchSize = 50 } = options;
+
+        const stocks = await prisma.stock.findMany({
+            where: { isActive: true, isTradable: true },
+            select: { id: true, symbol: true, market: true }
+        });
+
+        const symbols = stocks.map(s => s.symbol);
+
+        // Queue in batches to avoid overwhelming the system
+        const batches = [];
+        for (let i = 0; i < symbols.length; i += batchSize) {
+            batches.push(symbols.slice(i, i + batchSize));
+        }
+
+        let totalQueued = 0;
+        for (const batch of batches) {
+            const result = await this.bulkCollectStockData(batch, { timeframe });
+            totalQueued += result.totalQueued;
+        }
+
+        return {
+            success: true,
+            message: `Queued ${totalQueued} stocks for data collection`,
+            totalStocks: stocks.length,
+            totalQueued,
+            timeframe
+        };
+    }
+
+    /**
+     * Get scheduler status and configuration
+     */
+    async getSchedulerStatus() {
+        // Define scheduler configurations (matches data-collection.scheduler.ts)
+        const schedulers = [
+            { name: '1분 캔들', cron: '*/1 * * * *', timeframe: '1m', description: '1분마다 수집', enabled: true },
+            { name: '5분 캔들', cron: '*/5 * * * *', timeframe: '5m', description: '5분마다 수집', enabled: true },
+            { name: '15분 캔들', cron: '*/15 * * * *', timeframe: '15m', description: '15분마다 수집', enabled: true },
+            { name: '1시간 캔들', cron: '0 * * * *', timeframe: '1h', description: '매 정각 수집', enabled: true },
+            { name: '일봉', cron: '0 18 * * 1-5', timeframe: '1d', description: '평일 18시 수집', enabled: true },
+            { name: '주봉', cron: '0 18 * * 1', timeframe: '1w', description: '월요일 18시 수집', enabled: true },
+        ];
+
+        // Get queue status
+        const [waiting, active, completed, failed] = await Promise.all([
+            this.dataCollectionQueue.getWaitingCount(),
+            this.dataCollectionQueue.getActiveCount(),
+            this.dataCollectionQueue.getCompletedCount(),
+            this.dataCollectionQueue.getFailedCount()
+        ]);
+
+        return {
+            schedulers: schedulers.map(s => ({
+                ...s,
+                nextRun: this.getNextCronRun(s.cron)
+            })),
+            queueStatus: { waiting, active, completed, failed }
+        };
+    }
+
+    /**
+     * Get improved job history with pagination and filtering
+     */
+    async getDataCollectionJobsV2(params: {
+        page?: number;
+        limit?: number;
+        status?: string;
+        type?: string;
+    } = {}) {
+        const { page = 1, limit = 20, status, type } = params;
+        const offset = (page - 1) * limit;
+
+        // Get jobs from queue based on status filter
+        let statuses: Array<'completed' | 'failed' | 'active' | 'waiting' | 'delayed'> =
+            ['completed', 'failed', 'active', 'waiting'];
+
+        if (status) {
+            statuses = [status as any];
+        }
+
+        const allJobs = await this.dataCollectionQueue.getJobs(statuses);
+
+        // Filter by type if specified
+        let filteredJobs = allJobs;
+        if (type) {
+            filteredJobs = allJobs.filter(job => job.name === type);
+        }
+
+        // Sort by timestamp descending
+        filteredJobs.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+        // Paginate
+        const paginatedJobs = filteredJobs.slice(offset, offset + limit);
+        const total = filteredJobs.length;
+
+        const jobs = await Promise.all(paginatedJobs.map(async job => ({
+            id: job.id,
+            name: job.name,
+            status: await job.getState(),
+            data: job.data,
+            progress: job.progress(),
+            timestamp: job.timestamp,
+            processedOn: job.processedOn,
+            finishedOn: job.finishedOn,
+            failedReason: job.failedReason,
+            attemptsMade: job.attemptsMade,
+        })));
+
+        return {
+            jobs,
+            pagination: {
+                page,
+                limit,
+                total,
+                totalPages: Math.ceil(total / limit)
+            }
+        };
+    }
+
+    /**
+     * Retry a specific collection job
+     */
+    async retryCollectionJob(jobId: string) {
+        const job = await this.dataCollectionQueue.getJob(jobId);
+
+        if (!job) {
+            throw new Error('Job not found');
+        }
+
+        const state = await job.getState();
+        if (state !== 'failed') {
+            throw new Error(`Cannot retry job in ${state} state`);
+        }
+
+        await job.retry();
+
+        return {
+            success: true,
+            message: `Job ${jobId} has been requeued`,
+            jobId
+        };
+    }
+
+    /**
+     * Cancel a pending job
+     */
+    async cancelCollectionJob(jobId: string) {
+        const job = await this.dataCollectionQueue.getJob(jobId);
+
+        if (!job) {
+            throw new Error('Job not found');
+        }
+
+        const state = await job.getState();
+        if (state === 'completed' || state === 'failed') {
+            throw new Error(`Cannot cancel job in ${state} state`);
+        }
+
+        await job.remove();
+
+        return {
+            success: true,
+            message: `Job ${jobId} has been cancelled`,
+            jobId
+        };
+    }
+
+    /**
+     * Helper: Calculate next cron run time
+     */
+    private getNextCronRun(cronExpression: string): Date | null {
+        try {
+            // Simple approximation for common patterns
+            const now = new Date();
+            const parts = cronExpression.split(' ');
+
+            if (cronExpression.startsWith('*/')) {
+                // Every X minutes
+                const interval = parseInt(parts[0].substring(2));
+                const nextMinute = Math.ceil(now.getMinutes() / interval) * interval;
+                const next = new Date(now);
+                next.setMinutes(nextMinute, 0, 0);
+                if (next <= now) {
+                    next.setMinutes(next.getMinutes() + interval);
+                }
+                return next;
+            }
+
+            // For more complex patterns, return approximate next hour
+            const next = new Date(now);
+            next.setHours(next.getHours() + 1, 0, 0, 0);
+            return next;
+        } catch {
+            return null;
+        }
+    }
 }

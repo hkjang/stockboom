@@ -950,18 +950,42 @@ export class AdminService {
     // ============================================
 
     /**
+     * Helper: Find stock by corpCode, stockCode, or symbol
+     */
+    private async findStockByCode(code: string) {
+        // Try corpCode first (8 digits)
+        let stock = await prisma.stock.findFirst({ where: { corpCode: code } });
+        if (stock) return stock;
+
+        // Try stockCode
+        stock = await prisma.stock.findFirst({ where: { stockCode: code } });
+        if (stock) return stock;
+
+        // Try symbol
+        stock = await prisma.stock.findFirst({ where: { symbol: code } });
+        return stock;
+    }
+
+    /**
      * Collect and save executive status from OpenDART
      */
     async collectExecutives(corpCode: string, bizYear: string, reportCode: string = '11011', userId?: string) {
         try {
-            // Find stock by corpCode
-            const stock = await prisma.stock.findFirst({ where: { corpCode } });
+            // Find stock by corpCode, stockCode, or symbol
+            const stock = await this.findStockByCode(corpCode);
             if (!stock) {
-                throw new Error(`Stock with corpCode ${corpCode} not found`);
+                this.logger.warn(`Stock with code ${corpCode} not found, skipping...`);
+                return { success: false, count: 0, message: `Stock with code ${corpCode} not found. Please ensure the stock exists in the database.` };
+            }
+
+            // Use the corpCode from the stock record for OpenDART API
+            const actualCorpCode = stock.corpCode;
+            if (!actualCorpCode) {
+                return { success: false, count: 0, message: `Stock ${stock.name} does not have a corpCode set. Please sync corp codes first.` };
             }
 
             // Fetch data from OpenDART
-            const executives = await this.openDartService.getExecutiveStatus(corpCode, bizYear, reportCode, userId);
+            const executives = await this.openDartService.getExecutiveStatus(actualCorpCode, bizYear, reportCode, userId);
 
             if (!executives || executives.length === 0) {
                 return { success: true, count: 0, message: 'No executive data found' };
@@ -1030,12 +1054,20 @@ export class AdminService {
      */
     async collectOutsideDirectors(corpCode: string, bizYear: string, reportCode: string = '11011', userId?: string) {
         try {
-            const stock = await prisma.stock.findFirst({ where: { corpCode } });
+            // Find stock by corpCode, stockCode, or symbol
+            const stock = await this.findStockByCode(corpCode);
             if (!stock) {
-                throw new Error(`Stock with corpCode ${corpCode} not found`);
+                this.logger.warn(`Stock with code ${corpCode} not found, skipping...`);
+                return { success: false, count: 0, message: `Stock with code ${corpCode} not found. Please ensure the stock exists in the database with a valid corpCode.` };
             }
 
-            const directors = await this.openDartService.getOutsideDirectors(corpCode, bizYear, reportCode, userId);
+            // Use the corpCode from the stock record for OpenDART API
+            const actualCorpCode = stock.corpCode;
+            if (!actualCorpCode) {
+                return { success: false, count: 0, message: `Stock ${stock.name} does not have a corpCode set. Please sync corp codes first.` };
+            }
+
+            const directors = await this.openDartService.getOutsideDirectors(actualCorpCode, bizYear, reportCode, userId);
 
             if (!directors || directors.length === 0) {
                 return { success: true, count: 0, message: 'No outside director data found' };
@@ -1097,12 +1129,20 @@ export class AdminService {
      */
     async collectMajorShareholders(corpCode: string, bizYear: string, reportCode: string = '11011', userId?: string) {
         try {
-            const stock = await prisma.stock.findFirst({ where: { corpCode } });
+            // Find stock by corpCode, stockCode, or symbol
+            const stock = await this.findStockByCode(corpCode);
             if (!stock) {
-                throw new Error(`Stock with corpCode ${corpCode} not found`);
+                this.logger.warn(`Stock with code ${corpCode} not found, skipping...`);
+                return { success: false, count: 0, message: `Stock with code ${corpCode} not found. Please ensure the stock exists in the database with a valid corpCode.` };
             }
 
-            const shareholders = await this.openDartService.getMajorShareholders(corpCode, bizYear, reportCode, userId);
+            // Use the corpCode from the stock record for OpenDART API
+            const actualCorpCode = stock.corpCode;
+            if (!actualCorpCode) {
+                return { success: false, count: 0, message: `Stock ${stock.name} does not have a corpCode set. Please sync corp codes first.` };
+            }
+
+            const shareholders = await this.openDartService.getMajorShareholders(actualCorpCode, bizYear, reportCode, userId);
 
             if (!shareholders || shareholders.length === 0) {
                 return { success: true, count: 0, message: 'No shareholder data found' };
@@ -1167,12 +1207,20 @@ export class AdminService {
      */
     async collectDividends(corpCode: string, bizYear: string, reportCode: string = '11011', userId?: string) {
         try {
-            const stock = await prisma.stock.findFirst({ where: { corpCode } });
+            // Find stock by corpCode, stockCode, or symbol
+            const stock = await this.findStockByCode(corpCode);
             if (!stock) {
-                throw new Error(`Stock with corpCode ${corpCode} not found`);
+                this.logger.warn(`Stock with code ${corpCode} not found, skipping...`);
+                return { success: false, count: 0, message: `Stock with code ${corpCode} not found. Please ensure the stock exists in the database with a valid corpCode.` };
             }
 
-            const dividends = await this.openDartService.getDividendInfo(corpCode, bizYear, reportCode, userId);
+            // Use the corpCode from the stock record for OpenDART API
+            const actualCorpCode = stock.corpCode;
+            if (!actualCorpCode) {
+                return { success: false, count: 0, message: `Stock ${stock.name} does not have a corpCode set. Please sync corp codes first.` };
+            }
+
+            const dividends = await this.openDartService.getDividendInfo(actualCorpCode, bizYear, reportCode, userId);
 
             if (!dividends || dividends.length === 0) {
                 return { success: true, count: 0, message: 'No dividend data found' };
@@ -1238,12 +1286,20 @@ export class AdminService {
      */
     async collectLargeHoldings(corpCode: string, userId?: string) {
         try {
-            const stock = await prisma.stock.findFirst({ where: { corpCode } });
+            // Find stock by corpCode, stockCode, or symbol
+            const stock = await this.findStockByCode(corpCode);
             if (!stock) {
-                throw new Error(`Stock with corpCode ${corpCode} not found`);
+                this.logger.warn(`Stock with code ${corpCode} not found, skipping...`);
+                return { success: false, count: 0, message: `Stock with code ${corpCode} not found. Please ensure the stock exists in the database with a valid corpCode.` };
             }
 
-            const holdings = await this.openDartService.getLargeHoldings(corpCode, userId);
+            // Use the corpCode from the stock record for OpenDART API
+            const actualCorpCode = stock.corpCode;
+            if (!actualCorpCode) {
+                return { success: false, count: 0, message: `Stock ${stock.name} does not have a corpCode set. Please sync corp codes first.` };
+            }
+
+            const holdings = await this.openDartService.getLargeHoldings(actualCorpCode, userId);
 
             if (!holdings || holdings.length === 0) {
                 return { success: true, count: 0, message: 'No large holding data found' };

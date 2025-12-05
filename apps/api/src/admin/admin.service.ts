@@ -944,4 +944,417 @@ export class AdminService {
             return null;
         }
     }
+
+    // ============================================
+    // OpenDART Corporate Information Collection
+    // ============================================
+
+    /**
+     * Collect and save executive status from OpenDART
+     */
+    async collectExecutives(corpCode: string, bizYear: string, reportCode: string = '11011', userId?: string) {
+        try {
+            // Find stock by corpCode
+            const stock = await prisma.stock.findFirst({ where: { corpCode } });
+            if (!stock) {
+                throw new Error(`Stock with corpCode ${corpCode} not found`);
+            }
+
+            // Fetch data from OpenDART
+            const executives = await this.openDartService.getExecutiveStatus(corpCode, bizYear, reportCode, userId);
+
+            if (!executives || executives.length === 0) {
+                return { success: true, count: 0, message: 'No executive data found' };
+            }
+
+            // Save to database with upsert
+            let savedCount = 0;
+            const reportDate = new Date();
+
+            for (const exec of executives) {
+                try {
+                    await prisma.executive.upsert({
+                        where: {
+                            stockId_name_bizYear_reportCode: {
+                                stockId: stock.id,
+                                name: exec.nm || '',
+                                bizYear,
+                                reportCode,
+                            },
+                        },
+                        update: {
+                            position: exec.ofcps || '',
+                            isBoardMember: exec.rgist_exctv_at === 'Y',
+                            isAuditCommittee: exec.aud_at === 'Y',
+                            tenure: exec.mxmm_shrholdr_relate || null,
+                            birthYear: exec.birth_ym || null,
+                            gender: exec.sexdstn || null,
+                            experience: exec.main_career || null,
+                            reportDate,
+                        },
+                        create: {
+                            stockId: stock.id,
+                            name: exec.nm || '',
+                            position: exec.ofcps || '',
+                            isBoardMember: exec.rgist_exctv_at === 'Y',
+                            isAuditCommittee: exec.aud_at === 'Y',
+                            tenure: exec.mxmm_shrholdr_relate || null,
+                            birthYear: exec.birth_ym || null,
+                            gender: exec.sexdstn || null,
+                            experience: exec.main_career || null,
+                            bizYear,
+                            reportCode,
+                            reportDate,
+                        },
+                    });
+                    savedCount++;
+                } catch (err) {
+                    this.logger.warn(`Failed to save executive: ${exec.nm}`);
+                }
+            }
+
+            return {
+                success: true,
+                count: savedCount,
+                total: executives.length,
+                message: `Saved ${savedCount} executives for ${stock.name}`,
+            };
+        } catch (error: any) {
+            this.logger.error(`Failed to collect executives for ${corpCode}`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * Collect and save outside directors from OpenDART
+     */
+    async collectOutsideDirectors(corpCode: string, bizYear: string, reportCode: string = '11011', userId?: string) {
+        try {
+            const stock = await prisma.stock.findFirst({ where: { corpCode } });
+            if (!stock) {
+                throw new Error(`Stock with corpCode ${corpCode} not found`);
+            }
+
+            const directors = await this.openDartService.getOutsideDirectors(corpCode, bizYear, reportCode, userId);
+
+            if (!directors || directors.length === 0) {
+                return { success: true, count: 0, message: 'No outside director data found' };
+            }
+
+            let savedCount = 0;
+            const reportDate = new Date();
+
+            for (const dir of directors) {
+                try {
+                    await prisma.outsideDirector.upsert({
+                        where: {
+                            stockId_name_bizYear_reportCode: {
+                                stockId: stock.id,
+                                name: dir.nm || '',
+                                bizYear,
+                                reportCode,
+                            },
+                        },
+                        update: {
+                            isIndependent: true,
+                            specialization: dir.main_career || null,
+                            appointedDate: dir.chrg_job || null,
+                            tenure: dir.tenure || null,
+                            reportDate,
+                        },
+                        create: {
+                            stockId: stock.id,
+                            name: dir.nm || '',
+                            isIndependent: true,
+                            specialization: dir.main_career || null,
+                            appointedDate: dir.chrg_job || null,
+                            tenure: dir.tenure || null,
+                            bizYear,
+                            reportCode,
+                            reportDate,
+                        },
+                    });
+                    savedCount++;
+                } catch (err) {
+                    this.logger.warn(`Failed to save outside director: ${dir.nm}`);
+                }
+            }
+
+            return {
+                success: true,
+                count: savedCount,
+                total: directors.length,
+                message: `Saved ${savedCount} outside directors for ${stock.name}`,
+            };
+        } catch (error: any) {
+            this.logger.error(`Failed to collect outside directors for ${corpCode}`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * Collect and save major shareholders from OpenDART
+     */
+    async collectMajorShareholders(corpCode: string, bizYear: string, reportCode: string = '11011', userId?: string) {
+        try {
+            const stock = await prisma.stock.findFirst({ where: { corpCode } });
+            if (!stock) {
+                throw new Error(`Stock with corpCode ${corpCode} not found`);
+            }
+
+            const shareholders = await this.openDartService.getMajorShareholders(corpCode, bizYear, reportCode, userId);
+
+            if (!shareholders || shareholders.length === 0) {
+                return { success: true, count: 0, message: 'No shareholder data found' };
+            }
+
+            let savedCount = 0;
+            const reportDate = new Date();
+
+            for (const sh of shareholders) {
+                try {
+                    const sharesOwned = BigInt(String(sh.stock_knd || '0').replace(/,/g, '') || '0');
+                    const shareRatio = parseFloat(String(sh.bsis_posesn_stock_co || '0').replace(/,/g, '') || '0');
+
+                    await prisma.majorShareholder.upsert({
+                        where: {
+                            stockId_shareholderName_bizYear_reportCode: {
+                                stockId: stock.id,
+                                shareholderName: sh.nm || '',
+                                bizYear,
+                                reportCode,
+                            },
+                        },
+                        update: {
+                            relation: sh.relate || null,
+                            sharesOwned,
+                            shareRatio,
+                            isLargeHolder: shareRatio >= 5.0,
+                            reportDate,
+                        },
+                        create: {
+                            stockId: stock.id,
+                            shareholderName: sh.nm || '',
+                            relation: sh.relate || null,
+                            sharesOwned,
+                            shareRatio,
+                            isLargeHolder: shareRatio >= 5.0,
+                            bizYear,
+                            reportCode,
+                            reportDate,
+                        },
+                    });
+                    savedCount++;
+                } catch (err) {
+                    this.logger.warn(`Failed to save shareholder: ${sh.nm}`);
+                }
+            }
+
+            return {
+                success: true,
+                count: savedCount,
+                total: shareholders.length,
+                message: `Saved ${savedCount} shareholders for ${stock.name}`,
+            };
+        } catch (error: any) {
+            this.logger.error(`Failed to collect major shareholders for ${corpCode}`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * Collect and save dividend information from OpenDART
+     */
+    async collectDividends(corpCode: string, bizYear: string, reportCode: string = '11011', userId?: string) {
+        try {
+            const stock = await prisma.stock.findFirst({ where: { corpCode } });
+            if (!stock) {
+                throw new Error(`Stock with corpCode ${corpCode} not found`);
+            }
+
+            const dividends = await this.openDartService.getDividendInfo(corpCode, bizYear, reportCode, userId);
+
+            if (!dividends || dividends.length === 0) {
+                return { success: true, count: 0, message: 'No dividend data found' };
+            }
+
+            let savedCount = 0;
+            const reportDate = new Date();
+
+            for (const div of dividends) {
+                try {
+                    const parseDecimal = (val: any) => {
+                        if (!val || val === '-') return null;
+                        const num = parseFloat(String(val).replace(/,/g, ''));
+                        return isNaN(num) ? null : num;
+                    };
+
+                    await prisma.dividend.upsert({
+                        where: {
+                            stockId_fiscalYear_dividendType_reportCode: {
+                                stockId: stock.id,
+                                fiscalYear: bizYear,
+                                dividendType: div.se || 'cash',
+                                reportCode,
+                            },
+                        },
+                        update: {
+                            cashDividend: parseDecimal(div.thstrm),
+                            dividendYield: parseDecimal(div.lwfr),
+                            dividendPayout: parseDecimal(div.frmtrm),
+                            reportDate,
+                        },
+                        create: {
+                            stockId: stock.id,
+                            fiscalYear: bizYear,
+                            dividendType: div.se || 'cash',
+                            cashDividend: parseDecimal(div.thstrm),
+                            dividendYield: parseDecimal(div.lwfr),
+                            dividendPayout: parseDecimal(div.frmtrm),
+                            reportCode,
+                            reportDate,
+                        },
+                    });
+                    savedCount++;
+                } catch (err) {
+                    this.logger.warn(`Failed to save dividend: ${div.se}`);
+                }
+            }
+
+            return {
+                success: true,
+                count: savedCount,
+                total: dividends.length,
+                message: `Saved ${savedCount} dividend records for ${stock.name}`,
+            };
+        } catch (error: any) {
+            this.logger.error(`Failed to collect dividends for ${corpCode}`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * Collect large holdings (5% or more) from OpenDART
+     */
+    async collectLargeHoldings(corpCode: string, userId?: string) {
+        try {
+            const stock = await prisma.stock.findFirst({ where: { corpCode } });
+            if (!stock) {
+                throw new Error(`Stock with corpCode ${corpCode} not found`);
+            }
+
+            const holdings = await this.openDartService.getLargeHoldings(corpCode, userId);
+
+            if (!holdings || holdings.length === 0) {
+                return { success: true, count: 0, message: 'No large holding data found' };
+            }
+
+            let savedCount = 0;
+            const reportDate = new Date();
+            const bizYear = new Date().getFullYear().toString();
+
+            for (const hold of holdings) {
+                try {
+                    const sharesOwned = BigInt(String(hold.stkqy || '0').replace(/,/g, '') || '0');
+                    const shareRatio = parseFloat(String(hold.stkrt || '0').replace(/,/g, '') || '0');
+
+                    await prisma.majorShareholder.upsert({
+                        where: {
+                            stockId_shareholderName_bizYear_reportCode: {
+                                stockId: stock.id,
+                                shareholderName: hold.rpt_opnin_sttn_nm || '',
+                                bizYear,
+                                reportCode: 'majorstock',
+                            },
+                        },
+                        update: {
+                            sharesOwned,
+                            shareRatio,
+                            isLargeHolder: true,
+                            changeType: hold.chg_rson || null,
+                            changeDate: hold.rcept_dt ? new Date(hold.rcept_dt.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3')) : null,
+                            reportDate,
+                        },
+                        create: {
+                            stockId: stock.id,
+                            shareholderName: hold.rpt_opnin_sttn_nm || '',
+                            sharesOwned,
+                            shareRatio,
+                            isLargeHolder: true,
+                            changeType: hold.chg_rson || null,
+                            changeDate: hold.rcept_dt ? new Date(hold.rcept_dt.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3')) : null,
+                            bizYear,
+                            reportCode: 'majorstock',
+                            reportDate,
+                        },
+                    });
+                    savedCount++;
+                } catch (err) {
+                    this.logger.warn(`Failed to save large holding: ${hold.rpt_opnin_sttn_nm}`);
+                }
+            }
+
+            return {
+                success: true,
+                count: savedCount,
+                total: holdings.length,
+                message: `Saved ${savedCount} large holdings for ${stock.name}`,
+            };
+        } catch (error: any) {
+            this.logger.error(`Failed to collect large holdings for ${corpCode}`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * Get collected executives for a stock
+     */
+    async getStockExecutives(stockId: string, bizYear?: string) {
+        const where: any = { stockId };
+        if (bizYear) where.bizYear = bizYear;
+
+        return prisma.executive.findMany({
+            where,
+            orderBy: { createdAt: 'desc' },
+        });
+    }
+
+    /**
+     * Get collected outside directors for a stock
+     */
+    async getStockOutsideDirectors(stockId: string, bizYear?: string) {
+        const where: any = { stockId };
+        if (bizYear) where.bizYear = bizYear;
+
+        return prisma.outsideDirector.findMany({
+            where,
+            orderBy: { createdAt: 'desc' },
+        });
+    }
+
+    /**
+     * Get collected shareholders for a stock
+     */
+    async getStockMajorShareholders(stockId: string, bizYear?: string) {
+        const where: any = { stockId };
+        if (bizYear) where.bizYear = bizYear;
+
+        return prisma.majorShareholder.findMany({
+            where,
+            orderBy: [{ shareRatio: 'desc' }, { createdAt: 'desc' }],
+        });
+    }
+
+    /**
+     * Get collected dividends for a stock
+     */
+    async getStockDividends(stockId: string, fiscalYear?: string) {
+        const where: any = { stockId };
+        if (fiscalYear) where.fiscalYear = fiscalYear;
+
+        return prisma.dividend.findMany({
+            where,
+            orderBy: { fiscalYear: 'desc' },
+        });
+    }
 }

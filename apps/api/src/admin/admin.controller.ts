@@ -333,4 +333,113 @@ export class AdminController {
     async cancelCollectionJob(@Param('jobId') jobId: string) {
         return this.adminService.cancelCollectionJob(jobId);
     }
+
+    // =====================================
+    // OpenDART Corporate Information Endpoints
+    // =====================================
+
+    @Post('data-collection/opendart/executives')
+    @ApiOperation({ summary: 'Collect executive status from OpenDart' })
+    async collectExecutives(
+        @Request() req: any,
+        @Body() data: { corpCode: string; bizYear: string; reportCode?: string }
+    ) {
+        return this.adminService.collectExecutives(
+            data.corpCode,
+            data.bizYear,
+            data.reportCode || '11011',
+            req.user.userId
+        );
+    }
+
+    @Post('data-collection/opendart/outside-directors')
+    @ApiOperation({ summary: 'Collect outside directors from OpenDart' })
+    async collectOutsideDirectors(
+        @Request() req: any,
+        @Body() data: { corpCode: string; bizYear: string; reportCode?: string }
+    ) {
+        return this.adminService.collectOutsideDirectors(
+            data.corpCode,
+            data.bizYear,
+            data.reportCode || '11011',
+            req.user.userId
+        );
+    }
+
+    @Post('data-collection/opendart/major-shareholders')
+    @ApiOperation({ summary: 'Collect major shareholders from OpenDart' })
+    async collectMajorShareholders(
+        @Request() req: any,
+        @Body() data: { corpCode: string; bizYear: string; reportCode?: string }
+    ) {
+        return this.adminService.collectMajorShareholders(
+            data.corpCode,
+            data.bizYear,
+            data.reportCode || '11011',
+            req.user.userId
+        );
+    }
+
+    @Post('data-collection/opendart/dividends')
+    @ApiOperation({ summary: 'Collect dividend information from OpenDart' })
+    async collectDividends(
+        @Request() req: any,
+        @Body() data: { corpCode: string; bizYear: string; reportCode?: string }
+    ) {
+        return this.adminService.collectDividends(
+            data.corpCode,
+            data.bizYear,
+            data.reportCode || '11011',
+            req.user.userId
+        );
+    }
+
+    @Post('data-collection/opendart/large-holdings')
+    @ApiOperation({ summary: 'Collect large holdings (5%+) from OpenDart' })
+    async collectLargeHoldings(
+        @Request() req: any,
+        @Body() data: { corpCode: string }
+    ) {
+        return this.adminService.collectLargeHoldings(
+            data.corpCode,
+            req.user.userId
+        );
+    }
+
+    // Retrieved data endpoints
+    @Get('stocks/:stockId/executives')
+    @ApiOperation({ summary: 'Get collected executives for a stock' })
+    async getStockExecutives(
+        @Param('stockId') stockId: string,
+        @Query('bizYear') bizYear?: string
+    ) {
+        return this.adminService.getStockExecutives(stockId, bizYear);
+    }
+
+    @Get('stocks/:stockId/outside-directors')
+    @ApiOperation({ summary: 'Get collected outside directors for a stock' })
+    async getStockOutsideDirectors(
+        @Param('stockId') stockId: string,
+        @Query('bizYear') bizYear?: string
+    ) {
+        return this.adminService.getStockOutsideDirectors(stockId, bizYear);
+    }
+
+    @Get('stocks/:stockId/major-shareholders')
+    @ApiOperation({ summary: 'Get collected major shareholders for a stock' })
+    async getStockMajorShareholders(
+        @Param('stockId') stockId: string,
+        @Query('bizYear') bizYear?: string
+    ) {
+        return this.adminService.getStockMajorShareholders(stockId, bizYear);
+    }
+
+    @Get('stocks/:stockId/dividends')
+    @ApiOperation({ summary: 'Get collected dividends for a stock' })
+    async getStockDividends(
+        @Param('stockId') stockId: string,
+        @Query('fiscalYear') fiscalYear?: string
+    ) {
+        return this.adminService.getStockDividends(stockId, fiscalYear);
+    }
 }

@@ -228,6 +228,116 @@ export class OpenDartService {
         }
     }
 
+    // ============================================
+    // 정기보고서 주요정보 APIs
+    // ============================================
+
+    /**
+     * 임원 현황 조회
+     * reprt_code: 11011(사업보고서), 11012(반기보고서), 11013(1분기), 11014(3분기)
+     */
+    async getExecutiveStatus(corpCode: string, bizYear: string, reportCode: string = '11011', userId?: string) {
+        const apiKey = await this.getApiKey(userId);
+        try {
+            const url = `${this.baseUrl}/exctvSttus.json?crtfc_key=${apiKey}&corp_code=${corpCode}&bsns_year=${bizYear}&reprt_code=${reportCode}`;
+            const response = await this.fetchJson(url);
+            if (response.status !== '000') {
+                if (response.status === '013') {
+                    return []; // No data found
+                }
+                throw new Error(`OpenDart API error: ${response.message}`);
+            }
+            return response.list || [];
+        } catch (error) {
+            this.logger.error(`Failed to get executive status for ${corpCode}`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * 사외이사 및 그 변동현황 조회
+     */
+    async getOutsideDirectors(corpCode: string, bizYear: string, reportCode: string = '11011', userId?: string) {
+        const apiKey = await this.getApiKey(userId);
+        try {
+            const url = `${this.baseUrl}/outcmpnyDrctrNdChangeSttus.json?crtfc_key=${apiKey}&corp_code=${corpCode}&bsns_year=${bizYear}&reprt_code=${reportCode}`;
+            const response = await this.fetchJson(url);
+            if (response.status !== '000') {
+                if (response.status === '013') {
+                    return [];
+                }
+                throw new Error(`OpenDart API error: ${response.message}`);
+            }
+            return response.list || [];
+        } catch (error) {
+            this.logger.error(`Failed to get outside directors for ${corpCode}`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * 최대주주 현황 조회
+     */
+    async getMajorShareholders(corpCode: string, bizYear: string, reportCode: string = '11011', userId?: string) {
+        const apiKey = await this.getApiKey(userId);
+        try {
+            const url = `${this.baseUrl}/hyslrSttus.json?crtfc_key=${apiKey}&corp_code=${corpCode}&bsns_year=${bizYear}&reprt_code=${reportCode}`;
+            const response = await this.fetchJson(url);
+            if (response.status !== '000') {
+                if (response.status === '013') {
+                    return [];
+                }
+                throw new Error(`OpenDart API error: ${response.message}`);
+            }
+            return response.list || [];
+        } catch (error) {
+            this.logger.error(`Failed to get major shareholders for ${corpCode}`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * 배당에 관한 사항 조회
+     */
+    async getDividendInfo(corpCode: string, bizYear: string, reportCode: string = '11011', userId?: string) {
+        const apiKey = await this.getApiKey(userId);
+        try {
+            const url = `${this.baseUrl}/alotMatter.json?crtfc_key=${apiKey}&corp_code=${corpCode}&bsns_year=${bizYear}&reprt_code=${reportCode}`;
+            const response = await this.fetchJson(url);
+            if (response.status !== '000') {
+                if (response.status === '013') {
+                    return [];
+                }
+                throw new Error(`OpenDart API error: ${response.message}`);
+            }
+            return response.list || [];
+        } catch (error) {
+            this.logger.error(`Failed to get dividend info for ${corpCode}`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * 대량보유 상황보고 조회
+     */
+    async getLargeHoldings(corpCode: string, userId?: string) {
+        const apiKey = await this.getApiKey(userId);
+        try {
+            const url = `${this.baseUrl}/majorstock.json?crtfc_key=${apiKey}&corp_code=${corpCode}`;
+            const response = await this.fetchJson(url);
+            if (response.status !== '000') {
+                if (response.status === '013') {
+                    return [];
+                }
+                throw new Error(`OpenDart API error: ${response.message}`);
+            }
+            return response.list || [];
+        } catch (error) {
+            this.logger.error(`Failed to get large holdings for ${corpCode}`, error);
+            throw error;
+        }
+    }
+
     private async fetchJson(url: string): Promise<any> {
         return new Promise((resolve, reject) => {
             const getRequest = (currentUrl: string) => {

@@ -145,11 +145,125 @@ model Stock {
   news          News[]
   aiReports     AIReport[]
   trades        Trade[]
+  executives    Executive[]
+  outsideDirectors OutsideDirector[]
+  majorShareholders MajorShareholder[]
+  dividends     Dividend[]
   
   @@index([symbol])
   @@index([market])
   @@index([corpCode])
   @@map("stocks")
+}
+
+// ============================================
+// OpenDART Corporate Information
+// ============================================
+
+model Executive {
+  id              String    @id @default(cuid())
+  stockId         String
+  stock           Stock     @relation(fields: [stockId], references: [id], onDelete: Cascade)
+  
+  // Executive Info
+  name            String    // 성명
+  position        String    // 직위
+  isBoardMember   Boolean   @default(false)  // 이사회 의장/대표이사 여부
+  isAuditCommittee Boolean  @default(false)  // 감사위원회 위원 여부
+  tenure          String?   // 임기
+  birthYear       String?   // 출생연도
+  gender          String?   // 성별
+  experience      String?   @db.Text // 경력
+  
+  // Report Info
+  bizYear         String    // 사업연도
+  reportCode      String    // 보고서 코드
+  reportDate      DateTime  // 보고서 기준일
+  
+  createdAt       DateTime  @default(now())
+  
+  @@unique([stockId, name, bizYear, reportCode])
+  @@index([stockId, bizYear])
+  @@map("executives")
+}
+
+model OutsideDirector {
+  id              String    @id @default(cuid())
+  stockId         String
+  stock           Stock     @relation(fields: [stockId], references: [id], onDelete: Cascade)
+  
+  // Director Info
+  name            String    // 성명
+  isIndependent   Boolean   @default(true)   // 독립성 여부
+  specialization  String?   // 전문분야
+  appointedDate   String?   // 선임일
+  tenure          String?   // 임기
+  endDate         String?   // 임기만료일
+  
+  // Report Info
+  bizYear         String    // 사업연도
+  reportCode      String    // 보고서 코드
+  reportDate      DateTime  // 보고서 기준일
+  
+  createdAt       DateTime  @default(now())
+  
+  @@unique([stockId, name, bizYear, reportCode])
+  @@index([stockId, bizYear])
+  @@map("outside_directors")
+}
+
+model MajorShareholder {
+  id              String    @id @default(cuid())
+  stockId         String
+  stock           Stock     @relation(fields: [stockId], references: [id], onDelete: Cascade)
+  
+  // Shareholder Info
+  shareholderName String    // 주주명
+  relation        String?   // 회사와의 관계
+  sharesOwned     BigInt    // 보유주식수
+  shareRatio      Decimal   @db.Decimal(10, 4)  // 지분율 (%)
+  isLargeHolder   Boolean   @default(false) // 대량보유자 여부 (5% 이상)
+  changeType      String?   // 변동사유
+  changeDate      DateTime? // 변동일
+  
+  // Report Info
+  bizYear         String    // 사업연도
+  reportCode      String    // 보고서 코드
+  reportDate      DateTime  // 보고서 기준일
+  
+  createdAt       DateTime  @default(now())
+  
+  @@unique([stockId, shareholderName, bizYear, reportCode])
+  @@index([stockId, bizYear])
+  @@index([isLargeHolder])
+  @@map("major_shareholders")
+}
+
+model Dividend {
+  id              String    @id @default(cuid())
+  stockId         String
+  stock           Stock     @relation(fields: [stockId], references: [id], onDelete: Cascade)
+  
+  // Dividend Info
+  fiscalYear      String    // 사업연도
+  dividendType    String    // 배당구분 (현금배당/주식배당 등)
+  cashDividend    Decimal?  @db.Decimal(15, 2)  // 주당 현금배당금
+  stockDividend   Decimal?  @db.Decimal(15, 4)  // 주식배당비율
+  dividendYield   Decimal?  @db.Decimal(10, 4)  // 배당수익률 (%)
+  dividendPayout  Decimal?  @db.Decimal(10, 4)  // 배당성향 (%)
+  totalDividend   Decimal?  @db.Decimal(20, 2)  // 총 배당금액
+  recordDate      DateTime? // 배당기준일
+  paymentDate     DateTime? // 지급일
+  
+  // Report Info
+  reportCode      String    // 보고서 코드
+  reportDate      DateTime  // 보고서 기준일
+  
+  createdAt       DateTime  @default(now())
+  
+  @@unique([stockId, fiscalYear, dividendType, reportCode])
+  @@index([stockId, fiscalYear])
+  @@map("dividends")
 }
 
 model Candle {

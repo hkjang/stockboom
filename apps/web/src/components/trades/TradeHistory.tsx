@@ -30,15 +30,15 @@ export function TradeHistory({ limit = 20 }: TradeHistoryProps) {
         fetcher
     );
 
-    const getStatusBadge = (status: string) => {
+    const getStatusBadge = (status: string): 'success' | 'warning' | 'danger' | 'info' => {
         const statusMap: Record<string, 'success' | 'warning' | 'danger' | 'info'> = {
             FILLED: 'success',
             PENDING: 'warning',
             REJECTED: 'danger',
-            CANCELLED: 'default',
+            CANCELLED: 'info',
             SUBMITTED: 'info',
         };
-        return statusMap[status] || 'default';
+        return statusMap[status] || 'info';
     };
 
     if (isLoading) {

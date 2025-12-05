@@ -24,6 +24,15 @@ model User {
   twoFactorEnabled    Boolean @default(false)
   twoFactorSecret     String?
   
+  // Security - IP Whitelist
+  ipWhitelistEnabled  Boolean   @default(false)
+  allowedIps          String[]  // List of allowed IP addresses
+  
+  // Risk Management Settings
+  dailyMaxLoss        Decimal?  @db.Decimal(20, 2)  // Maximum daily loss amount
+  maxPositionPercent  Decimal?  @db.Decimal(5, 2)   // Max position size as % of portfolio (0-100)
+  maxDailyTrades      Int?                          // Maximum trades per day
+  
   // Metadata
   emailVerified Boolean @default(false)
   isActive      Boolean @default(true)
@@ -622,3 +631,33 @@ model DataSourceConfig {
   @@map("data_source_configs")
 }
 
+// ============================================
+// Audit Log for Security Tracking
+// ============================================
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  userId      String?
+  
+  // Action Info
+  action      String   // "LOGIN", "LOGIN_FAILED", "TRADE_CREATE", "TRADE_CANCEL", "SETTINGS_UPDATE", etc.
+  resource    String?  // Affected resource type: "trade", "portfolio", "user_settings", etc.
+  resourceId  String?  // ID of affected resource
+  
+  // Request Info
+  ipAddress   String
+  userAgent   String?
+  
+  // Details
+  details     Json?    // Additional context about the action
+  success     Boolean  @default(true)
+  errorMessage String?
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([action])
+  @@index([createdAt(sort: Desc)])
+  @@map("audit_logs")
+}

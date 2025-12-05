@@ -4,31 +4,72 @@ import { useState, useEffect } from 'react';
 import useSWR from 'swr';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
+import { swrFetcher } from '@/lib/api';
+import { useToast } from '@/components/ui/Toast';
+import { getAuthHeader } from '@/hooks/useAuth';
 
-const fetcher = (url: string) => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    return fetch(url, {
-        headers: {
-            'Authorization': token ? `Bearer ${token}` : '',
-        }
-    }).then(res => {
-        if (!res.ok) throw new Error('Failed to fetch');
-        return res.json();
-    });
-};
+// Types
+interface StockStats {
+    candles?: { count: number; lastUpdated?: string };
+    indicators?: { count: number; lastUpdated?: string };
+    news?: { count: number; lastUpdated?: string };
+    aiReports?: { count: number; lastUpdated?: string };
+}
+
+interface Stock {
+    id: string;
+    symbol: string;
+    name: string;
+    market: string;
+    sector?: string;
+    isActive: boolean;
+    isTradable: boolean;
+    stats?: StockStats;
+}
+
+interface StocksResponse {
+    stocks: Stock[];
+    total: number;
+}
+
+interface StockDetail extends Stock {
+    createdAt?: string;
+    updatedAt?: string;
+    lastPriceUpdate?: string;
+    // OpenDart fields
+    corpCode?: string;
+    stockCode?: string;
+    corpName?: string;
+    corpNameEng?: string;
+    ceoName?: string;
+    corpCls?: string;
+    address?: string;
+    homePage?: string;
+    irUrl?: string;
+    phoneNumber?: string;
+    faxNumber?: string;
+    // Market data
+    currentPrice?: number;
+    openPrice?: number;
+    highPrice?: number;
+    lowPrice?: number;
+    volume?: number;
+    marketCap?: number;
+}
 
 export default function AdminStocks() {
+    const { showToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
     const [showBulkModal, setShowBulkModal] = useState(false);
     const [showDetailsModal, setShowDetailsModal] = useState(false);
     const [selectedStockId, setSelectedStockId] = useState<string | null>(null);
     const [jsonInput, setJsonInput] = useState('');
-    const { data, mutate } = useSWR('/api/admin/stocks', fetcher);
+    const { data, mutate } = useSWR<StocksResponse>('/api/admin/stocks', swrFetcher);
 
     const stocks = data?.stocks || [];
     const total = data?.total || 0;
 
-    const filteredStocks = stocks.filter((stock: any) =>
+    const filteredStocks = stocks.filter((stock) =>
         stock.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
         stock.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -37,28 +78,27 @@ export default function AdminStocks() {
         try {
             const parsedStocks = JSON.parse(jsonInput);
             if (!Array.isArray(parsedStocks)) {
-                alert('JSON must be an array of stock objects');
+                showToast('JSON must be an array of stock objects', 'error');
                 return;
             }
 
-            const token = localStorage.getItem('token');
             const res = await fetch('/api/admin/stocks/bulk', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': token ? `Bearer ${token}` : '',
+                    ...getAuthHeader(),
                 },
                 body: JSON.stringify({ stocks: parsedStocks }),
             });
 
             const result = await res.json();
-            alert(`성공: ${result.success?.length || 0}, 실패: ${result.failed?.length || 0}`);
+            showToast(`성공: ${result.success?.length || 0}, 실패: ${result.failed?.length || 0}`, 'success');
             setShowBulkModal(false);
             setJsonInput('');
             mutate();
         } catch (error) {
             console.error('Bulk import failed:', error);
-            alert('대량 등록 실패: ' + (error as Error).message);
+            showToast('대량 등록 실패: ' + (error as Error).message, 'error');
         }
     };
 
@@ -281,7 +321,7 @@ interface StockDetailsModalProps {
 }
 
 function StockDetailsModal({ stockId, onClose, onUpdate }: StockDetailsModalProps) {
-    const { data: stock, mutate: mutateStock } = useSWR(`/api/admin/stocks/${stockId}`, fetcher);
+    const { data: stock, mutate: mutateStock } = useSWR<StockDetail>(`/api/admin/stocks/${stockId}`, swrFetcher);
     const [formData, setFormData] = useState<any>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
 

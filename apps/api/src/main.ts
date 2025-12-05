@@ -2,9 +2,11 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
+import { ThrottlerGuard } from '@nestjs/throttler';
 import helmet from 'helmet';
 import { json, urlencoded } from 'express';
 import { AppModule } from './app.module';
+import { GlobalExceptionFilter } from './common/filters/api-error.filter';
 
 async function bootstrap() {
     const logger = new Logger('Bootstrap');
@@ -37,6 +39,12 @@ async function bootstrap() {
 
     // Global prefix
     app.setGlobalPrefix('api');
+
+    // Global exception filter for consistent error responses
+    app.useGlobalFilters(new GlobalExceptionFilter());
+
+    // Global rate limiting guard
+    app.useGlobalGuards(app.get(ThrottlerGuard));
 
     // Validation
     app.useGlobalPipes(

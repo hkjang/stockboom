@@ -1,0 +1,86 @@
+  ??Next.js 14.2.33
+  - Environments: .env
+
+   Creating an optimized production build ...
+ ??Compiled successfully
+   Linting and checking validity of types ...
+
+./src/app/admin/users/AdminUserApiKeysDialog.tsx
+39:8  Warning: React Hook useEffect has a missing dependency: 'fetchKeys'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./src/app/trades/page.tsx
+17:8  Warning: React Hook useEffect has a missing dependency: 'fetchTrades'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./src/components/DashboardLayout.tsx
+23:8  Warning: React Hook useEffect has missing dependencies: 'fetchUser' and 'router'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules
+   Collecting page data ...
+   Generating static pages (0/29) ...
+Queue API Error: B [Error]: Dynamic server usage: Route /api/admin/queues couldn't be rendered statically because it used `request.headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at V (C:\Users\USER\projects\stockboom\node_modules\.pnpm\next@14.2.33_react-dom@18.3.1_react@18.3.1__react@18.3.1\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:21778)
+    at Object.get (C:\Users\USER\projects\stockboom\node_modules\.pnpm\next@14.2.33_react-dom@18.3.1_react@18.3.1__react@18.3.1\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:29465)
+    at p (C:\Users\USER\projects\stockboom\apps\web\.next\server\app\api\admin\queues\route.js:1:543)
+    at C:\Users\USER\projects\stockboom\node_modules\.pnpm\next@14.2.33_react-dom@18.3.1_react@18.3.1__react@18.3.1\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:38417
+    at C:\Users\USER\projects\stockboom\node_modules\.pnpm\next@14.2.33_react-dom@18.3.1_react@18.3.1__react@18.3.1\node_modules\next\dist\server\lib\trace\tracer.js:140:36
+    at NoopContextManager.with (C:\Users\USER\projects\stockboom\node_modules\.pnpm\next@14.2.33_react-dom@18.3.1_react@18.3.1__react@18.3.1\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (C:\Users\USER\projects\stockboom\node_modules\.pnpm\next@14.2.33_react-dom@18.3.1_react@18.3.1__react@18.3.1\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NoopTracer.startActiveSpan (C:\Users\USER\projects\stockboom\node_modules\.pnpm\next@14.2.33_react-dom@18.3.1_react@18.3.1__react@18.3.1\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18093)
+    at ProxyTracer.startActiveSpan (C:\Users\USER\projects\stockboom\node_modules\.pnpm\next@14.2.33_react-dom@18.3.1_react@18.3.1__react@18.3.1\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18854)
+    at C:\Users\USER\projects\stockboom\node_modules\.pnpm\next@14.2.33_react-dom@18.3.1_react@18.3.1__react@18.3.1\node_modules\next\dist\server\lib\trace\tracer.js:122:103 {
+  description: "Route /api/admin/queues couldn't be rendered statically because it used `request.headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+   Generating static pages (7/29) 
+   Generating static pages (14/29) 
+   Generating static pages (21/29) 
+ ??Generating static pages (29/29)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                           Size     First Load JS
+????/                                                 138 B          87.4 kB
+????/_not-found                                       873 B          88.1 kB
+????/admin                                            1.39 kB        93.6 kB
+????/admin/data-collection                            3.34 kB        95.5 kB
+????/admin/data-sources                               2.29 kB        94.5 kB
+????/admin/monitoring                                 2.52 kB        94.7 kB
+????/admin/queues                                     1.91 kB        94.1 kB
+????/admin/stocks                                     4.96 kB        97.2 kB
+????/admin/users                                      3.91 kB        96.1 kB
+????/alerts                                           4.49 kB         101 kB
+????/analysis                                         4.03 kB         100 kB
+??? /api/admin/data-collection/opendart/[action]      0 B                0 B
+??? /api/admin/data-collection/stocks/[action]        0 B                0 B
+??? /api/admin/data-sources                           0 B                0 B
+??? /api/admin/data-sources/[metricType]              0 B                0 B
+??? /api/admin/metrics                                0 B                0 B
+??? /api/admin/queues                                 0 B                0 B
+??? /api/admin/queues/[queueName]/failed              0 B                0 B
+??? /api/admin/queues/[queueName]/jobs/[jobId]/retry  0 B                0 B
+??? /api/admin/stats                                  0 B                0 B
+??? /api/admin/stocks                                 0 B                0 B
+??? /api/admin/stocks/[stockId]                       0 B                0 B
+??? /api/admin/stocks/bulk                            0 B                0 B
+??? /api/admin/users                                  0 B                0 B
+??? /api/admin/users/[userId]                         0 B                0 B
+??? /api/admin/users/[userId]/api-keys                0 B                0 B
+??? /api/admin/users/[userId]/reset-password          0 B                0 B
+??? /api/user/api-keys                                0 B                0 B
+????/auth/login                                       1.4 kB         88.7 kB
+????/auth/register                                    1.6 kB         88.9 kB
+????/dashboard                                        3.97 kB         100 kB
+????/portfolios                                       4.98 kB         101 kB
+????/settings/api-keys                                4.4 kB          105 kB
+????/strategies                                       4.27 kB         100 kB
+????/strategy                                         700 B            88 kB
+????/trades                                           4.01 kB         100 kB
++ First Load JS shared by all                         87.3 kB
+  ??chunks/844-f3f09362e51f653e.js                    31.7 kB
+  ??chunks/f28872f0-128fbfd67a15d55b.js               53.6 kB
+  ??other shared chunks (total)                       1.89 kB
+
+
+?? (Static)   prerendered as static content
+?  (Dynamic)  server-rendered on demand
+

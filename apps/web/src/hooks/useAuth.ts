@@ -64,3 +64,20 @@ export function getAuthHeader(): Record<string, string> {
     const token = getAuthToken();
     return token ? { Authorization: `Bearer ${token}` } : {};
 }
+
+/**
+ * Helper function to set token (for use outside of React components)
+ */
+export function setAuthToken(token: string): void {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem(TOKEN_KEY, token);
+}
+
+/**
+ * Helper function to clear auth (for use outside of React components)
+ */
+export function clearAuth(): void {
+    if (typeof window === 'undefined') return;
+    localStorage.removeItem(TOKEN_KEY);
+}
+

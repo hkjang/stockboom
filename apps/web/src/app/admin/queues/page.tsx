@@ -26,7 +26,7 @@ export default function QueueManagement() {
             mutate();
             alert('작업 재시도가 시작되었습니다.');
         } catch (error) {
-            alert('작업 재시도 실패: ' + error.message);
+            alert('작업 재시도 실패: ' + (error as Error).message);
         }
     };
 
@@ -42,7 +42,7 @@ export default function QueueManagement() {
             mutate();
             alert('완료된 작업이 삭제되었습니다.');
         } catch (error) {
-            alert('삭제 실패: ' + error.message);
+            alert('삭제 실패: ' + (error as Error).message);
         }
     };
 

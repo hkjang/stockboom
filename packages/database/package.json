@@ -2,7 +2,7 @@
     "name": "@stockboom/database",
     "version": "1.0.0",
     "private": true,
-    "main": "./index.ts",
+    "main": "./index.js",
     "types": "./index.ts",
     "scripts": {
         "db:generate": "prisma generate",

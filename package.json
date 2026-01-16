@@ -7,6 +7,10 @@
     "dev": "pnpm run --parallel dev",
     "build": "pnpm run --recursive build",
     "start": "pnpm run --parallel start",
+    "test": "pnpm run --recursive test",
+    "test:cov": "pnpm run --recursive test:cov",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,json,md}\"",
     "db:generate": "pnpm --filter @stockboom/database prisma generate",
     "db:push": "pnpm --filter @stockboom/database prisma db push",
     "db:migrate": "pnpm --filter @stockboom/database prisma migrate dev",
@@ -28,6 +32,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.10.0",
+    "prettier": "^3.2.0",
     "typescript": "^5.3.3"
   },
   "engines": {
@@ -35,3 +40,4 @@
     "pnpm": ">=8.0.0"
   }
 }
+

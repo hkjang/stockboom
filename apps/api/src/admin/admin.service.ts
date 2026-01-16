@@ -757,7 +757,7 @@ export class AdminService {
         const symbols = stocks.map(s => s.symbol);
 
         // Queue in batches to avoid overwhelming the system
-        const batches = [];
+        const batches: string[][] = [];
         for (let i = 0; i < symbols.length; i += batchSize) {
             batches.push(symbols.slice(i, i + batchSize));
         }

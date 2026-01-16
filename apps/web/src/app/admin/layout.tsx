@@ -21,9 +21,9 @@ export default function AdminLayout({
     ];
 
     return (
-        <div className="min-h-screen bg-gray-900 text-sm">
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-sm">
             {/* Header */}
-            <header className="bg-gray-800/80 backdrop-blur-sm border-b border-gray-700 sticky top-0 z-40">
+            <header className="bg-white/5 backdrop-blur-lg border-b border-white/10 sticky top-0 z-40">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5">
                     <div className="flex justify-between items-center">
                         <div className="flex items-center gap-2">
@@ -32,7 +32,7 @@ export default function AdminLayout({
                         </div>
                         <Link
                             href="/dashboard"
-                            className="px-3 py-1.5 text-xs text-gray-300 hover:text-white bg-gray-700/50 hover:bg-gray-700 rounded-md transition-colors"
+                            className="px-3 py-1.5 text-xs text-blue-200 hover:text-white bg-white/10 hover:bg-white/20 rounded-md transition-colors"
                         >
                             ← 대시보드
                         </Link>
@@ -44,7 +44,7 @@ export default function AdminLayout({
                 <div className="flex gap-4">
                     {/* Sidebar */}
                     <aside className="w-48 flex-shrink-0">
-                        <nav className="bg-gray-800/50 rounded-lg border border-gray-700 p-2 space-y-0.5 sticky top-14">
+                        <nav className="bg-white/10 backdrop-blur-lg rounded-xl border border-white/20 p-2 space-y-0.5 sticky top-14">
                             {navigation.map((item) => {
                                 const isActive = pathname === item.href ||
                                     (item.href !== '/admin' && pathname.startsWith(item.href));
@@ -53,8 +53,8 @@ export default function AdminLayout({
                                         key={item.name}
                                         href={item.href}
                                         className={`flex items-center px-3 py-2 text-xs font-medium rounded-md transition-all ${isActive
-                                            ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white'
-                                            : 'text-gray-400 hover:bg-gray-700/50 hover:text-white'
+                                            ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-600/20'
+                                            : 'text-blue-200 hover:bg-white/10 hover:text-white'
                                             }`}
                                     >
                                         <span className="mr-2 text-sm">{item.icon}</span>

@@ -50,46 +50,46 @@ export default function AdminStocks() {
             <div className="flex justify-between items-center">
                 <div>
                     <h1 className="text-xl font-bold text-white">종목 관리</h1>
-                    <p className="text-xs text-gray-400 mt-0.5">종목 및 데이터 수집 현황</p>
+                    <p className="text-xs text-blue-200 mt-0.5">종목 및 데이터 수집 현황</p>
                 </div>
                 <button onClick={() => setShowBulkModal(true)}
-                    className="px-3 py-1.5 text-xs bg-indigo-600 hover:bg-indigo-700 text-white rounded-md">📦 대량 등록</button>
+                    className="px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded-lg">📦 대량 등록</button>
             </div>
 
-            <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-3">
+            <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-3">
                 <input type="text" placeholder="검색..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full px-3 py-1.5 text-xs bg-gray-700/50 border border-gray-600 rounded text-white placeholder-gray-400" />
+                    className="w-full px-3 py-1.5 text-xs bg-white/5 border border-white/20 rounded-lg text-white placeholder-blue-300/50" />
             </div>
 
             <div className="grid grid-cols-3 gap-3">
-                <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-3">
-                    <div className="text-xs text-gray-400">총 종목</div>
+                <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-3">
+                    <div className="text-xs text-blue-200">총 종목</div>
                     <div className="text-lg font-bold text-white mt-0.5">{data?.total || 0}</div>
                 </div>
-                <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-3">
-                    <div className="text-xs text-gray-400">거래 가능</div>
+                <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-3">
+                    <div className="text-xs text-blue-200">거래 가능</div>
                     <div className="text-lg font-bold text-emerald-400 mt-0.5">{stocks.filter(s => s.isTradable).length}</div>
                 </div>
-                <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-3">
-                    <div className="text-xs text-gray-400">비활성</div>
-                    <div className="text-lg font-bold text-gray-500 mt-0.5">{stocks.filter(s => !s.isActive).length}</div>
+                <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-3">
+                    <div className="text-xs text-blue-200">비활성</div>
+                    <div className="text-lg font-bold text-blue-300/70 mt-0.5">{stocks.filter(s => !s.isActive).length}</div>
                 </div>
             </div>
 
-            <div className="bg-gray-800/50 border border-gray-700 rounded-lg overflow-hidden">
+            <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl overflow-hidden">
                 <table className="w-full text-xs">
-                    <thead className="bg-gray-700/50">
+                    <thead className="bg-white/5">
                         <tr>
-                            <th className="px-3 py-2 text-left text-gray-400">코드</th>
-                            <th className="px-3 py-2 text-left text-gray-400">종목명</th>
-                            <th className="px-3 py-2 text-left text-gray-400">시장</th>
-                            <th className="px-3 py-2 text-center text-gray-400">데이터</th>
-                            <th className="px-3 py-2 text-left text-gray-400">상태</th>
+                            <th className="px-3 py-2 text-left text-blue-200">코드</th>
+                            <th className="px-3 py-2 text-left text-blue-200">종목명</th>
+                            <th className="px-3 py-2 text-left text-blue-200">시장</th>
+                            <th className="px-3 py-2 text-center text-blue-200">데이터</th>
+                            <th className="px-3 py-2 text-left text-blue-200">상태</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-700">
+                    <tbody className="divide-y divide-white/10">
                         {filteredStocks.map((stock) => (
-                            <tr key={stock.id} className="hover:bg-gray-700/30">
+                            <tr key={stock.id} className="hover:bg-white/5">
                                 <td className="px-3 py-2 font-mono text-indigo-400 cursor-pointer hover:underline"
                                     onClick={() => { setSelectedStockId(stock.id); setShowDetailsModal(true); }}>
                                     {stock.symbol}
@@ -99,7 +99,7 @@ export default function AdminStocks() {
                                 <td className="px-3 py-2">
                                     <div className="flex gap-1 justify-center">
                                         {['candles', 'indicators', 'news', 'aiReports'].map(k => (
-                                            <span key={k} className={`px-1 py-0.5 rounded ${(stock.stats?.[k as keyof typeof stock.stats]?.count || 0) > 0 ? 'bg-indigo-600/20 text-indigo-400' : 'bg-gray-700/50 text-gray-500'}`}>
+                                            <span key={k} className={`px-1 py-0.5 rounded ${(stock.stats?.[k as keyof typeof stock.stats]?.count || 0) > 0 ? 'bg-blue-600/20 text-blue-400' : 'bg-white/5 text-blue-300/50'}`}>
                                                 {stock.stats?.[k as keyof typeof stock.stats]?.count || 0}
                                             </span>
                                         ))}
@@ -119,16 +119,16 @@ export default function AdminStocks() {
 
             {showBulkModal && (
                 <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-                    <div className="bg-gray-800 border border-gray-700 rounded-lg shadow-xl max-w-2xl w-full p-4">
+                    <div className="bg-slate-900/95 backdrop-blur-lg border border-white/20 rounded-xl shadow-xl max-w-2xl w-full p-4">
                         <h2 className="text-sm font-semibold text-white mb-3">대량 등록</h2>
                         <textarea value={jsonInput} onChange={(e) => setJsonInput(e.target.value)}
-                            className="w-full h-40 px-3 py-2 text-xs font-mono bg-gray-700/50 border border-gray-600 rounded text-white"
+                            className="w-full h-40 px-3 py-2 text-xs font-mono bg-white/5 border border-white/20 rounded-lg text-white"
                             placeholder='[{"symbol":"005930","name":"삼성전자","market":"KOSPI"}]' />
                         <div className="flex justify-end gap-2 mt-3">
                             <button onClick={() => { setShowBulkModal(false); setJsonInput(''); }}
-                                className="px-3 py-1.5 text-xs bg-gray-700 text-gray-300 rounded">취소</button>
+                                className="px-3 py-1.5 text-xs bg-white/10 text-blue-200 rounded-lg">취소</button>
                             <button onClick={handleBulkImport}
-                                className="px-3 py-1.5 text-xs bg-indigo-600 text-white rounded">등록</button>
+                                className="px-3 py-1.5 text-xs bg-blue-600 text-white rounded-lg">등록</button>
                         </div>
                     </div>
                 </div>
@@ -148,7 +148,7 @@ function StockDetailsModal({ stockId, onClose, onUpdate }: { stockId: string; on
 
     useEffect(() => { if (stock) setFormData(stock); }, [stock]);
 
-    if (!stock) return <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50"><div className="bg-gray-800 p-4 rounded-lg text-xs text-gray-300">로딩...</div></div>;
+    if (!stock) return <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50"><div className="bg-slate-900/95 backdrop-blur-lg p-4 rounded-xl text-xs text-blue-200">로딩...</div></div>;
 
     const handleSubmit = async () => {
         setSaving(true);
@@ -168,14 +168,14 @@ function StockDetailsModal({ stockId, onClose, onUpdate }: { stockId: string; on
         onUpdate(); onClose();
     };
 
-    const inp = "w-full px-2 py-1 text-xs bg-gray-700/50 border border-gray-600 rounded text-white";
+    const inp = "w-full px-2 py-1 text-xs bg-white/5 border border-white/20 rounded-lg text-white";
 
     return (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 overflow-y-auto">
-            <div className="bg-gray-800 border border-gray-700 rounded-lg shadow-xl max-w-3xl w-full p-4 my-8">
+            <div className="bg-slate-900/95 backdrop-blur-lg border border-white/20 rounded-xl shadow-xl max-w-3xl w-full p-4 my-8">
                 <div className="flex justify-between items-center mb-3">
                     <h2 className="text-sm font-semibold text-white">종목 상세</h2>
-                    <button onClick={onClose} className="text-gray-400 hover:text-white">×</button>
+                    <button onClick={onClose} className="text-blue-300 hover:text-white">×</button>
                 </div>
 
                 <div className="space-y-4 max-h-[60vh] overflow-y-auto text-xs">
@@ -184,15 +184,15 @@ function StockDetailsModal({ stockId, onClose, onUpdate }: { stockId: string; on
                         <div className="grid grid-cols-2 gap-2">
                             {['symbol', 'name', 'market', 'sector'].map(k => (
                                 <div key={k}>
-                                    <label className="text-gray-400">{k}</label>
+                                    <label className="text-blue-200">{k}</label>
                                     <input type="text" value={formData[k] || ''} onChange={(e) => setFormData({ ...formData, [k]: e.target.value })} className={inp} />
                                 </div>
                             ))}
-                            <label className="flex items-center gap-1 text-gray-300 col-span-1">
-                                <input type="checkbox" checked={formData.isActive || false} onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })} className="rounded bg-gray-700" />활성
+                            <label className="flex items-center gap-1 text-blue-200 col-span-1">
+                                <input type="checkbox" checked={formData.isActive || false} onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })} className="rounded bg-white/10" />활성
                             </label>
-                            <label className="flex items-center gap-1 text-gray-300 col-span-1">
-                                <input type="checkbox" checked={formData.isTradable || false} onChange={(e) => setFormData({ ...formData, isTradable: e.target.checked })} className="rounded bg-gray-700" />거래가능
+                            <label className="flex items-center gap-1 text-blue-200 col-span-1">
+                                <input type="checkbox" checked={formData.isTradable || false} onChange={(e) => setFormData({ ...formData, isTradable: e.target.checked })} className="rounded bg-white/10" />거래가능
                             </label>
                         </div>
                     </section>
@@ -202,7 +202,7 @@ function StockDetailsModal({ stockId, onClose, onUpdate }: { stockId: string; on
                         <div className="grid grid-cols-2 gap-2">
                             {['corpCode', 'corpName', 'ceoName', 'homePage'].map(k => (
                                 <div key={k}>
-                                    <label className="text-gray-400">{k}</label>
+                                    <label className="text-blue-200">{k}</label>
                                     <input type="text" value={formData[k] || ''} onChange={(e) => setFormData({ ...formData, [k]: e.target.value })} className={inp} />
                                 </div>
                             ))}
@@ -214,7 +214,7 @@ function StockDetailsModal({ stockId, onClose, onUpdate }: { stockId: string; on
                         <div className="grid grid-cols-3 gap-2">
                             {['currentPrice', 'volume', 'marketCap'].map(k => (
                                 <div key={k}>
-                                    <label className="text-gray-400">{k}</label>
+                                    <label className="text-blue-200">{k}</label>
                                     <input type="number" value={formData[k] || ''} onChange={(e) => setFormData({ ...formData, [k]: e.target.value })} className={inp} />
                                 </div>
                             ))}
@@ -222,11 +222,11 @@ function StockDetailsModal({ stockId, onClose, onUpdate }: { stockId: string; on
                     </section>
                 </div>
 
-                <div className="flex justify-between mt-4 pt-3 border-t border-gray-700">
-                    <button onClick={handleDelete} className="px-3 py-1.5 text-xs bg-red-600 hover:bg-red-700 text-white rounded">삭제</button>
+                <div className="flex justify-between mt-4 pt-3 border-t border-white/10">
+                    <button onClick={handleDelete} className="px-3 py-1.5 text-xs bg-red-600 hover:bg-red-700 text-white rounded-lg">삭제</button>
                     <div className="flex gap-2">
-                        <button onClick={onClose} className="px-3 py-1.5 text-xs bg-gray-700 text-gray-300 rounded">취소</button>
-                        <button onClick={handleSubmit} disabled={saving} className="px-3 py-1.5 text-xs bg-indigo-600 text-white rounded disabled:opacity-50">
+                        <button onClick={onClose} className="px-3 py-1.5 text-xs bg-white/10 text-blue-200 rounded-lg">취소</button>
+                        <button onClick={handleSubmit} disabled={saving} className="px-3 py-1.5 text-xs bg-blue-600 text-white rounded-lg disabled:opacity-50">
                             {saving ? '저장중...' : '저장'}
                         </button>
                     </div>

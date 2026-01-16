@@ -49,28 +49,28 @@ function EditUserModal({ user, isOpen, onClose, onSave }: { user: any, isOpen: b
 
     return (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-            <div className="bg-gray-800 border border-gray-700 rounded-lg shadow-xl max-w-sm w-full p-4">
+            <div className="bg-slate-900/95 backdrop-blur-lg border border-white/20 rounded-xl shadow-xl max-w-sm w-full p-4">
                 <h2 className="text-sm font-semibold text-white mb-3">사용자 수정</h2>
                 <form onSubmit={handleSubmit} className="space-y-3">
                     <div>
-                        <label className="block text-xs text-gray-400 mb-1">이메일</label>
+                        <label className="block text-xs text-blue-200 mb-1">이메일</label>
                         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                            className="w-full px-3 py-1.5 text-xs bg-gray-700/50 border border-gray-600 rounded text-white" required />
+                            className="w-full px-3 py-1.5 text-xs bg-white/5 border border-white/20 rounded-lg text-white" required />
                     </div>
                     <div>
-                        <label className="block text-xs text-gray-400 mb-1">이름</label>
+                        <label className="block text-xs text-blue-200 mb-1">이름</label>
                         <input type="text" value={name} onChange={(e) => setName(e.target.value)}
-                            className="w-full px-3 py-1.5 text-xs bg-gray-700/50 border border-gray-600 rounded text-white" />
+                            className="w-full px-3 py-1.5 text-xs bg-white/5 border border-white/20 rounded-lg text-white" />
                     </div>
                     <button type="button" onClick={handleResetPassword}
-                        className="w-full px-3 py-1.5 text-xs bg-amber-600 hover:bg-amber-700 text-white rounded">
+                        className="w-full px-3 py-1.5 text-xs bg-amber-600 hover:bg-amber-700 text-white rounded-lg">
                         🔑 비밀번호 초기화
                     </button>
-                    <div className="flex justify-end gap-2 pt-2 border-t border-gray-700">
+                    <div className="flex justify-end gap-2 pt-2 border-t border-white/10">
                         <button type="button" onClick={onClose}
-                            className="px-3 py-1.5 text-xs bg-gray-700 hover:bg-gray-600 text-gray-300 rounded">취소</button>
+                            className="px-3 py-1.5 text-xs bg-white/10 hover:bg-white/20 text-blue-200 rounded-lg">취소</button>
                         <button type="submit"
-                            className="px-3 py-1.5 text-xs bg-indigo-600 hover:bg-indigo-700 text-white rounded">저장</button>
+                            className="px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded-lg">저장</button>
                     </div>
                 </form>
             </div>
@@ -129,42 +129,42 @@ export default function AdminUsers() {
             <div className="flex justify-between items-center">
                 <div>
                     <h1 className="text-xl font-bold text-white">사용자 관리</h1>
-                    <p className="text-xs text-gray-400 mt-0.5">사용자 계정 관리</p>
+                    <p className="text-xs text-blue-200 mt-0.5">사용자 계정 관리</p>
                 </div>
-                <button className="px-3 py-1.5 text-xs bg-indigo-600 hover:bg-indigo-700 text-white rounded-md">
+                <button className="px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
                     + 새 사용자
                 </button>
             </div>
 
-            <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-3">
+            <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-3">
                 <input type="text" placeholder="검색..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full px-3 py-1.5 text-xs bg-gray-700/50 border border-gray-600 rounded text-white placeholder-gray-400" />
+                    className="w-full px-3 py-1.5 text-xs bg-white/5 border border-white/20 rounded-lg text-white placeholder-blue-300/50" />
             </div>
 
-            <div className="bg-gray-800/50 border border-gray-700 rounded-lg overflow-hidden">
+            <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl overflow-hidden">
                 <table className="w-full text-xs">
-                    <thead className="bg-gray-700/50">
+                    <thead className="bg-white/5">
                         <tr>
-                            <th className="px-3 py-2 text-left text-gray-400">사용자</th>
-                            <th className="px-3 py-2 text-left text-gray-400">2FA</th>
-                            <th className="px-3 py-2 text-left text-gray-400">가입일</th>
-                            <th className="px-3 py-2 text-left text-gray-400">상태</th>
-                            <th className="px-3 py-2 text-right text-gray-400">작업</th>
+                            <th className="px-3 py-2 text-left text-blue-200">사용자</th>
+                            <th className="px-3 py-2 text-left text-blue-200">2FA</th>
+                            <th className="px-3 py-2 text-left text-blue-200">가입일</th>
+                            <th className="px-3 py-2 text-left text-blue-200">상태</th>
+                            <th className="px-3 py-2 text-right text-blue-200">작업</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-700">
+                    <tbody className="divide-y divide-white/10">
                         {filteredUsers?.map((user: any) => (
-                            <tr key={user.id} className="hover:bg-gray-700/30">
+                            <tr key={user.id} className="hover:bg-white/5">
                                 <td className="px-3 py-2">
                                     <div className="text-white">{user.email}</div>
-                                    <div className="text-gray-500">{user.name || 'N/A'}</div>
+                                    <div className="text-blue-300/70">{user.name || 'N/A'}</div>
                                 </td>
                                 <td className="px-3 py-2">
                                     <Badge variant={user.twoFactorEnabled ? 'success' : 'default'} size="sm">
                                         {user.twoFactorEnabled ? '✓' : '✗'}
                                     </Badge>
                                 </td>
-                                <td className="px-3 py-2 text-gray-300">
+                                <td className="px-3 py-2 text-blue-200">
                                     {new Date(user.createdAt).toLocaleDateString('ko-KR')}
                                 </td>
                                 <td className="px-3 py-2">

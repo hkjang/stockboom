@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres:
     extends:
@@ -27,6 +25,10 @@ services:
       - redis
     networks:
       - stockboom-network
+
+volumes:
+  postgres_data:
+  redis_data:
 
 networks:
   stockboom-network:

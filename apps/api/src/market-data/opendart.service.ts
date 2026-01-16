@@ -5,7 +5,8 @@ import { parseStringPromise } from 'xml2js';
 import * as iconv from 'iconv-lite';
 import { UserApiKeysService } from '../user-api-keys/user-api-keys.service';
 import { prisma } from '@stockboom/database';
-import * as AdmZip from 'adm-zip';
+import AdmZip from 'adm-zip';
+
 
 @Injectable()
 export class OpenDartService {
@@ -356,8 +357,27 @@ export class OpenDartService {
 
     private async fetchJson(url: string): Promise<any> {
         return new Promise((resolve, reject) => {
+            const parsedUrl = new URL(url);
+            const options = {
+                hostname: parsedUrl.hostname,
+                path: parsedUrl.pathname + parsedUrl.search,
+                method: 'GET',
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                    'Accept': 'application/json, text/plain, */*',
+                    'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+                },
+            };
+
             const getRequest = (currentUrl: string) => {
-                https.get(currentUrl, (res) => {
+                const reqUrl = new URL(currentUrl);
+                const reqOptions = {
+                    ...options,
+                    hostname: reqUrl.hostname,
+                    path: reqUrl.pathname + reqUrl.search,
+                };
+
+                https.get(reqOptions, (res) => {
                     // Handle redirects
                     if (res.statusCode === 301 || res.statusCode === 302) {
                         if (res.headers.location) {
@@ -394,30 +414,46 @@ export class OpenDartService {
         });
     }
 
+
     private async fetchXml(url: string): Promise<string> {
+        const headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'application/xml, text/xml, */*',
+            'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+        };
+
         return new Promise((resolve, reject) => {
-            https.get(url, (res) => {
-                this.logger.log(`HTTP Status: ${res.statusCode}`);
+            const makeRequest = (targetUrl: string) => {
+                const parsedUrl = new URL(targetUrl);
+                const options = {
+                    hostname: parsedUrl.hostname,
+                    path: parsedUrl.pathname + parsedUrl.search,
+                    method: 'GET',
+                    headers,
+                };
 
-                // Handle redirects (302)
-                if (res.statusCode === 302 || res.statusCode === 301) {
-                    const redirectUrl = res.headers.location;
-                    this.logger.log(`Following redirect to: ${redirectUrl}`);
+                https.get(options, (res) => {
+                    this.logger.log(`HTTP Status: ${res.statusCode}`);
 
-                    if (redirectUrl) {
-                        // Follow redirect
-                        https.get(redirectUrl, (redirectRes) => {
-                            this.logger.log(`Redirect response status: ${redirectRes.statusCode}`);
-                            this.processXmlResponse(redirectRes, resolve, reject);
-                        }).on('error', reject);
-                        return;
+                    // Handle redirects (302)
+                    if (res.statusCode === 302 || res.statusCode === 301) {
+                        const redirectUrl = res.headers.location;
+                        this.logger.log(`Following redirect to: ${redirectUrl}`);
+
+                        if (redirectUrl) {
+                            makeRequest(redirectUrl);
+                            return;
+                        }
                     }
-                }
 
-                this.processXmlResponse(res, resolve, reject);
-            }).on('error', reject);
+                    this.processXmlResponse(res, resolve, reject);
+                }).on('error', reject);
+            };
+
+            makeRequest(url);
         });
     }
+
 
     private processXmlResponse(res: any, resolve: (value: string) => void, reject: (reason?: any) => void): void {
         const chunks: Buffer[] = [];

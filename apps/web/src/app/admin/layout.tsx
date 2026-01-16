@@ -18,7 +18,9 @@ export default function AdminLayout({
         { name: '데이터 소스', href: '/admin/data-sources', icon: '🔌' },
         { name: '모니터링', href: '/admin/monitoring', icon: '🖥️' },
         { name: '큐', href: '/admin/queues', icon: '📋' },
+        { name: '설정', href: '/admin/settings', icon: '⚙️' },
     ];
+
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-sm">

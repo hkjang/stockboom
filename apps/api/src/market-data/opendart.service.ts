@@ -18,6 +18,7 @@ export class OpenDartService {
     ) { }
 
     private async getApiKey(userId?: string): Promise<string> {
+        // 1. Check user-specific API key first
         if (userId) {
             try {
                 const userKeys = await this.userApiKeysService.getKeys(userId, userId, true);
@@ -26,16 +27,31 @@ export class OpenDartService {
                     return userKeys.openDartApiKey;
                 }
             } catch (error) {
-                this.logger.warn(`Failed to get user API key for ${userId}, using env key`);
+                this.logger.warn(`Failed to get user API key for ${userId}, checking system settings`);
             }
         }
 
+        // 2. Check SystemSettings database
+        try {
+            const systemSetting = await prisma.systemSettings.findUnique({
+                where: { key: 'OPENDART_API_KEY' },
+            });
+            if (systemSetting?.value && systemSetting.value.trim() !== '') {
+                this.logger.debug('Using OpenDart API key from SystemSettings');
+                return systemSetting.value;
+            }
+        } catch (error) {
+            this.logger.warn('Failed to get API key from SystemSettings, falling back to env');
+        }
+
+        // 3. Fall back to environment variable
         const envKey = this.configService.get<string>('OPENDART_API_KEY') || '';
         if (!envKey) {
-            throw new Error('OpenDart API key not configured');
+            throw new Error('OpenDart API key not configured. Set it in Admin Settings or .env file.');
         }
         return envKey;
     }
+
 
     async getCompanyOverview(corpCode: string, userId?: string) {
         const apiKey = await this.getApiKey(userId);

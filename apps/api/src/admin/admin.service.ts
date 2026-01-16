@@ -1413,4 +1413,214 @@ export class AdminService {
             orderBy: { fiscalYear: 'desc' },
         });
     }
+
+    // =====================================
+    // System Settings Management
+    // =====================================
+
+    /**
+     * Get all system settings
+     */
+    async getSystemSettings() {
+        const settings = await prisma.systemSettings.findMany({
+            orderBy: [{ category: 'asc' }, { key: 'asc' }],
+        });
+
+        // Mask secret values
+        return settings.map(setting => ({
+            ...setting,
+            value: setting.isSecret ? (setting.value ? '••••••••' : null) : setting.value,
+        }));
+    }
+
+    /**
+     * Get a single system setting by key
+     */
+    async getSystemSettingByKey(key: string) {
+        return prisma.systemSettings.findUnique({
+            where: { key },
+        });
+    }
+
+    /**
+     * Update a system setting
+     */
+    async updateSystemSetting(key: string, value: string | null, description?: string) {
+        return prisma.systemSettings.upsert({
+            where: { key },
+            update: { 
+                value,
+                ...(description && { description }),
+            },
+            create: {
+                key,
+                value,
+                description,
+            },
+        });
+    }
+
+    /**
+     * Update multiple system settings at once
+     */
+    async updateSystemSettings(settings: { key: string; value: string | null; description?: string; category?: string; isSecret?: boolean }[]) {
+        const results = await Promise.all(
+            settings.map(async (setting) => {
+                return prisma.systemSettings.upsert({
+                    where: { key: setting.key },
+                    update: { 
+                        value: setting.value,
+                        ...(setting.description && { description: setting.description }),
+                        ...(setting.category && { category: setting.category }),
+                        ...(setting.isSecret !== undefined && { isSecret: setting.isSecret }),
+                    },
+                    create: {
+                        key: setting.key,
+                        value: setting.value,
+                        description: setting.description,
+                        category: setting.category || 'general',
+                        isSecret: setting.isSecret || false,
+                    },
+                });
+            })
+        );
+
+        return { success: true, updated: results.length };
+    }
+
+    /**
+     * Delete a system setting
+     */
+    async deleteSystemSetting(key: string) {
+        return prisma.systemSettings.delete({
+            where: { key },
+        });
+    }
+
+    /**
+     * Get environment variable status (read-only, masked)
+     */
+    getEnvStatus() {
+        const envVars = [
+            // Database
+            { key: 'DATABASE_URL', category: 'database', isSecret: true },
+            // Redis
+            { key: 'REDIS_HOST', category: 'redis', isSecret: false },
+            { key: 'REDIS_PORT', category: 'redis', isSecret: false },
+            { key: 'REDIS_PASSWORD', category: 'redis', isSecret: true },
+            // JWT
+            { key: 'JWT_SECRET', category: 'auth', isSecret: true },
+            { key: 'JWT_EXPIRES_IN', category: 'auth', isSecret: false },
+            // KIS API
+            { key: 'KIS_APP_KEY', category: 'api', isSecret: true },
+            { key: 'KIS_APP_SECRET', category: 'api', isSecret: true },
+            { key: 'KIS_ACCOUNT_NUMBER', category: 'api', isSecret: true },
+            { key: 'KIS_MOCK_MODE', category: 'api', isSecret: false },
+            // OpenAI
+            { key: 'OPENAI_API_KEY', category: 'api', isSecret: true },
+            // Email
+            { key: 'SMTP_HOST', category: 'notification', isSecret: false },
+            { key: 'SMTP_PORT', category: 'notification', isSecret: false },
+            { key: 'SMTP_USER', category: 'notification', isSecret: false },
+            { key: 'SMTP_PASSWORD', category: 'notification', isSecret: true },
+            // VAPID
+            { key: 'VAPID_PUBLIC_KEY', category: 'notification', isSecret: false },
+            { key: 'VAPID_PRIVATE_KEY', category: 'notification', isSecret: true },
+            // Application
+            { key: 'NODE_ENV', category: 'general', isSecret: false },
+            { key: 'API_PORT', category: 'general', isSecret: false },
+            { key: 'WEB_PORT', category: 'general', isSecret: false },
+            { key: 'API_URL', category: 'general', isSecret: false },
+            { key: 'WEB_URL', category: 'general', isSecret: false },
+            // Encryption
+            { key: 'ENCRYPTION_KEY', category: 'security', isSecret: true },
+        ];
+
+        return envVars.map(({ key, category, isSecret }) => {
+            const value = process.env[key];
+            const hasValue = !!value && value.trim() !== '';
+
+            return {
+                key,
+                category,
+                isSecret,
+                hasValue,
+                value: hasValue 
+                    ? (isSecret ? '••••••••' : value) 
+                    : null,
+                status: hasValue ? 'configured' : 'not_set',
+            };
+        });
+    }
+
+    /**
+     * Initialize default system settings
+     */
+    async initializeDefaultSettings() {
+        const defaultSettings = [
+            // API Keys
+            { key: 'OPENDART_API_KEY', value: '', description: 'OpenDART API 키 (https://opendart.fss.or.kr/)', category: 'api', isSecret: true },
+            { key: 'KIS_APP_KEY', value: '', description: '한국투자증권 App Key', category: 'api', isSecret: true },
+            { key: 'KIS_APP_SECRET', value: '', description: '한국투자증권 App Secret', category: 'api', isSecret: true },
+            { key: 'KIS_ACCOUNT_NUMBER', value: '', description: '한국투자증권 계좌번호', category: 'api', isSecret: true },
+            { key: 'KIS_MOCK_MODE', value: 'true', description: '한국투자증권 모의투자 모드 사용', category: 'api', isSecret: false },
+            { key: 'OPENAI_API_KEY', value: '', description: 'OpenAI API 키 (AI 분석용)', category: 'api', isSecret: true },
+            { key: 'YAHOO_API_KEY', value: '', description: 'Yahoo Finance API 키 (선택)', category: 'api', isSecret: true },
+            
+            // Trading Settings
+            { key: 'AUTO_TRADE_ENABLED', value: 'false', description: '자동매매 활성화', category: 'trading', isSecret: false },
+            { key: 'MAX_DAILY_TRADES', value: '100', description: '일일 최대 거래 수', category: 'trading', isSecret: false },
+            { key: 'DEFAULT_STOP_LOSS_PERCENT', value: '5', description: '기본 손절 비율 (%)', category: 'trading', isSecret: false },
+            { key: 'DEFAULT_TAKE_PROFIT_PERCENT', value: '10', description: '기본 익절 비율 (%)', category: 'trading', isSecret: false },
+            { key: 'MAX_POSITION_PERCENT', value: '20', description: '최대 포지션 비율 (%)', category: 'trading', isSecret: false },
+            
+            // Notification Settings
+            { key: 'NOTIFICATION_ENABLED', value: 'true', description: '알림 활성화', category: 'notification', isSecret: false },
+            { key: 'EMAIL_NOTIFICATION_ENABLED', value: 'false', description: '이메일 알림 활성화', category: 'notification', isSecret: false },
+            { key: 'PUSH_NOTIFICATION_ENABLED', value: 'true', description: '푸시 알림 활성화', category: 'notification', isSecret: false },
+            { key: 'SMTP_HOST', value: 'smtp.gmail.com', description: 'SMTP 서버 주소', category: 'notification', isSecret: false },
+            { key: 'SMTP_PORT', value: '587', description: 'SMTP 포트', category: 'notification', isSecret: false },
+            { key: 'SMTP_USER', value: '', description: 'SMTP 사용자 이메일', category: 'notification', isSecret: false },
+            { key: 'SMTP_PASSWORD', value: '', description: 'SMTP 비밀번호', category: 'notification', isSecret: true },
+            { key: 'VAPID_PUBLIC_KEY', value: '', description: 'VAPID 공개 키 (웹 푸시용)', category: 'notification', isSecret: false },
+            { key: 'VAPID_PRIVATE_KEY', value: '', description: 'VAPID 비밀 키 (웹 푸시용)', category: 'notification', isSecret: true },
+            
+            // Data Collection Settings
+            { key: 'DATA_COLLECTION_ENABLED', value: 'true', description: '데이터 수집 활성화', category: 'data', isSecret: false },
+            { key: 'CANDLE_COLLECTION_INTERVAL', value: '1', description: '캔들 데이터 수집 간격 (분)', category: 'data', isSecret: false },
+            { key: 'PRICE_UPDATE_INTERVAL', value: '5', description: '가격 업데이트 간격 (분)', category: 'data', isSecret: false },
+            { key: 'NEWS_COLLECTION_ENABLED', value: 'true', description: '뉴스 수집 활성화', category: 'data', isSecret: false },
+            
+            // General Settings
+            { key: 'MAINTENANCE_MODE', value: 'false', description: '유지보수 모드', category: 'general', isSecret: false },
+            { key: 'DEBUG_MODE', value: 'false', description: '디버그 모드', category: 'general', isSecret: false },
+            { key: 'LOG_LEVEL', value: 'info', description: '로그 레벨 (debug, info, warn, error)', category: 'general', isSecret: false },
+            { key: 'SESSION_TIMEOUT', value: '7', description: '세션 만료 시간 (일)', category: 'general', isSecret: false },
+            
+            // Security Settings
+            { key: 'MAX_LOGIN_ATTEMPTS', value: '5', description: '최대 로그인 시도 횟수', category: 'security', isSecret: false },
+            { key: 'LOCKOUT_DURATION', value: '30', description: '계정 잠금 시간 (분)', category: 'security', isSecret: false },
+            { key: 'REQUIRE_2FA', value: 'false', description: '2단계 인증 필수', category: 'security', isSecret: false },
+        ];
+
+        const results = await Promise.all(
+            defaultSettings.map(async (setting) => {
+                // Only create if not exists
+                const existing = await prisma.systemSettings.findUnique({
+                    where: { key: setting.key },
+                });
+
+                if (!existing) {
+                    return prisma.systemSettings.create({
+                        data: setting,
+                    });
+                }
+
+                return existing;
+            })
+        );
+
+        return { initialized: results.length, settings: results.map(s => s.key) };
+    }
 }
+

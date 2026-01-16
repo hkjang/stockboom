@@ -442,4 +442,49 @@ export class AdminController {
     ) {
         return this.adminService.getStockDividends(stockId, fiscalYear);
     }
+
+    // =====================================
+    // System Settings Endpoints
+    // =====================================
+
+    @Get('settings')
+    @ApiOperation({ summary: 'Get all system settings' })
+    async getSystemSettings() {
+        return this.adminService.getSystemSettings();
+    }
+
+    @Put('settings')
+    @ApiOperation({ summary: 'Update system settings' })
+    async updateSystemSettings(
+        @Body() data: { settings: { key: string; value: string | null; description?: string; category?: string; isSecret?: boolean }[] }
+    ) {
+        return this.adminService.updateSystemSettings(data.settings);
+    }
+
+    @Put('settings/:key')
+    @ApiOperation({ summary: 'Update a single system setting' })
+    async updateSystemSetting(
+        @Param('key') key: string,
+        @Body() data: { value: string | null; description?: string }
+    ) {
+        return this.adminService.updateSystemSetting(key, data.value, data.description);
+    }
+
+    @Delete('settings/:key')
+    @ApiOperation({ summary: 'Delete a system setting' })
+    async deleteSystemSetting(@Param('key') key: string) {
+        return this.adminService.deleteSystemSetting(key);
+    }
+
+    @Get('env-status')
+    @ApiOperation({ summary: 'Get environment variable status (read-only)' })
+    getEnvStatus() {
+        return this.adminService.getEnvStatus();
+    }
+
+    @Post('settings/initialize')
+    @ApiOperation({ summary: 'Initialize default system settings' })
+    async initializeSettings() {
+        return this.adminService.initializeDefaultSettings();
+    }
 }

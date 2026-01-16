@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Param, Query, Body, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { AiService } from './ai.service';
 import { PatternDetectionService } from './pattern-detection.service';
@@ -69,4 +69,36 @@ export class AiController {
     async runPatternAnalysis(@Param('stockId') stockId: string) {
         return this.patternDetectionService.savePatternAnalysis(stockId);
     }
+
+    // =====================================
+    // Disclosure Analysis
+    // =====================================
+
+    @Post('disclosures/analyze')
+    @ApiOperation({ summary: 'Analyze a single disclosure with AI' })
+    async analyzeDisclosure(
+        @Body() data: {
+            corpName: string;
+            reportTitle: string;
+            reportType: string;
+            content?: string;
+            rcptNo?: string;
+        }
+    ) {
+        return this.aiService.analyzeDisclosure(data);
+    }
+
+    @Post('disclosures/analyze-batch')
+    @ApiOperation({ summary: 'Analyze multiple disclosures and provide comprehensive analysis' })
+    async analyzeDisclosureBatch(
+        @Body() disclosures: Array<{
+            corpName: string;
+            reportTitle: string;
+            reportType: string;
+            rcptDt: string;
+        }>
+    ) {
+        return this.aiService.analyzeDisclosureBatch(disclosures);
+    }
 }
+

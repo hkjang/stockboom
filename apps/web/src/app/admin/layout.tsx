@@ -15,9 +15,6 @@ export default function AdminLayout({
         { name: '사용자', href: '/admin/users', icon: '👥' },
         { name: '종목', href: '/admin/stocks', icon: '📈' },
         { name: '데이터 수집', href: '/admin/data-collection', icon: '💾' },
-        { name: '데이터 소스', href: '/admin/data-sources', icon: '🔌' },
-        { name: '모니터링', href: '/admin/monitoring', icon: '🖥️' },
-        { name: '큐', href: '/admin/queues', icon: '📋' },
         { name: '설정', href: '/admin/settings', icon: '⚙️' },
     ];
 
@@ -26,7 +23,7 @@ export default function AdminLayout({
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-sm">
             {/* Header */}
             <header className="bg-white/5 backdrop-blur-lg border-b border-white/10 sticky top-0 z-40">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5">
+                <div className="px-4 sm:px-6 lg:px-8 py-2.5">
                     <div className="flex justify-between items-center">
                         <div className="flex items-center gap-2">
                             <span className="text-lg">⚙️</span>
@@ -42,10 +39,10 @@ export default function AdminLayout({
                 </div>
             </header>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="px-4 sm:px-6 lg:px-8 py-4">
                 <div className="flex gap-4">
                     {/* Sidebar */}
-                    <aside className="w-48 flex-shrink-0">
+                    <aside className="w-44 flex-shrink-0">
                         <nav className="bg-white/10 backdrop-blur-lg rounded-xl border border-white/20 p-2 space-y-0.5 sticky top-14">
                             {navigation.map((item) => {
                                 const isActive = pathname === item.href ||

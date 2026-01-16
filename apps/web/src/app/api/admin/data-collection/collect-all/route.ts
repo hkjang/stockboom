@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
         const authHeader = request.headers.get('Authorization') || '';
         const body = await request.json();
 
-        const response = await fetch(`${API_URL}/admin/data-collection/collect-all`, {
+        const response = await fetch(`${API_URL}/api/admin/data-collection/collect-all`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

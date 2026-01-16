@@ -306,6 +306,170 @@ ${news.stock ? `관련 종목: ${news.stock.name} (${news.stock.symbol})` : ''}
     }
 
     /**
+     * Analyze corporate disclosure using LLM
+     */
+    async analyzeDisclosure(disclosureData: {
+        corpName: string;
+        reportTitle: string;
+        reportType: string;
+        content?: string;
+        rcptNo?: string;
+    }): Promise<{
+        summary: string;
+        impact: 'POSITIVE' | 'NEGATIVE' | 'NEUTRAL';
+        impactScore: number;
+        keyPoints: string[];
+        riskFactors: string[];
+        opportunities: string[];
+        investmentRecommendation: string;
+        confidence: number;
+    }> {
+        if (!this.openai) {
+            throw new Error('OpenAI not configured');
+        }
+
+        try {
+            const prompt = `다음 기업공시를 분석해주세요:
+
+기업명: ${disclosureData.corpName}
+공시제목: ${disclosureData.reportTitle}
+공시유형: ${disclosureData.reportType}
+${disclosureData.content ? `공시내용 요약: ${disclosureData.content.substring(0, 2000)}` : ''}
+
+다음 형식의 JSON으로 응답해주세요:
+{
+  "summary": "공시 내용 요약 (한국어, 2-3문장)",
+  "impact": "POSITIVE" | "NEGATIVE" | "NEUTRAL" (주가 영향),
+  "impactScore": -100 ~ 100 (음수: 부정적, 양수: 긍정적),
+  "keyPoints": ["핵심 포인트 1", "핵심 포인트 2", "핵심 포인트 3"],
+  "riskFactors": ["리스크 요인 1", "리스크 요인 2"],
+  "opportunities": ["투자 기회 1", "투자 기회 2"],
+  "investmentRecommendation": "투자자 권고사항 (한국어, 2-3문장)",
+  "confidence": 0-100 (분석 신뢰도)
+}`;
+
+            const response = await this.openai.chat.completions.create({
+                model: 'gpt-4',
+                messages: [
+                    {
+                        role: 'system',
+                        content: `You are a professional Korean stock market analyst specializing in corporate disclosure analysis.
+Analyze disclosures and provide investment-relevant insights in Korean.
+Focus on:
+- Financial impact (earnings, assets, liabilities)
+- Strategic implications (M&A, expansion, restructuring)
+- Risk assessment
+- Investment opportunities
+
+Common disclosure types:
+- 사업보고서: Annual comprehensive report
+- 반기/분기보고서: Semi-annual/Quarterly reports
+- 주요사항보고서: Major event reports (capital changes, M&A)
+- 지분공시: Ownership disclosures`,
+                    },
+                    {
+                        role: 'user',
+                        content: prompt,
+                    }
+                ],
+                temperature: 0.3,
+                response_format: { type: 'json_object' },
+            });
+
+            const result = JSON.parse(response.choices[0].message.content || '{}');
+
+            this.logger.log(`Disclosure analysis completed for: ${disclosureData.corpName}`);
+
+            return {
+                summary: result.summary || '분석 결과를 생성할 수 없습니다.',
+                impact: result.impact || 'NEUTRAL',
+                impactScore: result.impactScore || 0,
+                keyPoints: result.keyPoints || [],
+                riskFactors: result.riskFactors || [],
+                opportunities: result.opportunities || [],
+                investmentRecommendation: result.investmentRecommendation || '',
+                confidence: result.confidence || 50,
+            };
+
+        } catch (error) {
+            this.logger.error('Failed to analyze disclosure:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Analyze multiple disclosures and provide comprehensive analysis
+     */
+    async analyzeDisclosureBatch(disclosures: Array<{
+        corpName: string;
+        reportTitle: string;
+        reportType: string;
+        rcptDt: string;
+    }>): Promise<{
+        overallSentiment: 'POSITIVE' | 'NEGATIVE' | 'NEUTRAL';
+        averageImpactScore: number;
+        analyses: any[];
+        summary: string;
+    }> {
+        if (!this.openai) {
+            throw new Error('OpenAI not configured');
+        }
+
+        const disclosureList = disclosures.slice(0, 10).map((d, i) => 
+            `${i + 1}. [${d.rcptDt}] ${d.reportTitle}`
+        ).join('\n');
+
+        try {
+            const prompt = `다음 ${disclosures[0]?.corpName || '기업'}의 최근 공시 목록을 분석하고 종합적인 투자 의견을 제공해주세요:
+
+${disclosureList}
+
+다음 형식의 JSON으로 응답해주세요:
+{
+  "overallSentiment": "POSITIVE" | "NEGATIVE" | "NEUTRAL",
+  "averageImpactScore": -100 ~ 100,
+  "summary": "전체 공시 흐름 요약 (한국어, 3-4문장)",
+  "keyTrends": ["주요 트렌드 1", "주요 트렌드 2"],
+  "investmentImplication": "투자 시사점 (한국어, 2-3문장)",
+  "watchPoints": ["주목할 점 1", "주목할 점 2"]
+}`;
+
+            const response = await this.openai.chat.completions.create({
+                model: 'gpt-4',
+                messages: [
+                    {
+                        role: 'system',
+                        content: 'You are a professional Korean stock market analyst. Analyze corporate disclosure patterns and provide investment insights in Korean.',
+                    },
+                    {
+                        role: 'user',
+                        content: prompt,
+                    }
+                ],
+                temperature: 0.3,
+                response_format: { type: 'json_object' },
+            });
+
+            const result = JSON.parse(response.choices[0].message.content || '{}');
+
+            return {
+                overallSentiment: result.overallSentiment || 'NEUTRAL',
+                averageImpactScore: result.averageImpactScore || 0,
+                analyses: [{
+                    keyTrends: result.keyTrends || [],
+                    investmentImplication: result.investmentImplication || '',
+                    watchPoints: result.watchPoints || [],
+                }],
+                summary: result.summary || '',
+            };
+
+        } catch (error) {
+            this.logger.error('Failed to analyze disclosure batch:', error);
+            throw error;
+        }
+    }
+
+    /**
      * Get AI reports for a stock
      */
     async getStockReports(stockId: string, analysisType?: string, limit: number = 10) {

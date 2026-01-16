@@ -10,7 +10,7 @@ export async function POST(
         const authHeader = request.headers.get('Authorization') || '';
         const jobId = params.jobId;
 
-        const response = await fetch(`${API_URL}/admin/data-collection/jobs/${jobId}/retry`, {
+        const response = await fetch(`${API_URL}/api/admin/data-collection/jobs/${jobId}/retry`, {
             method: 'POST',
             headers: {
                 'Authorization': authHeader,
@@ -36,7 +36,7 @@ export async function DELETE(
         const authHeader = request.headers.get('Authorization') || '';
         const jobId = params.jobId;
 
-        const response = await fetch(`${API_URL}/admin/data-collection/jobs/${jobId}`, {
+        const response = await fetch(`${API_URL}/api/admin/data-collection/jobs/${jobId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': authHeader,

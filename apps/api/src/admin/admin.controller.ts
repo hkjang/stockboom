@@ -444,6 +444,166 @@ export class AdminController {
     }
 
     // =====================================
+    // NEW: Extended OpenDART Data Collection
+    // =====================================
+
+    @Post('data-collection/opendart/employees')
+    @ApiOperation({ summary: 'Collect employee status from OpenDart' })
+    async collectEmployees(
+        @Request() req: any,
+        @Body() data: { corpCode: string; bizYear: string; reportCode?: string }
+    ) {
+        return this.adminService.collectEmployees(
+            data.corpCode,
+            data.bizYear,
+            data.reportCode || '11011',
+            req.user.userId
+        );
+    }
+
+    @Post('data-collection/opendart/audit-opinion')
+    @ApiOperation({ summary: 'Collect audit opinion from OpenDart' })
+    async collectAuditOpinion(
+        @Request() req: any,
+        @Body() data: { corpCode: string; bizYear: string; reportCode?: string }
+    ) {
+        return this.adminService.collectAuditOpinion(
+            data.corpCode,
+            data.bizYear,
+            data.reportCode || '11011',
+            req.user.userId
+        );
+    }
+
+    @Post('data-collection/opendart/capital-changes')
+    @ApiOperation({ summary: 'Collect capital changes (증자/감자) from OpenDart' })
+    async collectCapitalChanges(
+        @Request() req: any,
+        @Body() data: { corpCode: string; bizYear: string; reportCode?: string }
+    ) {
+        return this.adminService.collectCapitalChanges(
+            data.corpCode,
+            data.bizYear,
+            data.reportCode || '11011',
+            req.user.userId
+        );
+    }
+
+    @Post('data-collection/opendart/treasury-stock')
+    @ApiOperation({ summary: 'Collect treasury stock data from OpenDart' })
+    async collectTreasuryStock(
+        @Request() req: any,
+        @Body() data: { corpCode: string; bizYear: string; reportCode?: string }
+    ) {
+        return this.adminService.collectTreasuryStock(
+            data.corpCode,
+            data.bizYear,
+            data.reportCode || '11011',
+            req.user.userId
+        );
+    }
+
+    @Post('data-collection/opendart/insider-trading')
+    @ApiOperation({ summary: 'Collect insider trading data from OpenDart' })
+    async collectInsiderTrading(
+        @Request() req: any,
+        @Body() data: { corpCode: string }
+    ) {
+        return this.adminService.collectInsiderTrading(
+            data.corpCode,
+            req.user.userId
+        );
+    }
+
+    @Post('data-collection/opendart/financial-summary')
+    @ApiOperation({ summary: 'Collect financial summary from OpenDart' })
+    async collectFinancialSummary(
+        @Request() req: any,
+        @Body() data: { corpCode: string; bizYear: string; reportCode?: string }
+    ) {
+        return this.adminService.collectFinancialSummary(
+            data.corpCode,
+            data.bizYear,
+            data.reportCode || '11011',
+            req.user.userId
+        );
+    }
+
+    @Get('stocks/:stockId/employees')
+    @ApiOperation({ summary: 'Get collected employees for a stock' })
+    async getStockEmployees(
+        @Param('stockId') stockId: string,
+        @Query('bizYear') bizYear?: string
+    ) {
+        return this.adminService.getStockEmployees(stockId, bizYear);
+    }
+
+    @Get('stocks/:stockId/financials')
+    @ApiOperation({ summary: 'Get collected financial summaries for a stock' })
+    async getStockFinancials(
+        @Param('stockId') stockId: string,
+        @Query('bizYear') bizYear?: string
+    ) {
+        return this.adminService.getStockFinancials(stockId, bizYear);
+    }
+
+    @Get('stocks/:stockId/insider-trading')
+    @ApiOperation({ summary: 'Get collected insider trading for a stock' })
+    async getStockInsiderTrading(
+        @Param('stockId') stockId: string,
+        @Query('limit') limit?: string
+    ) {
+        return this.adminService.getStockInsiderTrading(
+            stockId,
+            limit ? parseInt(limit) : 50
+        );
+    }
+
+    @Post('data-collection/opendart/disclosures')
+    @ApiOperation({ summary: 'Search disclosures from OpenDart' })
+    async searchDisclosures(
+        @Request() req: any,
+        @Body() data: { corpCode: string; bgnDe?: string; endDe?: string; pblntfTy?: string }
+    ) {
+        return this.adminService.searchDisclosures(
+            data.corpCode,
+            data.bgnDe,
+            data.endDe,
+            data.pblntfTy,
+            req.user.userId
+        );
+    }
+
+    // Phase 3: Major Event Reports
+    @Post('data-collection/opendart/major-events')
+    @ApiOperation({ summary: 'Collect major event reports (capital increase, merger, spinoff, etc.)' })
+    async collectMajorEvents(
+        @Request() req: any,
+        @Body() data: { corpCode: string; bgnDe: string; endDe: string }
+    ) {
+        return this.adminService.collectMajorEvents(
+            data.corpCode,
+            data.bgnDe,
+            data.endDe,
+            req.user.userId
+        );
+    }
+
+    @Get('stocks/:stockId/major-events')
+    @ApiOperation({ summary: 'Get collected major events for a stock' })
+    async getStockMajorEvents(
+        @Param('stockId') stockId: string,
+        @Query('eventType') eventType?: string,
+        @Query('limit') limit?: string
+    ) {
+        return this.adminService.getStockMajorEvents(
+            stockId,
+            eventType,
+            limit ? parseInt(limit) : 50
+        );
+    }
+
+    // =====================================
     // System Settings Endpoints
     // =====================================
 
@@ -487,4 +647,64 @@ export class AdminController {
     async initializeSettings() {
         return this.adminService.initializeDefaultSettings();
     }
+
+    // =====================================
+    // Automated Data Collection
+    // =====================================
+
+    @Get('stocks/:stockId/data-status')
+    @ApiOperation({ summary: 'Get data collection status for a stock' })
+    async getStockDataStatus(@Param('stockId') stockId: string) {
+        return this.adminService.getStockDataCollectionStatus(stockId);
+    }
+
+    @Post('stocks/:stockId/collect-all')
+    @ApiOperation({ summary: 'Collect all OpenDART data for a stock' })
+    async collectAllDataForStock(
+        @Request() req: any,
+        @Param('stockId') stockId: string,
+        @Body() data: { bizYear: string; reportCode?: string }
+    ) {
+        return this.adminService.collectAllDataForStock(
+            stockId,
+            data.bizYear,
+            data.reportCode || '11011',
+            req.user.userId
+        );
+    }
+
+    @Post('data-collection/batch')
+    @ApiOperation({ summary: 'Batch collect data for multiple stocks' })
+    async batchCollectData(
+        @Request() req: any,
+        @Body() data: { stockIds: string[]; bizYear: string; reportCode?: string }
+    ) {
+        return this.adminService.batchCollectData(
+            data.stockIds,
+            data.bizYear,
+            data.reportCode || '11011',
+            req.user.userId
+        );
+    }
+
+    @Get('data-collection/missing')
+    @ApiOperation({ summary: 'Get stocks with missing data' })
+    async getStocksWithMissingData(@Query('dataType') dataType?: string) {
+        return this.adminService.getStocksWithMissingData(dataType);
+    }
+
+    @Post('data-collection/auto-collect')
+    @ApiOperation({ summary: 'Auto collect missing data for all stocks' })
+    async autoCollectMissingData(
+        @Request() req: any,
+        @Body() data: { bizYear?: string; reportCode?: string; limit?: number }
+    ) {
+        return this.adminService.autoCollectMissingData(
+            data.bizYear,
+            data.reportCode || '11011',
+            data.limit || 10,
+            req.user.userId
+        );
+    }
 }
+

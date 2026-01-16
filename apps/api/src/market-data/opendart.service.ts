@@ -38,7 +38,6 @@ export class OpenDartService {
                 where: { key: 'OPENDART_API_KEY' },
             });
             if (systemSetting?.value && systemSetting.value.trim() !== '') {
-                this.logger.debug('Using OpenDart API key from SystemSettings');
                 return systemSetting.value;
             }
         } catch (error) {
@@ -353,6 +352,381 @@ export class OpenDartService {
             this.logger.error(`Failed to get large holdings for ${corpCode}`, error);
             throw error;
         }
+    }
+
+    // ============================================
+    // Phase 1: 정기보고서 주요정보 APIs (신규)
+    // ============================================
+
+    /**
+     * 직원 현황 조회
+     */
+    async getEmployeeStatus(corpCode: string, bizYear: string, reportCode: string = '11011', userId?: string) {
+        const apiKey = await this.getApiKey(userId);
+        try {
+            const url = `${this.baseUrl}/empSttus.json?crtfc_key=${apiKey}&corp_code=${corpCode}&bsns_year=${bizYear}&reprt_code=${reportCode}`;
+            const response = await this.fetchJson(url);
+            if (response.status !== '000') {
+                if (response.status === '013') return [];
+                throw new Error(`OpenDart API error: ${response.message}`);
+            }
+            return response.list || [];
+        } catch (error) {
+            this.logger.error(`Failed to get employee status for ${corpCode}`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * 감사의견 조회 (회계감사인 및 의견)
+     */
+    async getAuditOpinion(corpCode: string, bizYear: string, reportCode: string = '11011', userId?: string) {
+        const apiKey = await this.getApiKey(userId);
+        try {
+            const url = `${this.baseUrl}/accnutAdtorNmNdAdtOpinion.json?crtfc_key=${apiKey}&corp_code=${corpCode}&bsns_year=${bizYear}&reprt_code=${reportCode}`;
+            const response = await this.fetchJson(url);
+            if (response.status !== '000') {
+                if (response.status === '013') return [];
+                throw new Error(`OpenDart API error: ${response.message}`);
+            }
+            return response.list || [];
+        } catch (error) {
+            this.logger.error(`Failed to get audit opinion for ${corpCode}`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * 증자/감자 현황 조회
+     */
+    async getCapitalChanges(corpCode: string, bizYear: string, reportCode: string = '11011', userId?: string) {
+        const apiKey = await this.getApiKey(userId);
+        try {
+            const url = `${this.baseUrl}/irdsSttus.json?crtfc_key=${apiKey}&corp_code=${corpCode}&bsns_year=${bizYear}&reprt_code=${reportCode}`;
+            const response = await this.fetchJson(url);
+            if (response.status !== '000') {
+                if (response.status === '013') return [];
+                throw new Error(`OpenDart API error: ${response.message}`);
+            }
+            return response.list || [];
+        } catch (error) {
+            this.logger.error(`Failed to get capital changes for ${corpCode}`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * 자기주식 취득/처분 현황 조회
+     */
+    async getTreasuryStock(corpCode: string, bizYear: string, reportCode: string = '11011', userId?: string) {
+        const apiKey = await this.getApiKey(userId);
+        try {
+            const url = `${this.baseUrl}/tesstkAcqsDspsSttus.json?crtfc_key=${apiKey}&corp_code=${corpCode}&bsns_year=${bizYear}&reprt_code=${reportCode}`;
+            const response = await this.fetchJson(url);
+            if (response.status !== '000') {
+                if (response.status === '013') return [];
+                throw new Error(`OpenDart API error: ${response.message}`);
+            }
+            return response.list || [];
+        } catch (error) {
+            this.logger.error(`Failed to get treasury stock for ${corpCode}`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * 소액주주 현황 조회
+     */
+    async getMinorShareholders(corpCode: string, bizYear: string, reportCode: string = '11011', userId?: string) {
+        const apiKey = await this.getApiKey(userId);
+        try {
+            const url = `${this.baseUrl}/mrhlSttus.json?crtfc_key=${apiKey}&corp_code=${corpCode}&bsns_year=${bizYear}&reprt_code=${reportCode}`;
+            const response = await this.fetchJson(url);
+            if (response.status !== '000') {
+                if (response.status === '013') return [];
+                throw new Error(`OpenDart API error: ${response.message}`);
+            }
+            return response.list || [];
+        } catch (error) {
+            this.logger.error(`Failed to get minor shareholders for ${corpCode}`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * 단일회사 주요재무 (XBRL 재무제표)
+     */
+    async getFinancialSummary(corpCode: string, bizYear: string, reportCode: string = '11011', userId?: string) {
+        const apiKey = await this.getApiKey(userId);
+        try {
+            const url = `${this.baseUrl}/fnlttSinglAcnt.json?crtfc_key=${apiKey}&corp_code=${corpCode}&bsns_year=${bizYear}&reprt_code=${reportCode}`;
+            const response = await this.fetchJson(url);
+            if (response.status !== '000') {
+                if (response.status === '013') return [];
+                throw new Error(`OpenDart API error: ${response.message}`);
+            }
+            return response.list || [];
+        } catch (error) {
+            this.logger.error(`Failed to get financial summary for ${corpCode}`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * 다중회사 주요재무 (회사간 비교)
+     */
+    async getMultiCompanyFinancials(corpCodes: string[], bizYear: string, reportCode: string = '11011', userId?: string) {
+        const apiKey = await this.getApiKey(userId);
+        try {
+            const corpCodeParam = corpCodes.join(',');
+            const url = `${this.baseUrl}/fnlttMultiAcnt.json?crtfc_key=${apiKey}&corp_code=${corpCodeParam}&bsns_year=${bizYear}&reprt_code=${reportCode}`;
+            const response = await this.fetchJson(url);
+            if (response.status !== '000') {
+                if (response.status === '013') return [];
+                throw new Error(`OpenDart API error: ${response.message}`);
+            }
+            return response.list || [];
+        } catch (error) {
+            this.logger.error(`Failed to get multi company financials`, error);
+            throw error;
+        }
+    }
+
+    // ============================================
+    // Phase 2: 지분공시 종합정보 APIs
+    // ============================================
+
+    /**
+     * 임원/주요주주 소유보고 조회 (내부자 거래)
+     */
+    async getInsiderTrading(corpCode: string, userId?: string) {
+        const apiKey = await this.getApiKey(userId);
+        try {
+            const url = `${this.baseUrl}/elestock.json?crtfc_key=${apiKey}&corp_code=${corpCode}`;
+            const response = await this.fetchJson(url);
+            if (response.status !== '000') {
+                if (response.status === '013') return [];
+                throw new Error(`OpenDart API error: ${response.message}`);
+            }
+            return response.list || [];
+        } catch (error) {
+            this.logger.error(`Failed to get insider trading for ${corpCode}`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * 공시서류 원문 다운로드 (ZIP)
+     */
+    async getDisclosureDocument(receiptNumber: string, userId?: string): Promise<Buffer> {
+        const apiKey = await this.getApiKey(userId);
+        try {
+            const url = `${this.baseUrl}/document.xml?crtfc_key=${apiKey}&rcept_no=${receiptNumber}`;
+            const buffer = await this.fetchBinary(url);
+            return buffer;
+        } catch (error) {
+            this.logger.error(`Failed to get disclosure document ${receiptNumber}`, error);
+            throw error;
+        }
+    }
+
+    // ============================================
+    // Phase 3: 주요사항보고서 APIs
+    // ============================================
+
+    /**
+     * 유상증자 결정 (Paid-in Capital Increase Decision)
+     */
+    async getCapitalIncreaseDecision(corpCode: string, bgnDe: string, endDe: string, userId?: string) {
+        const apiKey = await this.getApiKey(userId);
+        try {
+            const url = `${this.baseUrl}/pifricDecsn.json?crtfc_key=${apiKey}&corp_code=${corpCode}&bgn_de=${bgnDe}&end_de=${endDe}`;
+            const response = await this.fetchJson(url);
+            if (response.status !== '000') {
+                if (response.status === '013') return [];
+                throw new Error(`OpenDart API error: ${response.message}`);
+            }
+            return response.list || [];
+        } catch (error) {
+            this.logger.error(`Failed to get capital increase decision for ${corpCode}`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * 무상증자 결정 (Bonus Issue Decision)
+     */
+    async getBonusIssueDecision(corpCode: string, bgnDe: string, endDe: string, userId?: string) {
+        const apiKey = await this.getApiKey(userId);
+        try {
+            const url = `${this.baseUrl}/fricDecsn.json?crtfc_key=${apiKey}&corp_code=${corpCode}&bgn_de=${bgnDe}&end_de=${endDe}`;
+            const response = await this.fetchJson(url);
+            if (response.status !== '000') {
+                if (response.status === '013') return [];
+                throw new Error(`OpenDart API error: ${response.message}`);
+            }
+            return response.list || [];
+        } catch (error) {
+            this.logger.error(`Failed to get bonus issue decision for ${corpCode}`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * 감자 결정 (Capital Reduction Decision)
+     */
+    async getCapitalReductionDecision(corpCode: string, bgnDe: string, endDe: string, userId?: string) {
+        const apiKey = await this.getApiKey(userId);
+        try {
+            const url = `${this.baseUrl}/crDecsn.json?crtfc_key=${apiKey}&corp_code=${corpCode}&bgn_de=${bgnDe}&end_de=${endDe}`;
+            const response = await this.fetchJson(url);
+            if (response.status !== '000') {
+                if (response.status === '013') return [];
+                throw new Error(`OpenDart API error: ${response.message}`);
+            }
+            return response.list || [];
+        } catch (error) {
+            this.logger.error(`Failed to get capital reduction decision for ${corpCode}`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * 영업정지 (Business Suspension)
+     */
+    async getBusinessSuspension(corpCode: string, bgnDe: string, endDe: string, userId?: string) {
+        const apiKey = await this.getApiKey(userId);
+        try {
+            const url = `${this.baseUrl}/bsnSp.json?crtfc_key=${apiKey}&corp_code=${corpCode}&bgn_de=${bgnDe}&end_de=${endDe}`;
+            const response = await this.fetchJson(url);
+            if (response.status !== '000') {
+                if (response.status === '013') return [];
+                throw new Error(`OpenDart API error: ${response.message}`);
+            }
+            return response.list || [];
+        } catch (error) {
+            this.logger.error(`Failed to get business suspension for ${corpCode}`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * 합병 결정 (Merger Decision)
+     */
+    async getMergerDecision(corpCode: string, bgnDe: string, endDe: string, userId?: string) {
+        const apiKey = await this.getApiKey(userId);
+        try {
+            const url = `${this.baseUrl}/cmpMgDecsn.json?crtfc_key=${apiKey}&corp_code=${corpCode}&bgn_de=${bgnDe}&end_de=${endDe}`;
+            const response = await this.fetchJson(url);
+            if (response.status !== '000') {
+                if (response.status === '013') return [];
+                throw new Error(`OpenDart API error: ${response.message}`);
+            }
+            return response.list || [];
+        } catch (error) {
+            this.logger.error(`Failed to get merger decision for ${corpCode}`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * 분할 결정 (Spin-off Decision)
+     */
+    async getSpinoffDecision(corpCode: string, bgnDe: string, endDe: string, userId?: string) {
+        const apiKey = await this.getApiKey(userId);
+        try {
+            const url = `${this.baseUrl}/cmpDvDecsn.json?crtfc_key=${apiKey}&corp_code=${corpCode}&bgn_de=${bgnDe}&end_de=${endDe}`;
+            const response = await this.fetchJson(url);
+            if (response.status !== '000') {
+                if (response.status === '013') return [];
+                throw new Error(`OpenDart API error: ${response.message}`);
+            }
+            return response.list || [];
+        } catch (error) {
+            this.logger.error(`Failed to get spinoff decision for ${corpCode}`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * 자기주식 취득/처분 결정
+     */
+    async getTreasuryStockDecision(corpCode: string, bgnDe: string, endDe: string, userId?: string) {
+        const apiKey = await this.getApiKey(userId);
+        try {
+            const url = `${this.baseUrl}/tsstkAqDecsn.json?crtfc_key=${apiKey}&corp_code=${corpCode}&bgn_de=${bgnDe}&end_de=${endDe}`;
+            const response = await this.fetchJson(url);
+            if (response.status !== '000') {
+                if (response.status === '013') return [];
+                throw new Error(`OpenDart API error: ${response.message}`);
+            }
+            return response.list || [];
+        } catch (error) {
+            this.logger.error(`Failed to get treasury stock decision for ${corpCode}`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * 주요 주요사항보고서 통합 조회
+     * - 유상증자, 무상증자, 감자, 합병, 분할, 자기주식 결정 등을 한번에 조회
+     */
+    async getMajorEventReports(corpCode: string, bgnDe: string, endDe: string, userId?: string) {
+        const results: any = {
+            capitalIncrease: [],
+            bonusIssue: [],
+            capitalReduction: [],
+            merger: [],
+            spinoff: [],
+            treasuryStock: [],
+        };
+
+        try {
+            // Parallel fetch all major event reports
+            const [capitalIncrease, bonusIssue, capitalReduction, merger, spinoff, treasuryStock] = await Promise.allSettled([
+                this.getCapitalIncreaseDecision(corpCode, bgnDe, endDe, userId),
+                this.getBonusIssueDecision(corpCode, bgnDe, endDe, userId),
+                this.getCapitalReductionDecision(corpCode, bgnDe, endDe, userId),
+                this.getMergerDecision(corpCode, bgnDe, endDe, userId),
+                this.getSpinoffDecision(corpCode, bgnDe, endDe, userId),
+                this.getTreasuryStockDecision(corpCode, bgnDe, endDe, userId),
+            ]);
+
+            if (capitalIncrease.status === 'fulfilled') results.capitalIncrease = capitalIncrease.value;
+            if (bonusIssue.status === 'fulfilled') results.bonusIssue = bonusIssue.value;
+            if (capitalReduction.status === 'fulfilled') results.capitalReduction = capitalReduction.value;
+            if (merger.status === 'fulfilled') results.merger = merger.value;
+            if (spinoff.status === 'fulfilled') results.spinoff = spinoff.value;
+            if (treasuryStock.status === 'fulfilled') results.treasuryStock = treasuryStock.value;
+
+            return results;
+        } catch (error) {
+            this.logger.error(`Failed to get major event reports for ${corpCode}`, error);
+            throw error;
+        }
+    }
+
+    private async fetchBinary(url: string): Promise<Buffer> {
+        return new Promise((resolve, reject) => {
+            const parsedUrl = new URL(url);
+            const options = {
+                hostname: parsedUrl.hostname,
+                path: parsedUrl.pathname + parsedUrl.search,
+                method: 'GET',
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                    'Accept': '*/*',
+                },
+            };
+
+            https.get(options, (res) => {
+                const chunks: Buffer[] = [];
+                res.on('data', (chunk: Buffer) => chunks.push(chunk));
+                res.on('end', () => {
+                    resolve(Buffer.concat(chunks));
+                });
+            }).on('error', reject);
+        });
     }
 
     private async fetchJson(url: string): Promise<any> {

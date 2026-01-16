@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
     try {
         const authHeader = request.headers.get('Authorization') || '';
 
-        const response = await fetch(`${API_URL}/admin/scheduler/status`, {
+        const response = await fetch(`${API_URL}/api/admin/scheduler/status`, {
             headers: {
                 'Authorization': authHeader,
             },

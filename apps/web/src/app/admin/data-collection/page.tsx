@@ -7,6 +7,7 @@ import { OpenDartTab } from './components/OpenDartTab';
 import { StockDataTab } from './components/StockDataTab';
 import { SchedulerTab } from './components/SchedulerTab';
 import { JobHistoryTab } from './components/JobHistoryTab';
+import { StockCollectionTab } from './components/StockCollectionTab';
 
 const fetcher = (url: string) => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -18,17 +19,18 @@ const fetcher = (url: string) => {
     });
 };
 
-type TabType = 'opendart' | 'stocks' | 'scheduler' | 'history';
+type TabType = 'auto-collect' | 'opendart' | 'stocks' | 'scheduler' | 'history';
 
 const tabs = [
+    { id: 'auto-collect' as TabType, label: '자동 수집', icon: '⚡' },
     { id: 'opendart' as TabType, label: 'OpenDart', icon: '🏢' },
-    { id: 'stocks' as TabType, label: '주가 데이터', icon: '📈' },
+    { id: 'stocks' as TabType, label: '주가/캔들', icon: '📈' },
     { id: 'scheduler' as TabType, label: '스케줄러', icon: '⏰' },
     { id: 'history' as TabType, label: '히스토리', icon: '📋' },
 ];
 
 export default function AdminDataCollection() {
-    const [activeTab, setActiveTab] = useState<TabType>('opendart');
+    const [activeTab, setActiveTab] = useState<TabType>('auto-collect');
 
     const { data: stats, isLoading: statsLoading, mutate: mutateStats } = useSWR(
         '/api/admin/data-collection/stats',
@@ -44,7 +46,7 @@ export default function AdminDataCollection() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-xl font-bold text-white">데이터 수집</h1>
-                    <p className="text-xs text-blue-200 mt-0.5">주식 데이터 수동 수집 및 관리</p>
+                    <p className="text-xs text-blue-200 mt-0.5">OpenDART 및 주가 데이터 수집 관리</p>
                 </div>
                 <button
                     onClick={handleRefresh}
@@ -77,6 +79,7 @@ export default function AdminDataCollection() {
 
             {/* Tab Content */}
             <div className="min-h-[300px]">
+                {activeTab === 'auto-collect' && <StockCollectionTab onRefresh={handleRefresh} />}
                 {activeTab === 'opendart' && <OpenDartTab onRefresh={handleRefresh} />}
                 {activeTab === 'stocks' && <StockDataTab onRefresh={handleRefresh} />}
                 {activeTab === 'scheduler' && <SchedulerTab onRefresh={handleRefresh} />}

@@ -196,6 +196,75 @@ export function OpenDartTab({ onRefresh }: OpenDartTabProps) {
         }
     };
 
+    const handleCollectInsiderTrading = async () => {
+        if (!collectCorpCode.trim()) {
+            showToast('기업코드를 입력해주세요', 'warning');
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const res = await fetch('/api/admin/data-collection/opendart/insider-trading', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...getAuthHeader(),
+                },
+                body: JSON.stringify({ corpCode: collectCorpCode }),
+            });
+
+            const data = await res.json();
+            if (res.ok && data.success) {
+                showToast(data.message || '내부자 거래 수집 완료', 'success');
+                onRefresh();
+            } else {
+                throw new Error(data.message || '내부자 거래 수집 실패');
+            }
+        } catch (error: any) {
+            showToast(error.message, 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleCollectMajorEvents = async () => {
+        if (!collectCorpCode.trim()) {
+            showToast('기업코드를 입력해주세요', 'warning');
+            return;
+        }
+
+        // Get date range (last 3 years by default)
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setFullYear(startDate.getFullYear() - 3);
+        const bgnDe = startDate.toISOString().split('T')[0].replace(/-/g, '');
+        const endDe = endDate.toISOString().split('T')[0].replace(/-/g, '');
+
+        setLoading(true);
+        try {
+            const res = await fetch('/api/admin/data-collection/opendart/major-events', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...getAuthHeader(),
+                },
+                body: JSON.stringify({ corpCode: collectCorpCode, bgnDe, endDe }),
+            });
+
+            const data = await res.json();
+            if (res.ok && data.success) {
+                showToast(`주요사항보고서 ${data.collected}건 수집 완료`, 'success');
+                onRefresh();
+            } else {
+                throw new Error(data.message || '주요사항보고서 수집 실패');
+            }
+        } catch (error: any) {
+            showToast(error.message, 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="space-y-6">
             {/* Corp Codes Sync */}
@@ -453,6 +522,132 @@ export function OpenDartTab({ onRefresh }: OpenDartTabProps) {
                             </button>
                         </div>
                     </Card>
+
+                    {/* Employees */}
+                    <Card className="bg-gray-800/50 border-gray-700 hover:border-green-500/50 transition-colors">
+                        <div className="p-4">
+                            <div className="flex items-center gap-2 mb-3">
+                                <UsersIcon className="w-5 h-5 text-green-400" />
+                                <h4 className="font-medium text-white">직원 현황</h4>
+                            </div>
+                            <p className="text-xs text-gray-400 mb-3">직원수, 남녀 비율</p>
+                            <button
+                                onClick={() => handleCollectData('employees', '직원 현황')}
+                                disabled={loading || !collectCorpCode.trim()}
+                                className="w-full px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {loading ? <Spinner /> : '수집'}
+                            </button>
+                        </div>
+                    </Card>
+
+                    {/* Audit Opinion */}
+                    <Card className="bg-gray-800/50 border-gray-700 hover:border-indigo-500/50 transition-colors">
+                        <div className="p-4">
+                            <div className="flex items-center gap-2 mb-3">
+                                <DocumentIcon className="w-5 h-5 text-indigo-400" />
+                                <h4 className="font-medium text-white">감사의견</h4>
+                            </div>
+                            <p className="text-xs text-gray-400 mb-3">회계감사인 및 감사의견</p>
+                            <button
+                                onClick={() => handleCollectData('audit-opinion', '감사의견')}
+                                disabled={loading || !collectCorpCode.trim()}
+                                className="w-full px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {loading ? <Spinner /> : '수집'}
+                            </button>
+                        </div>
+                    </Card>
+
+                    {/* Capital Changes */}
+                    <Card className="bg-gray-800/50 border-gray-700 hover:border-orange-500/50 transition-colors">
+                        <div className="p-4">
+                            <div className="flex items-center gap-2 mb-3">
+                                <ChartIcon className="w-5 h-5 text-orange-400" />
+                                <h4 className="font-medium text-white">증자/감자 현황</h4>
+                            </div>
+                            <p className="text-xs text-gray-400 mb-3">유상증자, 무상증자, 감자</p>
+                            <button
+                                onClick={() => handleCollectData('capital-changes', '증자/감자')}
+                                disabled={loading || !collectCorpCode.trim()}
+                                className="w-full px-3 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {loading ? <Spinner /> : '수집'}
+                            </button>
+                        </div>
+                    </Card>
+
+                    {/* Treasury Stock */}
+                    <Card className="bg-gray-800/50 border-gray-700 hover:border-pink-500/50 transition-colors">
+                        <div className="p-4">
+                            <div className="flex items-center gap-2 mb-3">
+                                <ScaleIcon className="w-5 h-5 text-pink-400" />
+                                <h4 className="font-medium text-white">자기주식 현황</h4>
+                            </div>
+                            <p className="text-xs text-gray-400 mb-3">자기주식 취득/처분/소각</p>
+                            <button
+                                onClick={() => handleCollectData('treasury-stock', '자기주식')}
+                                disabled={loading || !collectCorpCode.trim()}
+                                className="w-full px-3 py-2 bg-pink-600 hover:bg-pink-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {loading ? <Spinner /> : '수집'}
+                            </button>
+                        </div>
+                    </Card>
+
+                    {/* Insider Trading */}
+                    <Card className="bg-gray-800/50 border-gray-700 hover:border-red-500/50 transition-colors">
+                        <div className="p-4">
+                            <div className="flex items-center gap-2 mb-3">
+                                <UserCheckIcon className="w-5 h-5 text-red-400" />
+                                <h4 className="font-medium text-white">내부자 거래</h4>
+                            </div>
+                            <p className="text-xs text-gray-400 mb-3">임원/주요주주 소유보고</p>
+                            <button
+                                onClick={handleCollectInsiderTrading}
+                                disabled={loading || !collectCorpCode.trim()}
+                                className="w-full px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {loading ? <Spinner /> : '수집'}
+                            </button>
+                        </div>
+                    </Card>
+
+                    {/* Financial Summary */}
+                    <Card className="bg-gray-800/50 border-gray-700 hover:border-blue-500/50 transition-colors">
+                        <div className="p-4">
+                            <div className="flex items-center gap-2 mb-3">
+                                <ChartPieIcon className="w-5 h-5 text-blue-400" />
+                                <h4 className="font-medium text-white">재무요약</h4>
+                            </div>
+                            <p className="text-xs text-gray-400 mb-3">자산, 부채, 매출, 이익</p>
+                            <button
+                                onClick={() => handleCollectData('financial-summary', '재무요약')}
+                                disabled={loading || !collectCorpCode.trim()}
+                                className="w-full px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {loading ? <Spinner /> : '수집'}
+                            </button>
+                        </div>
+                    </Card>
+
+                    {/* Major Events */}
+                    <Card className="bg-gray-800/50 border-gray-700 hover:border-amber-500/50 transition-colors">
+                        <div className="p-4">
+                            <div className="flex items-center gap-2 mb-3">
+                                <MegaphoneIcon className="w-5 h-5 text-amber-400" />
+                                <h4 className="font-medium text-white">주요사항보고서</h4>
+                            </div>
+                            <p className="text-xs text-gray-400 mb-3">유상증자, 합병, 분할, 감자</p>
+                            <button
+                                onClick={handleCollectMajorEvents}
+                                disabled={loading || !collectCorpCode.trim()}
+                                className="w-full px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {loading ? <Spinner /> : '수집'}
+                            </button>
+                        </div>
+                    </Card>
                 </div>
             </div>
         </div>
@@ -543,6 +738,24 @@ function ScaleIcon({ className }: { className?: string }) {
         <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                 d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+        </svg>
+    );
+}
+
+function ChartIcon({ className }: { className?: string }) {
+    return (
+        <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+        </svg>
+    );
+}
+
+function MegaphoneIcon({ className }: { className?: string }) {
+    return (
+        <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
         </svg>
     );
 }

@@ -1414,6 +1414,736 @@ export class AdminService {
         });
     }
 
+    // ============================================
+    // NEW: Extended OpenDART Data Collection
+    // ============================================
+
+    /**
+     * Collect and save employee status from OpenDART
+     */
+    async collectEmployees(corpCode: string, bizYear: string, reportCode: string = '11011', userId?: string) {
+        try {
+            const stock = await this.findStockByCode(corpCode);
+            if (!stock) {
+                return { success: false, count: 0, message: `Stock with code ${corpCode} not found.` };
+            }
+
+            const actualCorpCode = stock.corpCode;
+            if (!actualCorpCode) {
+                return { success: false, count: 0, message: `Stock ${stock.name} does not have a corpCode set.` };
+            }
+
+            const employees = await this.openDartService.getEmployeeStatus(actualCorpCode, bizYear, reportCode, userId);
+
+            if (!employees || employees.length === 0) {
+                return { success: true, count: 0, message: 'No employee data found' };
+            }
+
+            const reportDate = new Date();
+            let totalMale = 0, totalFemale = 0, totalCount = 0;
+
+            for (const emp of employees) {
+                const maleCount = parseInt(String(emp.sm || '0').replace(/,/g, '')) || 0;
+                const femaleCount = parseInt(String(emp.sm_w || '0').replace(/,/g, '')) || 0;
+                totalMale += maleCount;
+                totalFemale += femaleCount;
+                totalCount += maleCount + femaleCount;
+            }
+
+            await prisma.employee.upsert({
+                where: {
+                    stockId_bizYear_reportCode: {
+                        stockId: stock.id,
+                        bizYear,
+                        reportCode,
+                    },
+                },
+                update: {
+                    maleCount: totalMale,
+                    femaleCount: totalFemale,
+                    totalCount,
+                    reportDate,
+                },
+                create: {
+                    stockId: stock.id,
+                    maleCount: totalMale,
+                    femaleCount: totalFemale,
+                    totalCount,
+                    bizYear,
+                    reportCode,
+                    reportDate,
+                },
+            });
+
+            return {
+                success: true,
+                count: 1,
+                message: `Saved employee stats for ${stock.name}: ${totalCount} employees`,
+                data: { maleCount: totalMale, femaleCount: totalFemale, totalCount },
+            };
+        } catch (error: any) {
+            this.logger.error(`Failed to collect employees for ${corpCode}`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * Collect and save audit opinion from OpenDART
+     */
+    async collectAuditOpinion(corpCode: string, bizYear: string, reportCode: string = '11011', userId?: string) {
+        try {
+            const stock = await this.findStockByCode(corpCode);
+            if (!stock) {
+                return { success: false, count: 0, message: `Stock with code ${corpCode} not found.` };
+            }
+
+            const actualCorpCode = stock.corpCode;
+            if (!actualCorpCode) {
+                return { success: false, count: 0, message: `Stock ${stock.name} does not have a corpCode set.` };
+            }
+
+            const opinions = await this.openDartService.getAuditOpinion(actualCorpCode, bizYear, reportCode, userId);
+
+            if (!opinions || opinions.length === 0) {
+                return { success: true, count: 0, message: 'No audit opinion data found' };
+            }
+
+            const reportDate = new Date();
+            let savedCount = 0;
+
+            for (const opinion of opinions) {
+                try {
+                    const parseDecimal = (val: any) => {
+                        if (!val || val === '-') return null;
+                        const num = parseFloat(String(val).replace(/,/g, ''));
+                        return isNaN(num) ? null : num;
+                    };
+
+                    await prisma.auditOpinion.upsert({
+                        where: {
+                            stockId_bizYear_reportCode: {
+                                stockId: stock.id,
+                                bizYear,
+                                reportCode,
+                            },
+                        },
+                        update: {
+                            auditorName: opinion.adtor || '',
+                            opinionType: opinion.adt_a || '',
+                            auditFee: parseDecimal(opinion.adt_reprt),
+                            nonAuditFee: parseDecimal(opinion.n_adt_reprt),
+                            reportDate,
+                        },
+                        create: {
+                            stockId: stock.id,
+                            auditorName: opinion.adtor || '',
+                            opinionType: opinion.adt_a || '',
+                            auditFee: parseDecimal(opinion.adt_reprt),
+                            nonAuditFee: parseDecimal(opinion.n_adt_reprt),
+                            bizYear,
+                            reportCode,
+                            reportDate,
+                        },
+                    });
+                    savedCount++;
+                } catch (err) {
+                    this.logger.warn(`Failed to save audit opinion`);
+                }
+            }
+
+            return {
+                success: true,
+                count: savedCount,
+                message: `Saved ${savedCount} audit opinion records for ${stock.name}`,
+            };
+        } catch (error: any) {
+            this.logger.error(`Failed to collect audit opinion for ${corpCode}`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * Collect and save capital changes (증자/감자) from OpenDART
+     */
+    async collectCapitalChanges(corpCode: string, bizYear: string, reportCode: string = '11011', userId?: string) {
+        try {
+            const stock = await this.findStockByCode(corpCode);
+            if (!stock) {
+                return { success: false, count: 0, message: `Stock with code ${corpCode} not found.` };
+            }
+
+            const actualCorpCode = stock.corpCode;
+            if (!actualCorpCode) {
+                return { success: false, count: 0, message: `Stock ${stock.name} does not have a corpCode set.` };
+            }
+
+            const changes = await this.openDartService.getCapitalChanges(actualCorpCode, bizYear, reportCode, userId);
+
+            if (!changes || changes.length === 0) {
+                return { success: true, count: 0, message: 'No capital change data found' };
+            }
+
+            const reportDate = new Date();
+            let savedCount = 0;
+
+            for (const change of changes) {
+                try {
+                    const changeDate = change.stck_issu_dcis_de
+                        ? new Date(change.stck_issu_dcis_de.replace(/(\d{4})\.(\d{2})\.(\d{2})/, '$1-$2-$3'))
+                        : new Date();
+
+                    await prisma.capitalChange.upsert({
+                        where: {
+                            stockId_changeType_changeDate_reportCode: {
+                                stockId: stock.id,
+                                changeType: change.isu_dcrs_stle || '증자',
+                                changeDate,
+                                reportCode,
+                            },
+                        },
+                        update: {
+                            issuePrice: change.isu_pric ? parseFloat(String(change.isu_pric).replace(/,/g, '')) : null,
+                            sharesIssued: change.isu_stock_totqy ? BigInt(String(change.isu_stock_totqy).replace(/,/g, '')) : null,
+                            totalAmount: change.isu_amt ? parseFloat(String(change.isu_amt).replace(/,/g, '')) : null,
+                            reason: change.rm || null,
+                            reportDate,
+                        },
+                        create: {
+                            stockId: stock.id,
+                            changeType: change.isu_dcrs_stle || '증자',
+                            changeDate,
+                            issuePrice: change.isu_pric ? parseFloat(String(change.isu_pric).replace(/,/g, '')) : null,
+                            sharesIssued: change.isu_stock_totqy ? BigInt(String(change.isu_stock_totqy).replace(/,/g, '')) : null,
+                            totalAmount: change.isu_amt ? parseFloat(String(change.isu_amt).replace(/,/g, '')) : null,
+                            reason: change.rm || null,
+                            bizYear,
+                            reportCode,
+                            reportDate,
+                        },
+                    });
+                    savedCount++;
+                } catch (err) {
+                    this.logger.warn(`Failed to save capital change`);
+                }
+            }
+
+            return {
+                success: true,
+                count: savedCount,
+                message: `Saved ${savedCount} capital change records for ${stock.name}`,
+            };
+        } catch (error: any) {
+            this.logger.error(`Failed to collect capital changes for ${corpCode}`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * Collect and save treasury stock data from OpenDART
+     */
+    async collectTreasuryStock(corpCode: string, bizYear: string, reportCode: string = '11011', userId?: string) {
+        try {
+            const stock = await this.findStockByCode(corpCode);
+            if (!stock) {
+                return { success: false, count: 0, message: `Stock with code ${corpCode} not found.` };
+            }
+
+            const actualCorpCode = stock.corpCode;
+            if (!actualCorpCode) {
+                return { success: false, count: 0, message: `Stock ${stock.name} does not have a corpCode set.` };
+            }
+
+            const treasuryData = await this.openDartService.getTreasuryStock(actualCorpCode, bizYear, reportCode, userId);
+
+            if (!treasuryData || treasuryData.length === 0) {
+                return { success: true, count: 0, message: 'No treasury stock data found' };
+            }
+
+            const reportDate = new Date();
+            let savedCount = 0;
+
+            for (const ts of treasuryData) {
+                try {
+                    const transactionDate = ts.acqs_de
+                        ? new Date(ts.acqs_de.replace(/(\d{4})\.(\d{2})\.(\d{2})/, '$1-$2-$3'))
+                        : null;
+
+                    await prisma.treasuryStock.upsert({
+                        where: {
+                            stockId_transactionType_transactionDate_reportCode: {
+                                stockId: stock.id,
+                                transactionType: ts.acqs_mth || '취득',
+                                transactionDate: transactionDate || new Date(),
+                                reportCode,
+                            },
+                        },
+                        update: {
+                            shares: ts.trmend_qy ? BigInt(String(ts.trmend_qy).replace(/,/g, '')) : BigInt(0),
+                            amount: ts.trmend_amt ? parseFloat(String(ts.trmend_amt).replace(/,/g, '')) : null,
+                            purpose: ts.acqs_pp || null,
+                            reportDate,
+                        },
+                        create: {
+                            stockId: stock.id,
+                            transactionType: ts.acqs_mth || '취득',
+                            shares: ts.trmend_qy ? BigInt(String(ts.trmend_qy).replace(/,/g, '')) : BigInt(0),
+                            amount: ts.trmend_amt ? parseFloat(String(ts.trmend_amt).replace(/,/g, '')) : null,
+                            transactionDate,
+                            purpose: ts.acqs_pp || null,
+                            bizYear,
+                            reportCode,
+                            reportDate,
+                        },
+                    });
+                    savedCount++;
+                } catch (err) {
+                    this.logger.warn(`Failed to save treasury stock`);
+                }
+            }
+
+            return {
+                success: true,
+                count: savedCount,
+                message: `Saved ${savedCount} treasury stock records for ${stock.name}`,
+            };
+        } catch (error: any) {
+            this.logger.error(`Failed to collect treasury stock for ${corpCode}`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * Collect and save insider trading data from OpenDART
+     */
+    async collectInsiderTrading(corpCode: string, userId?: string) {
+        try {
+            const stock = await this.findStockByCode(corpCode);
+            if (!stock) {
+                return { success: false, count: 0, message: `Stock with code ${corpCode} not found.` };
+            }
+
+            const actualCorpCode = stock.corpCode;
+            if (!actualCorpCode) {
+                return { success: false, count: 0, message: `Stock ${stock.name} does not have a corpCode set.` };
+            }
+
+            const insiderData = await this.openDartService.getInsiderTrading(actualCorpCode, userId);
+
+            if (!insiderData || insiderData.length === 0) {
+                return { success: true, count: 0, message: 'No insider trading data found' };
+            }
+
+            let savedCount = 0;
+
+            for (const insider of insiderData) {
+                try {
+                    const transactionDate = insider.acqs_de
+                        ? new Date(insider.acqs_de.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3'))
+                        : new Date();
+                    const reportDate = insider.rcept_dt
+                        ? new Date(insider.rcept_dt.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3'))
+                        : new Date();
+
+                    await prisma.insiderTrading.create({
+                        data: {
+                            stockId: stock.id,
+                            reporterName: insider.nm || '',
+                            position: insider.ofcps || '',
+                            relationship: insider.relate || null,
+                            transactionType: insider.chg_rson || '취득',
+                            shares: BigInt(String(insider.stkqy || '0').replace(/,/g, '') || '0'),
+                            price: insider.pric ? parseFloat(String(insider.pric).replace(/,/g, '')) : null,
+                            sharesAfter: insider.trmend_qy ? BigInt(String(insider.trmend_qy).replace(/,/g, '')) : null,
+                            transactionDate,
+                            reportDate,
+                        },
+                    });
+                    savedCount++;
+                } catch (err) {
+                    // May fail on duplicate - that's OK
+                }
+            }
+
+            return {
+                success: true,
+                count: savedCount,
+                message: `Saved ${savedCount} insider trading records for ${stock.name}`,
+            };
+        } catch (error: any) {
+            this.logger.error(`Failed to collect insider trading for ${corpCode}`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * Collect and save financial summary from OpenDART
+     */
+    async collectFinancialSummary(corpCode: string, bizYear: string, reportCode: string = '11011', userId?: string) {
+        try {
+            const stock = await this.findStockByCode(corpCode);
+            if (!stock) {
+                return { success: false, count: 0, message: `Stock with code ${corpCode} not found.` };
+            }
+
+            const actualCorpCode = stock.corpCode;
+            if (!actualCorpCode) {
+                return { success: false, count: 0, message: `Stock ${stock.name} does not have a corpCode set.` };
+            }
+
+            const financialData = await this.openDartService.getFinancialSummary(actualCorpCode, bizYear, reportCode, userId);
+
+            if (!financialData || financialData.length === 0) {
+                return { success: true, count: 0, message: 'No financial summary data found' };
+            }
+
+            const reportDate = new Date();
+            const parseAmount = (val: any) => {
+                if (!val || val === '-') return null;
+                const num = parseFloat(String(val).replace(/,/g, ''));
+                return isNaN(num) ? null : num;
+            };
+
+            // Map report code to quarter
+            const quarterMap: Record<string, string> = {
+                '11011': '4Q',
+                '11012': '2Q',
+                '11013': '1Q',
+                '11014': '3Q',
+            };
+            const quarter = quarterMap[reportCode] || '4Q';
+
+            // Find specific accounts from the data
+            let totalAssets: number | null = null, totalLiabilities: number | null = null, totalEquity: number | null = null, capital: number | null = null;
+            let revenue: number | null = null, operatingProfit: number | null = null, netIncome: number | null = null;
+            let eps: number | null = null, bps: number | null = null;
+
+            for (const item of financialData) {
+                const accountName = item.account_nm || '';
+                const currentValue = parseAmount(item.thstrm_amount);
+
+                if (accountName.includes('자산총계')) totalAssets = currentValue;
+                else if (accountName.includes('부채총계')) totalLiabilities = currentValue;
+                else if (accountName.includes('자본총계')) totalEquity = currentValue;
+                else if (accountName.includes('자본금') && !accountName.includes('총계')) capital = currentValue;
+                else if (accountName.includes('매출액')) revenue = currentValue;
+                else if (accountName.includes('영업이익')) operatingProfit = currentValue;
+                else if (accountName.includes('당기순이익') || accountName.includes('분기순이익')) netIncome = currentValue;
+                else if (accountName.includes('기본주당이익') || accountName.includes('주당순이익')) eps = currentValue;
+                else if (accountName.includes('주당순자산')) bps = currentValue;
+            }
+
+            await prisma.financialSummary.upsert({
+                where: {
+                    stockId_bizYear_quarter_isConsolidated: {
+                        stockId: stock.id,
+                        bizYear,
+                        quarter,
+                        isConsolidated: true,
+                    },
+                },
+                update: {
+                    totalAssets, totalLiabilities, totalEquity, capital,
+                    revenue, operatingProfit, netIncome,
+                    eps, bps,
+                    reportDate,
+                },
+                create: {
+                    stockId: stock.id,
+                    totalAssets, totalLiabilities, totalEquity, capital,
+                    revenue, operatingProfit, netIncome,
+                    eps, bps,
+                    bizYear,
+                    quarter,
+                    reportCode,
+                    reportDate,
+                    isConsolidated: true,
+                },
+            });
+
+            return {
+                success: true,
+                count: 1,
+                message: `Saved financial summary for ${stock.name} (${bizYear} ${quarter})`,
+                data: { totalAssets, totalLiabilities, totalEquity, revenue, operatingProfit, netIncome, eps, bps },
+            };
+        } catch (error: any) {
+            this.logger.error(`Failed to collect financial summary for ${corpCode}`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * Get collected employees for a stock
+     */
+    async getStockEmployees(stockId: string, bizYear?: string) {
+        const where: any = { stockId };
+        if (bizYear) where.bizYear = bizYear;
+
+        return prisma.employee.findMany({
+            where,
+            orderBy: { bizYear: 'desc' },
+        });
+    }
+
+    /**
+     * Get collected financial summaries for a stock
+     */
+    async getStockFinancials(stockId: string, bizYear?: string) {
+        const where: any = { stockId };
+        if (bizYear) where.bizYear = bizYear;
+
+        return prisma.financialSummary.findMany({
+            where,
+            orderBy: [{ bizYear: 'desc' }, { quarter: 'desc' }],
+        });
+    }
+
+    /**
+     * Get collected insider trading for a stock
+     */
+    async getStockInsiderTrading(stockId: string, limit: number = 50) {
+        return prisma.insiderTrading.findMany({
+            where: { stockId },
+            orderBy: { transactionDate: 'desc' },
+            take: limit,
+        });
+    }
+
+    /**
+     * Search disclosures from OpenDART
+     */
+    async searchDisclosures(
+        corpCode: string,
+        bgnDe?: string,
+        endDe?: string,
+        pblntfTy?: string,
+        userId?: string
+    ) {
+        try {
+            const disclosures = await this.openDartService.getDisclosureList(
+                bgnDe || '',
+                endDe || '',
+                corpCode,
+                userId
+            );
+
+            return {
+                success: true,
+                list: disclosures || [],
+                total_count: disclosures?.length || 0,
+            };
+        } catch (error: any) {
+            this.logger.error(`Failed to search disclosures for ${corpCode}`, error);
+            return {
+                success: false,
+                list: [],
+                total_count: 0,
+                message: error.message || 'Failed to search disclosures',
+            };
+        }
+    }
+
+    /**
+     * Collect major event reports from OpenDART
+     * Phase 3: Capital increase, merger, spinoff, etc.
+     */
+    async collectMajorEvents(
+        corpCode: string,
+        bgnDe: string,
+        endDe: string,
+        userId?: string
+    ) {
+        this.logger.log(`Collecting major events for corpCode: ${corpCode}`);
+
+        try {
+            // Find stock by corpCode
+            const stock = await prisma.stock.findFirst({
+                where: { corpCode },
+            });
+
+            if (!stock) {
+                return { success: false, message: 'Stock not found for this corpCode' };
+            }
+
+            // Get all major event reports
+            const events = await this.openDartService.getMajorEventReports(
+                corpCode,
+                bgnDe,
+                endDe,
+                userId
+            );
+
+            let totalInserted = 0;
+
+            // Process capital increase events
+            for (const event of events.capitalIncrease || []) {
+                await prisma.majorEvent.upsert({
+                    where: {
+                        id: `${stock.id}_CAPITAL_INCREASE_${event.rcept_no || event.rcept_dt}`,
+                    },
+                    create: {
+                        id: `${stock.id}_CAPITAL_INCREASE_${event.rcept_no || event.rcept_dt}`,
+                        stockId: stock.id,
+                        eventType: 'CAPITAL_INCREASE',
+                        eventSubType: event.piric_nstk_ostk_cnt || '유상증자',
+                        shares: event.nstk_ostk_cnt ? BigInt(event.nstk_ostk_cnt.replace(/,/g, '')) : null,
+                        amount: event.fdpp_fclt ? parseFloat(event.fdpp_fclt.replace(/,/g, '')) : null,
+                        pricePerShare: event.slprc ? parseFloat(event.slprc.replace(/,/g, '')) : null,
+                        boardDecisionDate: event.bd_od ? new Date(event.bd_od.replace(/\./g, '-')) : null,
+                        reportDate: event.rcept_dt ? new Date(event.rcept_dt.substring(0, 4) + '-' + event.rcept_dt.substring(4, 6) + '-' + event.rcept_dt.substring(6, 8)) : new Date(),
+                        purpose: event.ic_mthn,
+                        receiptNumber: event.rcept_no,
+                    },
+                    update: {},
+                });
+                totalInserted++;
+            }
+
+            // Process bonus issue events
+            for (const event of events.bonusIssue || []) {
+                await prisma.majorEvent.upsert({
+                    where: {
+                        id: `${stock.id}_BONUS_ISSUE_${event.rcept_no || event.rcept_dt}`,
+                    },
+                    create: {
+                        id: `${stock.id}_BONUS_ISSUE_${event.rcept_no || event.rcept_dt}`,
+                        stockId: stock.id,
+                        eventType: 'BONUS_ISSUE',
+                        shares: event.nstk_ostk_cnt ? BigInt(event.nstk_ostk_cnt.replace(/,/g, '')) : null,
+                        boardDecisionDate: event.bd_od ? new Date(event.bd_od.replace(/\./g, '-')) : null,
+                        reportDate: event.rcept_dt ? new Date(event.rcept_dt.substring(0, 4) + '-' + event.rcept_dt.substring(4, 6) + '-' + event.rcept_dt.substring(6, 8)) : new Date(),
+                        receiptNumber: event.rcept_no,
+                    },
+                    update: {},
+                });
+                totalInserted++;
+            }
+
+            // Process merger events
+            for (const event of events.merger || []) {
+                await prisma.majorEvent.upsert({
+                    where: {
+                        id: `${stock.id}_MERGER_${event.rcept_no || event.rcept_dt}`,
+                    },
+                    create: {
+                        id: `${stock.id}_MERGER_${event.rcept_no || event.rcept_dt}`,
+                        stockId: stock.id,
+                        eventType: 'MERGER',
+                        eventSubType: event.mrgr_form,
+                        targetCompany: event.cmpny_nm,
+                        amount: event.mrgr_at ? parseFloat(event.mrgr_at.replace(/,/g, '')) : null,
+                        boardDecisionDate: event.bd_od ? new Date(event.bd_od.replace(/\./g, '-')) : null,
+                        effectiveDate: event.mrgr_pd_de ? new Date(event.mrgr_pd_de.replace(/\./g, '-')) : null,
+                        reportDate: event.rcept_dt ? new Date(event.rcept_dt.substring(0, 4) + '-' + event.rcept_dt.substring(4, 6) + '-' + event.rcept_dt.substring(6, 8)) : new Date(),
+                        receiptNumber: event.rcept_no,
+                    },
+                    update: {},
+                });
+                totalInserted++;
+            }
+
+            // Process spinoff events
+            for (const event of events.spinoff || []) {
+                await prisma.majorEvent.upsert({
+                    where: {
+                        id: `${stock.id}_SPINOFF_${event.rcept_no || event.rcept_dt}`,
+                    },
+                    create: {
+                        id: `${stock.id}_SPINOFF_${event.rcept_no || event.rcept_dt}`,
+                        stockId: stock.id,
+                        eventType: 'SPINOFF',
+                        eventSubType: event.dv_atn,
+                        targetCompany: event.nw_estbs_cmpny_nm,
+                        boardDecisionDate: event.bd_od ? new Date(event.bd_od.replace(/\./g, '-')) : null,
+                        effectiveDate: event.dv_de ? new Date(event.dv_de.replace(/\./g, '-')) : null,
+                        reportDate: event.rcept_dt ? new Date(event.rcept_dt.substring(0, 4) + '-' + event.rcept_dt.substring(4, 6) + '-' + event.rcept_dt.substring(6, 8)) : new Date(),
+                        receiptNumber: event.rcept_no,
+                    },
+                    update: {},
+                });
+                totalInserted++;
+            }
+
+            // Process capital reduction events
+            for (const event of events.capitalReduction || []) {
+                await prisma.majorEvent.upsert({
+                    where: {
+                        id: `${stock.id}_CAPITAL_REDUCTION_${event.rcept_no || event.rcept_dt}`,
+                    },
+                    create: {
+                        id: `${stock.id}_CAPITAL_REDUCTION_${event.rcept_no || event.rcept_dt}`,
+                        stockId: stock.id,
+                        eventType: 'CAPITAL_REDUCTION',
+                        eventSubType: event.cr_rs,
+                        shares: event.cr_stk_cnt ? BigInt(event.cr_stk_cnt.replace(/,/g, '')) : null,
+                        boardDecisionDate: event.bd_od ? new Date(event.bd_od.replace(/\./g, '-')) : null,
+                        reportDate: event.rcept_dt ? new Date(event.rcept_dt.substring(0, 4) + '-' + event.rcept_dt.substring(4, 6) + '-' + event.rcept_dt.substring(6, 8)) : new Date(),
+                        purpose: event.cr_rs,
+                        receiptNumber: event.rcept_no,
+                    },
+                    update: {},
+                });
+                totalInserted++;
+            }
+
+            // Process treasury stock events
+            for (const event of events.treasuryStock || []) {
+                await prisma.majorEvent.upsert({
+                    where: {
+                        id: `${stock.id}_TREASURY_STOCK_${event.rcept_no || event.rcept_dt}`,
+                    },
+                    create: {
+                        id: `${stock.id}_TREASURY_STOCK_${event.rcept_no || event.rcept_dt}`,
+                        stockId: stock.id,
+                        eventType: 'TREASURY_STOCK',
+                        eventSubType: event.aq_dp_atn,
+                        shares: event.aq_dp_stk_cnt ? BigInt(event.aq_dp_stk_cnt.replace(/,/g, '')) : null,
+                        amount: event.aq_dp_at ? parseFloat(event.aq_dp_at.replace(/,/g, '')) : null,
+                        boardDecisionDate: event.bd_od ? new Date(event.bd_od.replace(/\./g, '-')) : null,
+                        reportDate: event.rcept_dt ? new Date(event.rcept_dt.substring(0, 4) + '-' + event.rcept_dt.substring(4, 6) + '-' + event.rcept_dt.substring(6, 8)) : new Date(),
+                        purpose: event.aq_dp_ppn,
+                        receiptNumber: event.rcept_no,
+                    },
+                    update: {},
+                });
+                totalInserted++;
+            }
+
+            return {
+                success: true,
+                collected: totalInserted,
+                details: {
+                    capitalIncrease: events.capitalIncrease?.length || 0,
+                    bonusIssue: events.bonusIssue?.length || 0,
+                    capitalReduction: events.capitalReduction?.length || 0,
+                    merger: events.merger?.length || 0,
+                    spinoff: events.spinoff?.length || 0,
+                    treasuryStock: events.treasuryStock?.length || 0,
+                },
+            };
+        } catch (error: any) {
+            this.logger.error(`Failed to collect major events for ${corpCode}`, error);
+            return {
+                success: false,
+                message: error.message || 'Failed to collect major events',
+            };
+        }
+    }
+
+    /**
+     * Get collected major events for a stock
+     */
+    async getStockMajorEvents(stockId: string, eventType?: string, limit: number = 50) {
+        return prisma.majorEvent.findMany({
+            where: {
+                stockId,
+                ...(eventType && { eventType }),
+            },
+            orderBy: { reportDate: 'desc' },
+            take: limit,
+        });
+    }
+
     // =====================================
     // System Settings Management
     // =====================================
@@ -1621,6 +2351,414 @@ export class AdminService {
         );
 
         return { initialized: results.length, settings: results.map(s => s.key) };
+    }
+
+    // =====================================
+    // Automated Data Collection
+    // =====================================
+
+    /**
+     * Get data collection status for a stock
+     */
+    async getStockDataCollectionStatus(stockId: string) {
+        const stock = await prisma.stock.findUnique({
+            where: { id: stockId },
+            select: {
+                id: true,
+                symbol: true,
+                name: true,
+                corpCode: true,
+                corpName: true,
+                _count: {
+                    select: {
+                        executives: true,
+                        majorShareholders: true,
+                        dividends: true,
+                        employees: true,
+                        auditOpinions: true,
+                        capitalChanges: true,
+                        treasuryStocks: true,
+                        insiderTradings: true,
+                        financialSummaries: true,
+                        majorEvents: true,
+                    }
+                }
+            }
+        });
+
+        if (!stock) return null;
+
+        return {
+            ...stock,
+            dataStatus: {
+                executives: stock._count.executives > 0,
+                majorShareholders: stock._count.majorShareholders > 0,
+                dividends: stock._count.dividends > 0,
+                employees: stock._count.employees > 0,
+                auditOpinions: stock._count.auditOpinions > 0,
+                capitalChanges: stock._count.capitalChanges > 0,
+                treasuryStocks: stock._count.treasuryStocks > 0,
+                insiderTradings: stock._count.insiderTradings > 0,
+                financialSummaries: stock._count.financialSummaries > 0,
+                majorEvents: stock._count.majorEvents > 0,
+            },
+            counts: stock._count,
+        };
+    }
+
+    /**
+     * Collect all available OpenDART data for a stock
+     * Tries multiple report codes and years for better success rate
+     */
+    async collectAllDataForStock(
+        stockId: string,
+        bizYear: string,
+        reportCode: string = '11011',
+        userId?: string
+    ) {
+        const stock = await prisma.stock.findUnique({
+            where: { id: stockId },
+            select: { id: true, symbol: true, name: true, corpCode: true }
+        });
+
+        if (!stock || !stock.corpCode) {
+            return { success: false, message: 'Stock not found or corpCode not set' };
+        }
+
+        const results: any = {
+            stockId: stock.id,
+            stockName: stock.name,
+            symbol: stock.symbol,
+            corpCode: stock.corpCode,
+            bizYear,
+            collected: {},
+            errors: [],
+        };
+
+        // Report codes: 11011=사업보고서, 11012=반기보고서, 11013=1분기, 11014=3분기
+        const reportCodes = ['11011', '11012', '11013', '11014'];
+        // Years to try: current year-1, current year-2
+        const currentYear = new Date().getFullYear();
+        const yearsToTry = [bizYear, (parseInt(bizYear) - 1).toString()];
+
+        // Helper function to try collecting with fallback
+        const collectWithFallback = async (
+            taskName: string,
+            collectFn: (corpCode: string, year: string, code: string, userId?: string) => Promise<any>
+        ) => {
+            // Try all combinations until we find data
+            for (const year of yearsToTry) {
+                for (const code of reportCodes) {
+                    try {
+                        const result = await collectFn(stock.corpCode!, year, code, userId);
+                        if (result.count && result.count > 0) {
+                            this.logger.log(`[Collect] ${taskName} SUCCESS: year=${year}, code=${code}, count=${result.count}`);
+                            return result;
+                        }
+                        // count is 0 or undefined - continue to next combination
+                    } catch (error: any) {
+                        // Continue to next combination on error
+                    }
+                }
+            }
+            return { success: true, count: 0, message: `No ${taskName} data found after trying all combinations` };
+        };
+
+        // Tasks that require bizYear and reportCode - use fallback logic
+        const fallbackTasks = [
+            { name: 'executives', fn: this.collectExecutives.bind(this) },
+            { name: 'outsideDirectors', fn: this.collectOutsideDirectors.bind(this) },
+            { name: 'majorShareholders', fn: this.collectMajorShareholders.bind(this) },
+            { name: 'dividends', fn: this.collectDividends.bind(this) },
+            { name: 'employees', fn: this.collectEmployees.bind(this) },
+            { name: 'auditOpinion', fn: this.collectAuditOpinion.bind(this) },
+            { name: 'financialSummary', fn: this.collectFinancialSummary.bind(this) },
+        ];
+
+        // Run fallback tasks
+        for (const task of fallbackTasks) {
+            try {
+                const result = await collectWithFallback(task.name, task.fn) as any;
+                results.collected[task.name] = {
+                    success: result.success !== false,
+                    count: result.count || 0,
+                };
+            } catch (error: any) {
+                this.logger.error(`[collectAllDataForStock] ${task.name} failed: ${error.message}`);
+                results.collected[task.name] = { success: false, error: error.message };
+                results.errors.push({ task: task.name, error: error.message });
+            }
+        }
+
+        // Insider trading doesn't require bizYear/reportCode
+        try {
+            const result = await this.collectInsiderTrading(stock.corpCode!, userId) as any;
+            results.collected.insiderTrading = {
+                success: result.success !== false,
+                count: result.count || 0,
+            };
+        } catch (error: any) {
+            this.logger.error(`[collectAllDataForStock] insiderTrading failed: ${error.message}`);
+            results.collected.insiderTrading = { success: false, error: error.message };
+            results.errors.push({ task: 'insiderTrading', error: error.message });
+        }
+
+
+        // Collect major events separately (needs date range)
+        try {
+            const endDate = new Date();
+            const startDate = new Date();
+            startDate.setFullYear(startDate.getFullYear() - 3);
+            const bgnDe = startDate.toISOString().split('T')[0].replace(/-/g, '');
+            const endDe = endDate.toISOString().split('T')[0].replace(/-/g, '');
+
+            const majorEventsResult = await this.collectMajorEvents(stock.corpCode!, bgnDe, endDe, userId);
+            results.collected.majorEvents = {
+                success: majorEventsResult.success !== false,
+                count: majorEventsResult.collected || 0,
+            };
+        } catch (error: any) {
+            results.collected.majorEvents = { success: false, error: error.message };
+            results.errors.push({ task: 'majorEvents', error: error.message });
+        }
+
+        results.success = results.errors.length === 0;
+        results.totalCollected = Object.values(results.collected)
+            .filter((c: any) => c.success)
+            .reduce((sum: number, c: any) => sum + (c.count || 0), 0);
+
+        // Update lastDataCollectionAt to track that we attempted collection
+        await prisma.stock.update({
+            where: { id: stockId },
+            data: { lastDataCollectionAt: new Date() },
+        });
+
+        return results;
+    }
+
+    /**
+     * Batch collect data for multiple stocks
+     */
+    async batchCollectData(
+        stockIds: string[],
+        bizYear: string,
+        reportCode: string = '11011',
+        userId?: string
+    ) {
+        const results: any[] = [];
+        let processed = 0;
+        const total = stockIds.length;
+
+        for (const stockId of stockIds) {
+            try {
+                const result = await this.collectAllDataForStock(stockId, bizYear, reportCode, userId);
+                results.push(result);
+                processed++;
+                this.logger.log(`Batch collection progress: ${processed}/${total}`);
+            } catch (error: any) {
+                results.push({
+                    stockId,
+                    success: false,
+                    error: error.message,
+                });
+                processed++;
+            }
+        }
+
+        return {
+            total,
+            processed,
+            successful: results.filter(r => r.success).length,
+            failed: results.filter(r => !r.success).length,
+            results,
+        };
+    }
+
+    /**
+     * Get stocks with missing data
+     * Excludes stocks that have been attempted within the last 24 hours
+     */
+    async getStocksWithMissingData(dataType?: string) {
+        // Exclude stocks that were collected within the last 24 hours
+        const oneDayAgo = new Date();
+        oneDayAgo.setHours(oneDayAgo.getHours() - 24);
+
+        const stocks = await prisma.stock.findMany({
+            where: {
+                corpCode: { not: null },
+                // Only KOSPI and KOSDAQ (exclude KONEX, ETF, etc.)
+                market: { in: ['KOSPI', 'KOSDAQ'] },
+                // Exclude investment companies, funds, etc.
+                NOT: {
+                    OR: [
+                        { name: { contains: '투자회사' } },
+                        { name: { contains: '투자신탁' } },
+                        { name: { contains: '펀드' } },
+                        { name: { contains: 'ETF' } },
+                        { name: { contains: 'ETN' } },
+                        { name: { contains: '리츠' } },
+                        { name: { contains: 'REIT' } },
+                        { name: { contains: '스팩' } },
+                        { name: { contains: 'SPAC' } },
+                    ]
+                },
+                OR: [
+                    { lastDataCollectionAt: null },
+                    { lastDataCollectionAt: { lt: oneDayAgo } },
+                ],
+            },
+            select: {
+                id: true,
+                symbol: true,
+                name: true,
+                corpCode: true,
+                market: true,
+                lastDataCollectionAt: true,
+                _count: {
+                    select: {
+                        executives: true,
+                        majorShareholders: true,
+                        dividends: true,
+                        employees: true,
+                        auditOpinions: true,
+                        financialSummaries: true,
+                        insiderTradings: true,
+                        majorEvents: true,
+                    }
+                }
+            },
+            take: 100,
+        });
+
+        return stocks.map(stock => ({
+            id: stock.id,
+            symbol: stock.symbol,
+            name: stock.name,
+            corpCode: stock.corpCode,
+            missingData: {
+                executives: stock._count.executives === 0,
+                majorShareholders: stock._count.majorShareholders === 0,
+                dividends: stock._count.dividends === 0,
+                employees: stock._count.employees === 0,
+                auditOpinions: stock._count.auditOpinions === 0,
+                financialSummaries: stock._count.financialSummaries === 0,
+                insiderTradings: stock._count.insiderTradings === 0,
+                majorEvents: stock._count.majorEvents === 0,
+            },
+            counts: stock._count,
+            hasAnyMissing: Object.values(stock._count).some(c => c === 0),
+        })).filter(stock => {
+            if (!dataType) return stock.hasAnyMissing;
+            return (stock.missingData as any)[dataType] === true;
+        });
+    }
+
+    /**
+     * Auto collect missing data for all stocks
+     * This method finds all stocks with missing data and collects them automatically
+     */
+    async autoCollectMissingData(
+        bizYear?: string,
+        reportCode: string = '11011',
+        limit: number = 10,
+        userId?: string
+    ) {
+        // Default to previous year if not specified
+        const targetYear = bizYear || (new Date().getFullYear() - 1).toString();
+        
+        this.logger.log(`[AutoCollect] Starting auto collection for bizYear: ${targetYear}, limit: ${limit}`);
+
+        // Get stocks with missing data
+        const stocksWithMissingData = await this.getStocksWithMissingData();
+        const stocksToProcess = stocksWithMissingData.slice(0, limit);
+
+        if (stocksToProcess.length === 0) {
+            this.logger.log('[AutoCollect] No stocks with missing data found');
+            return {
+                success: true,
+                message: 'No stocks with missing data',
+                processed: 0,
+                results: [],
+            };
+        }
+
+        this.logger.log(`[AutoCollect] Found ${stocksWithMissingData.length} stocks with missing data, processing ${stocksToProcess.length}`);
+
+        const results: any[] = [];
+        let processed = 0;
+        let successful = 0;
+        let failed = 0;
+        let totalCollected = 0;
+
+        for (const stock of stocksToProcess) {
+            try {
+                this.logger.log(`[AutoCollect] Processing ${stock.name} (${stock.symbol})`);
+                
+                const result = await this.collectAllDataForStock(
+                    stock.id,
+                    targetYear,
+                    reportCode,
+                    userId
+                );
+
+                processed++;
+                if (result.success) {
+                    successful++;
+                    totalCollected += result.totalCollected || 0;
+                } else {
+                    failed++;
+                }
+
+                results.push({
+                    stockId: stock.id,
+                    symbol: stock.symbol,
+                    name: stock.name,
+                    success: result.success,
+                    totalCollected: result.totalCollected || 0,
+                    errors: result.errors || [],
+                });
+
+                this.logger.log(`[AutoCollect] Completed ${stock.name}: ${result.totalCollected || 0} records collected`);
+
+                // Add small delay between API calls to avoid rate limiting
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+            } catch (error: any) {
+                processed++;
+                failed++;
+                this.logger.error(`[AutoCollect] Failed to collect for ${stock.name}: ${error.message}`);
+                
+                results.push({
+                    stockId: stock.id,
+                    symbol: stock.symbol,
+                    name: stock.name,
+                    success: false,
+                    totalCollected: 0,
+                    errors: [{ task: 'all', error: error.message }],
+                });
+            }
+        }
+
+        const summary = {
+            success: true,
+            message: `Auto collection completed: ${successful}/${processed} stocks successful`,
+            bizYear: targetYear,
+            totalStocksWithMissingData: stocksWithMissingData.length,
+            processed,
+            successful,
+            failed,
+            totalCollected,
+            results,
+        };
+
+        this.logger.log(`[AutoCollect] Completed: ${JSON.stringify({
+            processed,
+            successful,
+            failed,
+            totalCollected
+        })}`);
+
+        return summary;
     }
 }
 

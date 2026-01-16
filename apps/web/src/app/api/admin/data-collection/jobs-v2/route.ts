@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
         if (searchParams.get('status')) params.set('status', searchParams.get('status')!);
         if (searchParams.get('type')) params.set('type', searchParams.get('type')!);
 
-        const response = await fetch(`${API_URL}/admin/data-collection/jobs-v2?${params}`, {
+        const response = await fetch(`${API_URL}/api/admin/data-collection/jobs-v2?${params}`, {
             headers: {
                 'Authorization': authHeader,
             },

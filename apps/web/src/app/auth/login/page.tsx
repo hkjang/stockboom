@@ -97,6 +97,35 @@ export default function LoginPage() {
                             계정이 없으신가요? 회원가입
                         </a>
                     </div>
+
+                    {/* 개발용 자동 입력 버튼 */}
+                    {process.env.NODE_ENV === 'development' && (
+                        <div className="mt-6 pt-6 border-t border-white/10">
+                            <p className="text-xs text-blue-300/50 mb-3 text-center">🔧 개발 테스트용</p>
+                            <div className="flex gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setEmail('admin@stockboom.com');
+                                        setPassword('password123');
+                                    }}
+                                    className="flex-1 py-2 bg-purple-600/30 border border-purple-400/30 text-purple-200 rounded-lg text-xs hover:bg-purple-600/50 transition"
+                                >
+                                    👑 관리자
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setEmail('trader1@example.com');
+                                        setPassword('password123');
+                                    }}
+                                    className="flex-1 py-2 bg-green-600/30 border border-green-400/30 text-green-200 rounded-lg text-xs hover:bg-green-600/50 transition"
+                                >
+                                    👤 일반 사용자
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 <div className="mt-6 text-center">

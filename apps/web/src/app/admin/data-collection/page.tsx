@@ -44,11 +44,11 @@ export default function AdminDataCollection() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-xl font-bold text-white">데이터 수집</h1>
-                    <p className="text-xs text-gray-400 mt-0.5">주식 데이터 수동 수집 및 관리</p>
+                    <p className="text-xs text-blue-200 mt-0.5">주식 데이터 수동 수집 및 관리</p>
                 </div>
                 <button
                     onClick={handleRefresh}
-                    className="px-3 py-1.5 text-xs bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-md transition-colors flex items-center gap-1.5"
+                    className="px-3 py-1.5 text-xs bg-white/10 hover:bg-white/20 text-blue-200 rounded-lg transition-colors flex items-center gap-1.5"
                 >
                     <RefreshIcon className="w-3 h-3" />
                     새로고침
@@ -59,14 +59,14 @@ export default function AdminDataCollection() {
             <DataCollectionStats stats={stats} loading={statsLoading} />
 
             {/* Tab Navigation */}
-            <div className="flex gap-1 p-1 bg-gray-800/50 rounded-lg border border-gray-700">
+            <div className="flex gap-1 p-1 bg-white/10 backdrop-blur-lg rounded-xl border border-white/20">
                 {tabs.map(tab => (
                     <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`flex-1 px-3 py-2 rounded-md text-xs font-medium transition-all ${activeTab === tab.id
-                            ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white'
-                            : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+                        className={`flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-all ${activeTab === tab.id
+                            ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-600/20'
+                            : 'text-blue-200 hover:text-white hover:bg-white/10'
                             }`}
                     >
                         <span className="mr-1.5">{tab.icon}</span>

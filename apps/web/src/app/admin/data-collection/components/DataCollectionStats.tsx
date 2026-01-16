@@ -33,15 +33,15 @@ export function StatsCard({ title, value, description, icon, variant = 'default'
             <div className="p-3">
                 <div className="flex items-start justify-between">
                     <div className="flex-1">
-                        <p className="text-xs font-medium text-gray-400">{title}</p>
+                        <p className="text-xs font-medium text-blue-200">{title}</p>
                         {loading ? (
-                            <div className="h-5 w-16 bg-gray-700/50 rounded animate-pulse mt-1" />
+                            <div className="h-5 w-16 bg-white/10 rounded animate-pulse mt-1" />
                         ) : (
                             <p className="text-lg font-bold text-white mt-0.5">
                                 {typeof value === 'number' ? value.toLocaleString() : value}
                             </p>
                         )}
-                        {description && <p className="text-xs text-gray-500 mt-0.5">{description}</p>}
+                        {description && <p className="text-xs text-blue-300/70 mt-0.5">{description}</p>}
                     </div>
                     <div className={`p-2 rounded-lg ${iconBgStyles[variant]}`}>{icon}</div>
                 </div>

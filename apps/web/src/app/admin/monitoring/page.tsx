@@ -27,20 +27,20 @@ function FailedJobsModal({ queueName, isOpen, onClose }: { queueName: string | n
 
     return (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-            <div className="bg-gray-800 border border-gray-700 rounded-lg shadow-xl max-w-2xl w-full max-h-[70vh] flex flex-col">
-                <div className="p-3 border-b border-gray-700 flex justify-between items-center">
+            <div className="bg-slate-900/95 backdrop-blur-lg border border-white/20 rounded-xl shadow-xl max-w-2xl w-full max-h-[70vh] flex flex-col">
+                <div className="p-3 border-b border-white/10 flex justify-between items-center">
                     <h2 className="text-sm font-semibold text-white">실패한 작업: {queueName}</h2>
-                    <button onClick={onClose} className="text-gray-400 hover:text-white text-xs">✕</button>
+                    <button onClick={onClose} className="text-blue-300 hover:text-white text-xs">✕</button>
                 </div>
                 <div className="p-3 overflow-y-auto flex-1 space-y-2">
-                    {!failedJobs ? <p className="text-xs text-gray-400">로딩 중...</p> :
-                        failedJobs.length === 0 ? <p className="text-xs text-gray-500 text-center py-3">실패한 작업 없음</p> :
+                    {!failedJobs ? <p className="text-xs text-blue-200">로딩 중...</p> :
+                        failedJobs.length === 0 ? <p className="text-xs text-blue-300/70 text-center py-3">실패한 작업 없음</p> :
                             failedJobs.map((job: any) => (
-                                <div key={job.id} className="bg-red-900/20 border border-red-800/50 rounded p-2 text-xs">
+                                <div key={job.id} className="bg-red-900/20 border border-red-500/30 rounded-lg p-2 text-xs">
                                     <div className="flex justify-between items-start">
                                         <span className="text-white">#{job.id}</span>
                                         <button onClick={() => handleRetry(job.id)}
-                                            className="px-2 py-0.5 bg-blue-600 hover:bg-blue-700 text-white rounded">재시도</button>
+                                            className="px-2 py-0.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">재시도</button>
                                     </div>
                                     <p className="text-red-400 mt-1 truncate">{job.failedReason}</p>
                                 </div>
@@ -67,7 +67,7 @@ export default function AdminMonitoring() {
         <div className="space-y-4">
             <div>
                 <h1 className="text-xl font-bold text-white">시스템 모니터링</h1>
-                <p className="text-xs text-gray-400 mt-0.5">실시간 시스템 상태</p>
+                <p className="text-xs text-blue-200 mt-0.5">실시간 시스템 상태</p>
             </div>
 
             {/* System Metrics */}
@@ -77,13 +77,13 @@ export default function AdminMonitoring() {
                     { title: '메모리', value: metrics?.memory || 0, icon: '💾' },
                     { title: '디스크', value: metrics?.disk || 0, icon: '💿' },
                 ].map((item) => (
-                    <div key={item.title} className="bg-gray-800/50 border border-gray-700 rounded-lg p-3">
+                    <div key={item.title} className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-3">
                         <div className="flex items-center justify-between mb-2">
-                            <span className="text-xs text-gray-400">{item.title}</span>
+                            <span className="text-xs text-blue-200">{item.title}</span>
                             <span className="text-sm">{item.icon}</span>
                         </div>
                         <p className="text-2xl font-bold text-white mb-2">{item.value}%</p>
-                        <div className="w-full bg-gray-700 rounded-full h-1.5">
+                        <div className="w-full bg-white/10 rounded-full h-1.5">
                             <div className={`h-1.5 rounded-full ${getProgressColor(item.value)}`}
                                 style={{ width: `${item.value}%` }} />
                         </div>
@@ -92,13 +92,13 @@ export default function AdminMonitoring() {
             </div>
 
             {/* Queue Monitoring */}
-            <div className="bg-gray-800/50 border border-gray-700 rounded-lg overflow-hidden">
-                <div className="px-3 py-2 border-b border-gray-700">
+            <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl overflow-hidden">
+                <div className="px-3 py-2 border-b border-white/10">
                     <h3 className="text-xs font-medium text-white">큐 상태</h3>
                 </div>
                 <div className="p-3 space-y-3">
                     {Array.isArray(queues) && queues.map((queue: any) => (
-                        <div key={queue.name} className="border-b border-gray-700/50 pb-2 last:border-0">
+                        <div key={queue.name} className="border-b border-white/10 pb-2 last:border-0">
                             <div className="flex justify-between items-center mb-2">
                                 <span className="text-xs font-medium text-white">{queue.name}</span>
                                 <Badge variant={queue.active > 0 ? 'info' : 'default'} size="sm">
@@ -106,46 +106,46 @@ export default function AdminMonitoring() {
                                 </Badge>
                             </div>
                             <div className="grid grid-cols-4 gap-2 text-xs">
-                                <div className="text-center p-1.5 bg-gray-700/30 rounded">
-                                    <p className="text-gray-500">대기</p>
+                                <div className="text-center p-1.5 bg-white/5 rounded-lg">
+                                    <p className="text-blue-300/70">대기</p>
                                     <p className="font-semibold text-amber-400">{queue.waiting || 0}</p>
                                 </div>
-                                <div className="text-center p-1.5 bg-gray-700/30 rounded">
-                                    <p className="text-gray-500">처리중</p>
+                                <div className="text-center p-1.5 bg-white/5 rounded-lg">
+                                    <p className="text-blue-300/70">처리중</p>
                                     <p className="font-semibold text-blue-400">{queue.active || 0}</p>
                                 </div>
-                                <div className="text-center p-1.5 bg-gray-700/30 rounded">
-                                    <p className="text-gray-500">완료</p>
+                                <div className="text-center p-1.5 bg-white/5 rounded-lg">
+                                    <p className="text-blue-300/70">완료</p>
                                     <p className="font-semibold text-emerald-400">{queue.completed || 0}</p>
                                 </div>
-                                <div className="text-center p-1.5 bg-gray-700/30 rounded cursor-pointer hover:bg-gray-700/50"
+                                <div className="text-center p-1.5 bg-white/5 rounded-lg cursor-pointer hover:bg-white/10"
                                     onClick={() => { setSelectedQueue(queue.name); setIsModalOpen(true); }}>
-                                    <p className="text-gray-500">실패</p>
+                                    <p className="text-blue-300/70">실패</p>
                                     <p className="font-semibold text-red-400">{queue.failed || 0}</p>
                                 </div>
                             </div>
                         </div>
                     ))}
                     {(!Array.isArray(queues) || queues.length === 0) && (
-                        <p className="text-xs text-gray-500 text-center py-3">큐 데이터 없음</p>
+                        <p className="text-xs text-blue-300/70 text-center py-3">큐 데이터 없음</p>
                     )}
                 </div>
             </div>
 
             {/* Error Logs */}
-            <div className="bg-gray-800/50 border border-gray-700 rounded-lg overflow-hidden">
-                <div className="px-3 py-2 border-b border-gray-700">
+            <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl overflow-hidden">
+                <div className="px-3 py-2 border-b border-white/10">
                     <h3 className="text-xs font-medium text-white">최근 에러</h3>
                 </div>
                 <div className="p-3 space-y-1.5 max-h-48 overflow-y-auto">
                     {Array.isArray(metrics?.errorLogs) && metrics.errorLogs.map((log: any, i: number) => (
-                        <div key={i} className="p-2 bg-red-900/20 border-l-2 border-red-500 rounded text-xs">
+                        <div key={i} className="p-2 bg-red-900/20 border-l-2 border-red-500 rounded-lg text-xs">
                             <p className="text-red-300 truncate">{log.message}</p>
                             <span className="text-red-400/70">{new Date(log.timestamp).toLocaleString('ko-KR')}</span>
                         </div>
                     ))}
                     {(!Array.isArray(metrics?.errorLogs) || metrics.errorLogs.length === 0) && (
-                        <p className="text-xs text-gray-500 text-center py-3">에러 없음</p>
+                        <p className="text-xs text-blue-300/70 text-center py-3">에러 없음</p>
                     )}
                 </div>
             </div>

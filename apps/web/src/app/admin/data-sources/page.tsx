@@ -69,10 +69,10 @@ export default function AdminDataSources() {
             <div className="flex justify-between items-center">
                 <div>
                     <h1 className="text-xl font-bold text-white">데이터 소스</h1>
-                    <p className="text-xs text-gray-400 mt-0.5">지표별 데이터 소스 관리</p>
+                    <p className="text-xs text-blue-200 mt-0.5">지표별 데이터 소스 관리</p>
                 </div>
                 <button onClick={handleInitialize}
-                    className="px-3 py-1.5 text-xs bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-md">
+                    className="px-3 py-1.5 text-xs bg-white/10 hover:bg-white/20 text-blue-200 rounded-lg">
                     🔄 초기화
                 </button>
             </div>
@@ -83,27 +83,27 @@ export default function AdminDataSources() {
                     const isEditing = editingMetric === metric.value;
 
                     return (
-                        <div key={metric.value} className="bg-gray-800/50 border border-gray-700 rounded-lg p-3">
+                        <div key={metric.value} className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-3">
                             <div className="flex justify-between items-start">
                                 <div className="flex-1">
                                     <div className="flex items-center gap-2">
                                         <h3 className="text-xs font-semibold text-white">{metric.label}</h3>
-                                        <span className="text-xs text-gray-500">{metric.desc}</span>
+                                        <span className="text-xs text-blue-300/70">{metric.desc}</span>
                                     </div>
 
                                     {isEditing ? (
                                         <div className="mt-2 space-y-2">
                                             <div className="flex items-center gap-2">
-                                                <label className="text-xs text-gray-400">주 소스:</label>
+                                                <label className="text-xs text-blue-200">주 소스:</label>
                                                 <select value={formData.primarySource} onChange={(e) => setFormData({ ...formData, primarySource: e.target.value })}
-                                                    className="px-2 py-1 text-xs bg-gray-700/50 border border-gray-600 rounded text-white">
+                                                    className="px-2 py-1 text-xs bg-white/5 border border-white/20 rounded-lg text-white">
                                                     {dataSources.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
                                                 </select>
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <label className="text-xs text-gray-400">백업:</label>
+                                                <label className="text-xs text-blue-200">백업:</label>
                                                 {dataSources.filter(s => s.value !== formData.primarySource).map(s => (
-                                                    <label key={s.value} className="flex items-center text-xs text-gray-300">
+                                                    <label key={s.value} className="flex items-center text-xs text-blue-200">
                                                         <input type="checkbox" checked={formData.fallbackSources?.includes(s.value)}
                                                             onChange={(e) => {
                                                                 const fb = formData.fallbackSources || [];
@@ -112,22 +112,22 @@ export default function AdminDataSources() {
                                                                     fallbackSources: e.target.checked ? [...fb, s.value] : fb.filter((x: string) => x !== s.value)
                                                                 });
                                                             }}
-                                                            className="mr-1 rounded bg-gray-700 border-gray-600" />
+                                                            className="mr-1 rounded bg-white/10 border-white/20" />
                                                         {s.label}
                                                     </label>
                                                 ))}
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <label className="flex items-center text-xs text-gray-300">
+                                                <label className="flex items-center text-xs text-blue-200">
                                                     <input type="checkbox" checked={formData.isActive}
                                                         onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                                                        className="mr-1 rounded bg-gray-700 border-gray-600" />
+                                                        className="mr-1 rounded bg-white/10 border-white/20" />
                                                     활성화
                                                 </label>
                                                 <button onClick={handleSave}
-                                                    className="px-2 py-0.5 text-xs bg-indigo-600 hover:bg-indigo-700 text-white rounded">저장</button>
+                                                    className="px-2 py-0.5 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded-lg">저장</button>
                                                 <button onClick={() => setEditingMetric(null)}
-                                                    className="px-2 py-0.5 text-xs bg-gray-700 text-gray-300 rounded">취소</button>
+                                                    className="px-2 py-0.5 text-xs bg-white/10 text-blue-200 rounded-lg">취소</button>
                                             </div>
                                         </div>
                                     ) : config ? (
@@ -136,7 +136,7 @@ export default function AdminDataSources() {
                                                 {dataSources.find(s => s.value === config.primarySource)?.label}
                                             </span>
                                             {config.fallbackSources?.map((s: string) => (
-                                                <span key={s} className="px-1.5 py-0.5 text-xs rounded bg-gray-700/50 text-gray-400">
+                                                <span key={s} className="px-1.5 py-0.5 text-xs rounded bg-white/10 text-blue-300">
                                                     {dataSources.find(d => d.value === s)?.label}
                                                 </span>
                                             ))}
@@ -145,13 +145,13 @@ export default function AdminDataSources() {
                                             </span>
                                         </div>
                                     ) : (
-                                        <p className="text-xs text-gray-500 mt-1">설정 없음</p>
+                                        <p className="text-xs text-blue-300/70 mt-1">설정 없음</p>
                                     )}
                                 </div>
 
                                 {!isEditing && (
                                     <button onClick={() => handleEdit(config || { metricType: metric.value, primarySource: 'kis', fallbackSources: [], isActive: true })}
-                                        className="px-2 py-0.5 text-xs bg-indigo-600/20 text-indigo-400 hover:bg-indigo-600/30 rounded">수정</button>
+                                        className="px-2 py-0.5 text-xs bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 rounded-lg">수정</button>
                                 )}
                             </div>
                         </div>

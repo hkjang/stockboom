@@ -204,7 +204,16 @@ export class TradesService {
             throw new BadRequestException('Cannot cancel trade in current status');
         }
 
-        // TODO: Call broker API to cancel order
+        // 실제 KIS API로 주문 취소 요청
+        if (trade.brokerOrderId) {
+            try {
+                const remainingQty = trade.quantity - trade.filledQuantity;
+                await this.kisApiService.cancelOrder(trade.brokerOrderId, remainingQty, userId);
+            } catch (error) {
+                this.logger.error(`Failed to cancel order via KIS API: ${error.message}`);
+                throw new BadRequestException(`주문 취소 실패: ${error.message}`);
+            }
+        }
 
         return prisma.trade.update({
             where: { id },

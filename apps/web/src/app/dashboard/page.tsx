@@ -3,6 +3,8 @@
 import { useEffect, useState, useMemo } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import CreatePortfolioModal from '@/components/CreatePortfolioModal';
+import { HelpTooltip, HelpModal, HelpButton, pageHelpContent } from '@/components/ui/HelpTooltip';
+import { HelpCircle } from 'lucide-react';
 
 interface Portfolio {
     id: string;
@@ -24,6 +26,7 @@ export default function DashboardPage() {
     const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
     const [strategies, setStrategies] = useState<Strategy[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [showHelp, setShowHelp] = useState(false);
 
     const getAuthHeader = (): Record<string, string> => {
         const token = localStorage.getItem('token');
@@ -96,10 +99,26 @@ export default function DashboardPage() {
 
     return (
         <DashboardLayout>
+            {/* Help Modal */}
+            <HelpModal
+                isOpen={showHelp}
+                onClose={() => setShowHelp(false)}
+                title={pageHelpContent.dashboard.title}
+                sections={pageHelpContent.dashboard.sections}
+            />
+
             <div className="container mx-auto px-6 py-8">
-                <div className="mb-8">
-                    <h2 className="text-3xl font-bold text-white mb-2">대시보드</h2>
-                    <p className="text-blue-200">포트폴리오 및 투자 현황</p>
+                <div className="mb-8 flex items-center justify-between">
+                    <div>
+                        <h2 className="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+                            대시보드
+                            <HelpTooltip term="portfolio" position="right">
+                                <HelpCircle size={18} className="text-gray-400" />
+                            </HelpTooltip>
+                        </h2>
+                        <p className="text-blue-200">포트폴리오 및 투자 현황</p>
+                    </div>
+                    <HelpButton onClick={() => setShowHelp(true)} />
                 </div>
 
                 {/* Quick Stats */}
@@ -109,19 +128,34 @@ export default function DashboardPage() {
                         <div className="text-3xl font-bold text-white">{stats.totalPortfolios}</div>
                     </div>
                     <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-                        <div className="text-blue-300 text-sm mb-1">총 평가액</div>
+                        <div className="text-blue-300 text-sm mb-1 flex items-center gap-1">
+                            총 평가액
+                            <HelpTooltip term="unrealizedPnl" position="bottom">
+                                <HelpCircle size={12} className="text-gray-400" />
+                            </HelpTooltip>
+                        </div>
                         <div className="text-3xl font-bold text-white">
                             ₩{stats.totalValue.toLocaleString()}
                         </div>
                     </div>
                     <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-                        <div className="text-blue-300 text-sm mb-1">총 수익률</div>
+                        <div className="text-blue-300 text-sm mb-1 flex items-center gap-1">
+                            총 수익률
+                            <HelpTooltip term="pnl" position="bottom">
+                                <HelpCircle size={12} className="text-gray-400" />
+                            </HelpTooltip>
+                        </div>
                         <div className={`text-3xl font-bold ${stats.isPositive ? 'text-green-400' : 'text-red-400'}`}>
                             {stats.isPositive ? '+' : ''}{stats.totalReturnPct.toFixed(2)}%
                         </div>
                     </div>
                     <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-                        <div className="text-blue-300 text-sm mb-1">활성 전략</div>
+                        <div className="text-blue-300 text-sm mb-1 flex items-center gap-1">
+                            활성 전략
+                            <HelpTooltip term="strategy" position="bottom">
+                                <HelpCircle size={12} className="text-gray-400" />
+                            </HelpTooltip>
+                        </div>
                         <div className="text-3xl font-bold text-white">{stats.activeStrategies}</div>
                     </div>
                 </div>

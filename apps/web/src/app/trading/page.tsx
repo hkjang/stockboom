@@ -6,7 +6,8 @@ import StockSearch from '@/components/trading/StockSearch';
 import OrderbookPanel from '@/components/trading/OrderbookPanel';
 import OrderForm from '@/components/trading/OrderForm';
 import TickerPanel from '@/components/trading/TickerPanel';
-import { Activity, Clock, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
+import { HelpTooltip, HelpModal, HelpButton, pageHelpContent } from '@/components/ui/HelpTooltip';
+import { Activity, Clock, AlertCircle, CheckCircle, XCircle, HelpCircle } from 'lucide-react';
 
 interface Stock {
     id: string;
@@ -35,6 +36,7 @@ export default function TradingPage() {
     const [selectedPrice, setSelectedPrice] = useState<number | undefined>(undefined);
     const [pendingOrders, setPendingOrders] = useState<PendingOrder[]>([]);
     const [loadingOrders, setLoadingOrders] = useState(false);
+    const [showHelp, setShowHelp] = useState(false);
 
     const getAuthHeader = (): Record<string, string> => {
         const token = localStorage.getItem('token');
@@ -128,11 +130,27 @@ export default function TradingPage() {
 
     return (
         <DashboardLayout>
+            {/* Help Modal */}
+            <HelpModal
+                isOpen={showHelp}
+                onClose={() => setShowHelp(false)}
+                title={pageHelpContent.trading.title}
+                sections={pageHelpContent.trading.sections}
+            />
+
             <div className="container mx-auto px-6 py-8">
                 {/* Header */}
-                <div className="mb-6">
-                    <h1 className="text-3xl font-bold text-white mb-2">실시간 매매</h1>
-                    <p className="text-blue-200">호가 확인 및 주문 실행</p>
+                <div className="mb-6 flex items-center justify-between">
+                    <div>
+                        <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+                            실시간 매매
+                            <HelpTooltip term="marketOrder" position="right">
+                                <span className="text-sm text-gray-400">(시장가/지정가)</span>
+                            </HelpTooltip>
+                        </h1>
+                        <p className="text-blue-200">호가 확인 및 주문 실행</p>
+                    </div>
+                    <HelpButton onClick={() => setShowHelp(true)} />
                 </div>
 
                 {/* Stock Search */}
@@ -175,7 +193,12 @@ export default function TradingPage() {
                         {/* Pending Orders */}
                         <div className="bg-white/5 backdrop-blur-lg rounded-xl border border-white/10 overflow-hidden">
                             <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
-                                <h2 className="text-lg font-semibold text-white">미체결 주문</h2>
+                                <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+                                    미체결 주문
+                                    <HelpTooltip term="limitOrder" position="right">
+                                        <HelpCircle size={14} className="text-gray-400" />
+                                    </HelpTooltip>
+                                </h2>
                                 <span className="text-sm text-gray-400">
                                     {pendingOrders.length}건
                                 </span>

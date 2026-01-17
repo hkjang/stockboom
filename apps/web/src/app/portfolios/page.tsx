@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/DashboardLayout';
 import CreatePortfolioModal from '@/components/CreatePortfolioModal';
 import EditPortfolioModal from '@/components/EditPortfolioModal';
-import { Trash2, RefreshCw, Plus, TrendingUp, TrendingDown, Edit } from 'lucide-react';
+import { HelpTooltip, HelpModal, HelpButton, pageHelpContent } from '@/components/ui/HelpTooltip';
+import { Trash2, RefreshCw, Plus, TrendingUp, TrendingDown, Edit, HelpCircle } from 'lucide-react';
 
 export default function PortfoliosPage() {
     const router = useRouter();
@@ -15,6 +16,7 @@ export default function PortfoliosPage() {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedPortfolio, setSelectedPortfolio] = useState<any>(null);
     const [portfolioToEdit, setPortfolioToEdit] = useState<any>(null);
+    const [showHelp, setShowHelp] = useState(false);
 
     useEffect(() => {
         fetchPortfolios();
@@ -89,19 +91,35 @@ export default function PortfoliosPage() {
 
     return (
         <DashboardLayout>
+            {/* Help Modal */}
+            <HelpModal
+                isOpen={showHelp}
+                onClose={() => setShowHelp(false)}
+                title={pageHelpContent.portfolio.title}
+                sections={pageHelpContent.portfolio.sections}
+            />
+
             <div className="container mx-auto px-6 py-8">
                 <div className="mb-8 flex items-center justify-between">
                     <div>
-                        <h2 className="text-3xl font-bold text-white mb-2">포트폴리오</h2>
+                        <h2 className="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+                            포트폴리오
+                            <HelpTooltip term="portfolio" position="right">
+                                <HelpCircle size={18} className="text-gray-400" />
+                            </HelpTooltip>
+                        </h2>
                         <p className="text-blue-200">내 투자 포트폴리오 관리</p>
                     </div>
-                    <button
-                        onClick={() => setIsModalOpen(true)}
-                        className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
-                    >
-                        <Plus size={20} />
-                        새 포트폴리오
-                    </button>
+                    <div className="flex items-center gap-3">
+                        <HelpButton onClick={() => setShowHelp(true)} />
+                        <button
+                            onClick={() => setIsModalOpen(true)}
+                            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
+                        >
+                            <Plus size={20} />
+                            새 포트폴리오
+                        </button>
+                    </div>
                 </div>
 
                 {portfolios.length === 0 ? (

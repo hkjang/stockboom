@@ -5,7 +5,8 @@ import DashboardLayout from '@/components/DashboardLayout';
 import TechnicalAnalysisTab from '@/components/analysis/TechnicalAnalysisTab';
 import AIAnalysisTab from '@/components/analysis/AIAnalysisTab';
 import NewsTab from '@/components/analysis/NewsTab';
-import { Search, TrendingUp, Newspaper, Brain, RefreshCw, Star, Loader2 } from 'lucide-react';
+import { HelpTooltip, HelpModal, HelpButton, pageHelpContent } from '@/components/ui/HelpTooltip';
+import { Search, TrendingUp, Newspaper, Brain, RefreshCw, Star, Loader2, HelpCircle } from 'lucide-react';
 
 type TabType = 'technical' | 'ai' | 'news';
 
@@ -24,6 +25,7 @@ export default function AnalysisPage() {
     const [stocks, setStocks] = useState<Stock[]>([]);
     const [selectedStock, setSelectedStock] = useState<Stock | null>(null);
     const [isSearching, setIsSearching] = useState(false);
+    const [showHelp, setShowHelp] = useState(false);
 
     // Watchlist state
     const [isInWatchlist, setIsInWatchlist] = useState(false);
@@ -277,11 +279,27 @@ export default function AnalysisPage() {
 
     return (
         <DashboardLayout>
+            {/* Help Modal */}
+            <HelpModal
+                isOpen={showHelp}
+                onClose={() => setShowHelp(false)}
+                title={pageHelpContent.analysis.title}
+                sections={pageHelpContent.analysis.sections}
+            />
+
             <div className="container mx-auto px-6 py-8">
                 {/* Header */}
-                <div className="mb-8">
-                    <h2 className="text-3xl font-bold text-white mb-2">종목분석</h2>
-                    <p className="text-blue-200">기술적 지표, AI 분석, 뉴스 센티먼트</p>
+                <div className="mb-8 flex items-center justify-between">
+                    <div>
+                        <h2 className="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+                            종목분석
+                            <HelpTooltip term="rsi" position="right">
+                                <HelpCircle size={18} className="text-gray-400" />
+                            </HelpTooltip>
+                        </h2>
+                        <p className="text-blue-200">기술적 지표, AI 분석, 뉴스 센티먼트</p>
+                    </div>
+                    <HelpButton onClick={() => setShowHelp(true)} />
                 </div>
 
                 {/* Search Bar */}

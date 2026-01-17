@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
-import { TrendingUp, TrendingDown, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { HelpTooltip, HelpModal, HelpButton, pageHelpContent } from '@/components/ui/HelpTooltip';
+import { TrendingUp, TrendingDown, Clock, CheckCircle, XCircle, AlertCircle, HelpCircle } from 'lucide-react';
 
 export default function TradesPage() {
     const [loading, setLoading] = useState(true);
@@ -10,6 +11,7 @@ export default function TradesPage() {
     const [statistics, setStatistics] = useState<any>(null);
     const [page, setPage] = useState(1);
     const [filter, setFilter] = useState('ALL');
+    const [showHelp, setShowHelp] = useState(false);
 
     useEffect(() => {
         fetchTrades();
@@ -94,10 +96,26 @@ export default function TradesPage() {
 
     return (
         <DashboardLayout>
+            {/* Help Modal */}
+            <HelpModal
+                isOpen={showHelp}
+                onClose={() => setShowHelp(false)}
+                title={pageHelpContent.trades.title}
+                sections={pageHelpContent.trades.sections}
+            />
+
             <div className="container mx-auto px-6 py-8">
-                <div className="mb-8">
-                    <h2 className="text-3xl font-bold text-white mb-2">거래내역</h2>
-                    <p className="text-blue-200">매매 기록 및 거래 현황</p>
+                <div className="mb-8 flex items-center justify-between">
+                    <div>
+                        <h2 className="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+                            거래내역
+                            <HelpTooltip term="pnl" position="right">
+                                <HelpCircle size={18} className="text-gray-400" />
+                            </HelpTooltip>
+                        </h2>
+                        <p className="text-blue-200">매매 기록 및 거래 현황</p>
+                    </div>
+                    <HelpButton onClick={() => setShowHelp(true)} />
                 </div>
 
                 {/* Statistics Cards */}
@@ -108,7 +126,12 @@ export default function TradesPage() {
                             <div className="text-3xl font-bold text-white">{statistics.totalTrades || 0}</div>
                         </div>
                         <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-                            <div className="text-blue-300 text-sm mb-1">승률</div>
+                            <div className="text-blue-300 text-sm mb-1 flex items-center gap-1">
+                                승률
+                                <HelpTooltip term="winRate" position="bottom">
+                                    <HelpCircle size={12} className="text-gray-500" />
+                                </HelpTooltip>
+                            </div>
                             <div className="text-3xl font-bold text-green-400">{statistics.winRate || 0}%</div>
                         </div>
                         <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">

@@ -3,13 +3,15 @@
 import { useEffect, useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import EditStrategyModal from '@/components/EditStrategyModal';
-import { Play, Pause, Trash2, Edit, TrendingUp } from 'lucide-react';
+import { HelpTooltip, HelpModal, HelpButton, pageHelpContent } from '@/components/ui/HelpTooltip';
+import { Play, Pause, Trash2, Edit, TrendingUp, HelpCircle } from 'lucide-react';
 
 export default function StrategiesPage() {
     const [loading, setLoading] = useState(true);
     const [strategies, setStrategies] = useState<any[]>([]);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [strategyToEdit, setStrategyToEdit] = useState<any>(null);
+    const [showHelp, setShowHelp] = useState(false);
 
     useEffect(() => {
         fetchStrategies();
@@ -60,10 +62,26 @@ export default function StrategiesPage() {
 
     return (
         <DashboardLayout>
+            {/* Help Modal */}
+            <HelpModal
+                isOpen={showHelp}
+                onClose={() => setShowHelp(false)}
+                title={pageHelpContent.strategy.title}
+                sections={pageHelpContent.strategy.sections}
+            />
+
             <div className="container mx-auto px-6 py-8">
-                <div className="mb-8">
-                    <h2 className="text-3xl font-bold text-white mb-2">전략관리</h2>
-                    <p className="text-blue-200">자동매매 전략 설정 및 백테스팅</p>
+                <div className="mb-8 flex items-center justify-between">
+                    <div>
+                        <h2 className="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+                            전략관리
+                            <HelpTooltip term="strategy" position="right">
+                                <HelpCircle size={18} className="text-gray-400" />
+                            </HelpTooltip>
+                        </h2>
+                        <p className="text-blue-200">자동매매 전략 설정 및 백테스팅</p>
+                    </div>
+                    <HelpButton onClick={() => setShowHelp(true)} />
                 </div>
 
                 {strategies.length === 0 ? (
@@ -110,14 +128,24 @@ export default function StrategiesPage() {
 
                                     {strategy.winRate !== null && (
                                         <div className="flex items-center justify-between">
-                                            <span className="text-blue-300 text-sm">승률</span>
+                                            <span className="text-blue-300 text-sm flex items-center gap-1">
+                                                승률
+                                                <HelpTooltip term="winRate" position="left">
+                                                    <HelpCircle size={10} className="text-gray-500" />
+                                                </HelpTooltip>
+                                            </span>
                                             <span className="text-white font-semibold text-sm">{Number(strategy.winRate).toFixed(1)}%</span>
                                         </div>
                                     )}
 
                                     {strategy.sharpeRatio !== null && (
                                         <div className="flex items-center justify-between">
-                                            <span className="text-blue-300 text-sm">샤프 지수</span>
+                                            <span className="text-blue-300 text-sm flex items-center gap-1">
+                                                샤프 지수
+                                                <HelpTooltip term="sharpeRatio" position="left">
+                                                    <HelpCircle size={10} className="text-gray-500" />
+                                                </HelpTooltip>
+                                            </span>
                                             <span className="text-white font-semibold text-sm">{Number(strategy.sharpeRatio).toFixed(2)}</span>
                                         </div>
                                     )}

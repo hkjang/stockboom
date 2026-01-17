@@ -4,6 +4,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { BullModule } from '@nestjs/bull';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { StocksModule } from './stocks/stocks.module';
@@ -20,6 +21,7 @@ import { DataSourceModule } from './data-source/data-source.module';
 import { CommonModule } from './common/common.module';
 import { UserApiKeysModule } from './user-api-keys/user-api-keys.module';
 import { WatchlistModule } from './watchlist/watchlist.module';
+import { TradingEngineModule } from './trading-engine/trading-engine.module';
 
 @Module({
     imports: [
@@ -31,6 +33,9 @@ import { WatchlistModule } from './watchlist/watchlist.module';
 
         // Scheduling
         ScheduleModule.forRoot(),
+
+        // Event Emitter
+        EventEmitterModule.forRoot(),
 
         // Rate limiting
         ThrottlerModule.forRoot([{
@@ -68,6 +73,7 @@ import { WatchlistModule } from './watchlist/watchlist.module';
         DataSourceModule,
         UserApiKeysModule,
         WatchlistModule,
+        TradingEngineModule,
     ],
     providers: [
         // Global Rate Limiting Guard

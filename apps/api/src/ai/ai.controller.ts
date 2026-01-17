@@ -2,7 +2,9 @@ import { Controller, Get, Post, Param, Query, Body, UseGuards } from '@nestjs/co
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { AiService } from './ai.service';
 import { PatternDetectionService } from './pattern-detection.service';
+import { AITradingService, PredictionHorizon } from './ai-trading.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { User } from '../auth/decorators/user.decorator';
 
 @ApiTags('AI Analysis')
 @Controller('ai')
@@ -12,7 +14,43 @@ export class AiController {
     constructor(
         private aiService: AiService,
         private patternDetectionService: PatternDetectionService,
+        private aiTradingService: AITradingService,
     ) { }
+
+    // =====================================
+    // AI Trading Endpoints
+    // =====================================
+
+    @Get('trading/:stockId/prediction')
+    @ApiOperation({ summary: 'Get AI price prediction for a stock' })
+    async getPricePrediction(
+        @Param('stockId') stockId: string,
+        @Query('horizon') horizon?: PredictionHorizon,
+    ) {
+        return this.aiTradingService.predictPrice(stockId, horizon || '1D');
+    }
+
+    @Get('trading/:stockId/recommendation')
+    @ApiOperation({ summary: 'Get AI trading recommendation for a stock' })
+    async getRecommendation(@Param('stockId') stockId: string) {
+        return this.aiTradingService.generateRecommendation(stockId);
+    }
+
+    @Get('trading/:stockId/sentiment')
+    @ApiOperation({ summary: 'Get sentiment analysis for a stock' })
+    async getSentiment(@Param('stockId') stockId: string) {
+        return this.aiTradingService.analyzeSentiment(stockId);
+    }
+
+    @Get('trading/portfolio/optimize')
+    @ApiOperation({ summary: 'Get portfolio optimization suggestions' })
+    async optimizePortfolio(@User() user: any) {
+        return this.aiTradingService.optimizePortfolio(user.id);
+    }
+
+    // =====================================
+    // News Analysis
+    // =====================================
 
     @Post('news/:newsId/analyze')
     @ApiOperation({ summary: 'Analyze news article with LLM' })
@@ -48,6 +86,10 @@ export class AiController {
             limit ? parseInt(limit as any) : 10,
         );
     }
+
+    // =====================================
+    // Pattern Detection
+    // =====================================
 
     @Get('stocks/:stockId/anomalies')
     @ApiOperation({ summary: 'Detect trading anomalies' })
@@ -101,4 +143,3 @@ export class AiController {
         return this.aiService.analyzeDisclosureBatch(disclosures);
     }
 }
-

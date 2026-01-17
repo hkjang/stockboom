@@ -26,7 +26,7 @@ export default function WatchlistPage() {
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
 
-    const getAuthHeader = () => {
+    const getAuthHeader = (): Record<string, string> => {
         const token = localStorage.getItem('token');
         return { 'Authorization': `Bearer ${token}` };
     };

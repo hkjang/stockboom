@@ -73,7 +73,7 @@ export function StockCollectionTab({ onRefresh }: StockCollectionTabProps) {
     const [autoCollectResult, setAutoCollectResult] = useState<AutoCollectResult | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
 
-    const getAuthHeader = () => {
+    const getAuthHeader = (): Record<string, string> => {
         const token = localStorage.getItem('token');
         return token ? { Authorization: `Bearer ${token}` } : {};
     };

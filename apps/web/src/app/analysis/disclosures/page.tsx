@@ -47,7 +47,7 @@ export default function DisclosureSearchPage() {
     const [aiAnalysis, setAiAnalysis] = useState<AIAnalysis | null>(null);
     const [aiLoading, setAiLoading] = useState(false);
 
-    const getAuthHeader = () => {
+    const getAuthHeader = (): Record<string, string> => {
         const token = localStorage.getItem('token');
         return token ? { Authorization: `Bearer ${token}` } : {};
     };

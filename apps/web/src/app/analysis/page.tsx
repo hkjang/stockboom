@@ -44,16 +44,16 @@ export default function AnalysisPage() {
     const [aiError, setAiError] = useState<string | undefined>();
     const [newsError, setNewsError] = useState<string | undefined>();
 
-    const getAuthHeader = () => {
+    const getAuthHeader = (): Record<string, string> => {
         const token = localStorage.getItem('token');
-        return token ? `Bearer ${token}` : '';
+        return token ? { Authorization: `Bearer ${token}` } : {};
     };
 
     // Check if stock is in watchlist
     const checkWatchlistStatus = useCallback(async (stockId: string) => {
         try {
             const res = await fetch(`/api/watchlist/${stockId}/check`, {
-                headers: { 'Authorization': getAuthHeader() }
+                headers: getAuthHeader()
             });
             if (res.ok) {
                 const data = await res.json();
@@ -73,14 +73,14 @@ export default function AnalysisPage() {
             if (isInWatchlist) {
                 await fetch(`/api/watchlist/${selectedStock.id}`, {
                     method: 'DELETE',
-                    headers: { 'Authorization': getAuthHeader() }
+                    headers: getAuthHeader()
                 });
                 setIsInWatchlist(false);
             } else {
                 await fetch(`/api/watchlist/${selectedStock.id}`, {
                     method: 'POST',
                     headers: {
-                        'Authorization': getAuthHeader(),
+                        ...getAuthHeader(),
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({})
@@ -105,7 +105,7 @@ export default function AnalysisPage() {
             setIsSearching(true);
             try {
                 const res = await fetch(`/api/stocks?search=${encodeURIComponent(searchQuery)}`, {
-                    headers: { 'Authorization': getAuthHeader() }
+                    headers: getAuthHeader()
                 });
                 if (res.ok) {
                     const data = await res.json();
@@ -127,7 +127,7 @@ export default function AnalysisPage() {
         setTechnicalError(undefined);
         try {
             const res = await fetch(`/api/analysis/${stockId}/technical`, {
-                headers: { 'Authorization': getAuthHeader() }
+                headers: getAuthHeader()
             });
             if (res.ok) {
                 const data = await res.json();
@@ -149,17 +149,17 @@ export default function AnalysisPage() {
         try {
             // Get AI reports
             const reportsRes = await fetch(`/api/ai/stocks/${stockId}/reports?limit=1`, {
-                headers: { 'Authorization': getAuthHeader() }
+                headers: getAuthHeader()
             });
 
             // Get patterns
             const patternsRes = await fetch(`/api/ai/stocks/${stockId}/patterns`, {
-                headers: { 'Authorization': getAuthHeader() }
+                headers: getAuthHeader()
             });
 
             // Get anomalies
             const anomaliesRes = await fetch(`/api/ai/stocks/${stockId}/anomalies`, {
-                headers: { 'Authorization': getAuthHeader() }
+                headers: getAuthHeader()
             });
 
             const data: any = {};
@@ -199,7 +199,7 @@ export default function AnalysisPage() {
         setNewsError(undefined);
         try {
             const res = await fetch(`/api/ai/stocks/${stockId}/news-analysis?limit=10`, {
-                headers: { 'Authorization': getAuthHeader() }
+                headers: getAuthHeader()
             });
             if (res.ok) {
                 const data = await res.json();
@@ -263,7 +263,7 @@ export default function AnalysisPage() {
         try {
             const res = await fetch(`/api/ai/stocks/${selectedStock.id}/report`, {
                 method: 'GET',
-                headers: { 'Authorization': getAuthHeader() }
+                headers: getAuthHeader()
             });
             if (res.ok) {
                 await fetchAiData(selectedStock.id);

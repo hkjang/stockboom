@@ -7,6 +7,7 @@ import { MarketDataService } from './market-data.service';
 import { KisApiService } from './kis-api.service';
 import { KisWebsocketService } from './kis-websocket.service';
 import { KisSyncService } from './kis-sync.service';
+import { TradingController } from './trading.controller';
 import { YahooFinanceService } from './yahoo-finance.service';
 import { OpenDartService } from './opendart.service';
 import { UserApiKeysModule } from '../user-api-keys/user-api-keys.module';
@@ -19,6 +20,7 @@ import { UserApiKeysModule } from '../user-api-keys/user-api-keys.module';
         ScheduleModule.forRoot(),
         EventEmitterModule.forRoot(),
     ],
+    controllers: [TradingController],
     providers: [
         MarketDataService,
         KisApiService,
@@ -37,5 +39,6 @@ import { UserApiKeysModule } from '../user-api-keys/user-api-keys.module';
     ],
 })
 export class MarketDataModule { }
+
 
 

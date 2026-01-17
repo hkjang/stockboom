@@ -15,14 +15,21 @@ export class TradesService {
     async findAll(userId: string, params?: {
         skip?: number;
         take?: number;
-        status?: OrderStatus;
+        status?: OrderStatus | OrderStatus[];
     }): Promise<Trade[]> {
         const { skip, take, status } = params || {};
+
+        // Build status filter - handle both single value and array
+        const statusFilter = status
+            ? Array.isArray(status)
+                ? { in: status }
+                : status
+            : undefined;
 
         return prisma.trade.findMany({
             where: {
                 userId,
-                ...(status && { status }),
+                ...(statusFilter && { status: statusFilter }),
             },
             include: {
                 stock: true,

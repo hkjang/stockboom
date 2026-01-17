@@ -179,7 +179,7 @@ export function FinancialCharts({ data }: FinancialChartProps) {
     if (!data || data.length === 0) {
         return (
             <div className="text-center text-gray-400 py-12">
-                재무 데이터가 없습니다. 데이터 수집 페이지에서 "재무요약"을 먼저 수집해주세요.
+                재무 데이터가 없습니다. 데이터 수집 페이지에서 &quot;재무요약&quot;을 먼저 수집해주세요.
             </div>
         );
     }

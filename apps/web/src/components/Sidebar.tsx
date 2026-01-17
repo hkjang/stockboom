@@ -2,10 +2,11 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Briefcase, Star, TrendingUp, Zap, BarChart3, Bell, Shield, FileSearch, Scale } from 'lucide-react';
+import { Home, Briefcase, Star, TrendingUp, Zap, BarChart3, Bell, Shield, FileSearch, Scale, Activity, Settings } from 'lucide-react';
 
 const menuItems = [
     { name: '대시보드', path: '/dashboard', icon: Home },
+    { name: '실시간 매매', path: '/trading', icon: Activity },
     { name: '포트폴리오', path: '/portfolios', icon: Briefcase },
     { name: '관심종목', path: '/watchlist', icon: Star },
     { name: '거래내역', path: '/trades', icon: TrendingUp },
@@ -14,6 +15,7 @@ const menuItems = [
     { name: '재무비교', path: '/analysis/comparison', icon: Scale },
     { name: '공시검색', path: '/analysis/disclosures', icon: FileSearch },
     { name: '알림설정', path: '/alerts', icon: Bell },
+    { name: '증권사 연동', path: '/settings/broker', icon: Settings },
 ];
 
 export default function Sidebar() {

@@ -20,7 +20,7 @@ export default function NotificationBell() {
     const [loading, setLoading] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    const getAuthHeader = () => {
+    const getAuthHeader = (): Record<string, string> => {
         const token = localStorage.getItem('token');
         return { 'Authorization': `Bearer ${token}` };
     };

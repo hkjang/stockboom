@@ -89,7 +89,7 @@ export default function StockDetailPage() {
     const [collecting, setCollecting] = useState(false);
     const [dataStatus, setDataStatus] = useState<{ dataStatus: any; counts: any } | null>(null);
 
-    const getAuthHeader = () => {
+    const getAuthHeader = (): Record<string, string> => {
         const token = localStorage.getItem('token');
         return token ? { Authorization: `Bearer ${token}` } : {};
     };

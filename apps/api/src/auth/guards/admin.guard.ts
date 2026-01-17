@@ -24,7 +24,7 @@ export class AdminGuard implements CanActivate {
 
         // DB에서 사용자 정보 조회 (isAdmin 필드 확인 가능)
         const dbUser = await prisma.user.findUnique({
-            where: { id: user.id },
+            where: { id: user.userId },
         });
 
         if (!dbUser) {

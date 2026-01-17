@@ -25,7 +25,7 @@ export default function DashboardPage() {
     const [strategies, setStrategies] = useState<Strategy[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const getAuthHeader = () => {
+    const getAuthHeader = (): Record<string, string> => {
         const token = localStorage.getItem('token');
         return { 'Authorization': `Bearer ${token}` };
     };

@@ -53,6 +53,7 @@ model User {
   autoTradingSessions AutoTradingSession[]
   scheduledOrders   ScheduledOrder[]
   riskEvents        RiskEvent[]
+  userActivities    UserActivity[]
   
   @@map("users")
 }
@@ -1113,3 +1114,48 @@ model RiskEvent {
   @@index([eventType])
   @@map("risk_events")
 }
+
+// ============================================
+// System Logging
+// ============================================
+
+model SystemLog {
+  id        String   @id @default(cuid())
+  
+  level     String   // info, warn, error, debug
+  source    String   // API, Trading, DataCollection, Auth, WebSocket, Scheduler
+  message   String
+  metadata  Json?    // Additional log data
+  
+  createdAt DateTime @default(now())
+  
+  @@index([level])
+  @@index([source])
+  @@index([createdAt(sort: Desc)])
+  @@map("system_logs")
+}
+
+// ============================================
+// User Activity Tracking
+// ============================================
+
+model UserActivity {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  actionType  String   // LOGIN, LOGOUT, TRADE, SETTINGS, VIEW, CREATE, DELETE, ADMIN
+  action      String   // Human readable description
+  details     String?  // Additional details
+  
+  ipAddress   String?
+  userAgent   String?
+  
+  createdAt   DateTime @default(now())
+  
+  @@index([userId])
+  @@index([actionType])
+  @@index([createdAt(sort: Desc)])
+  @@map("user_activities")
+}
+

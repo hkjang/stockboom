@@ -11,13 +11,38 @@ export default function AdminLayout({
     const pathname = usePathname();
 
     const navigation = [
+        // 메인
         { name: '대시보드', href: '/admin', icon: '📊' },
-        { name: '사용자', href: '/admin/users', icon: '👥' },
-        { name: '종목', href: '/admin/stocks', icon: '📈' },
+        
+        // 시장 분석
+        { name: '시장 데이터', href: '/admin/market-data', icon: '📈' },
+        { name: '트레이딩 뷰', href: '/admin/trading-view', icon: '🎯' },
+        { name: '암호화폐', href: '/admin/crypto', icon: '₿' },
+        { name: '뉴스 감성', href: '/admin/news-sentiment', icon: '📰' },
+        { name: '경제 캘린더', href: '/admin/calendar', icon: '📅' },
+        
+        // 트레이딩 도구
+        { name: '종목 스크리너', href: '/admin/screener', icon: '🔍' },
+        { name: '백테스팅', href: '/admin/backtest', icon: '📉' },
+        { name: '관심종목', href: '/admin/watchlist', icon: '⭐' },
+        
+        // 포트폴리오
+        { name: '포트폴리오', href: '/admin/portfolios', icon: '💼' },
+        { name: '포트폴리오 분석', href: '/admin/analytics', icon: '🧮' },
+        { name: '거래내역', href: '/admin/trades', icon: '💹' },
+        
+        // 알림 & 전략
+        { name: '알림 설정', href: '/admin/alert-settings', icon: '🔔' },
+        { name: '전략', href: '/admin/strategies', icon: '⚡' },
+        
+        // 시스템
+        { name: '종목 관리', href: '/admin/stocks', icon: '🏢' },
         { name: '데이터 수집', href: '/admin/data-collection', icon: '💾' },
+        { name: 'API 상태', href: '/admin/api-status', icon: '🔌' },
+        { name: '시스템로그', href: '/admin/logs', icon: '📋' },
+        { name: '사용자', href: '/admin/users', icon: '👥' },
         { name: '설정', href: '/admin/settings', icon: '⚙️' },
     ];
-
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-sm">
@@ -43,7 +68,7 @@ export default function AdminLayout({
                 <div className="flex gap-4">
                     {/* Sidebar */}
                     <aside className="w-44 flex-shrink-0">
-                        <nav className="bg-white/10 backdrop-blur-lg rounded-xl border border-white/20 p-2 space-y-0.5 sticky top-14">
+                        <nav className="bg-white/10 backdrop-blur-lg rounded-xl border border-white/20 p-2 space-y-0.5 sticky top-14 max-h-[calc(100vh-80px)] overflow-y-auto">
                             {navigation.map((item) => {
                                 const isActive = pathname === item.href ||
                                     (item.href !== '/admin' && pathname.startsWith(item.href));

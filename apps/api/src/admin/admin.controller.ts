@@ -706,5 +706,104 @@ export class AdminController {
             req.user.userId
         );
     }
+
+    // =====================================
+    // Portfolio Management Endpoints
+    // =====================================
+
+    @Get('portfolios')
+    @ApiOperation({ summary: 'Get all portfolios with user info' })
+    async getAllPortfolios() {
+        return this.adminService.getAllPortfolios();
+    }
+
+    @Delete('portfolios/:portfolioId')
+    @ApiOperation({ summary: 'Delete a portfolio' })
+    async deletePortfolio(@Param('portfolioId') portfolioId: string) {
+        return this.adminService.deletePortfolio(portfolioId);
+    }
+
+    // =====================================
+    // Strategy Management Endpoints
+    // =====================================
+
+    @Get('strategies')
+    @ApiOperation({ summary: 'Get all strategies with user info' })
+    async getAllStrategies() {
+        return this.adminService.getAllStrategies();
+    }
+
+    @Patch('strategies/:strategyId')
+    @ApiOperation({ summary: 'Update strategy status' })
+    async updateStrategyStatus(
+        @Param('strategyId') strategyId: string,
+        @Body() body: { isActive?: boolean }
+    ) {
+        return this.adminService.updateStrategyStatus(strategyId, body.isActive);
+    }
+
+    @Delete('strategies/:strategyId')
+    @ApiOperation({ summary: 'Delete a strategy' })
+    async deleteStrategy(@Param('strategyId') strategyId: string) {
+        return this.adminService.deleteStrategy(strategyId);
+    }
+
+    // =====================================
+    // Trade Monitoring Endpoints
+    // =====================================
+
+    @Get('trades')
+    @ApiOperation({ summary: 'Get all trades with user info' })
+    async getAllTrades(@Query('limit') limit?: string) {
+        return this.adminService.getAllTrades(limit ? parseInt(limit) : 100);
+    }
+
+    // =====================================
+    // Notification Management Endpoints
+    // =====================================
+
+    @Get('notifications')
+    @ApiOperation({ summary: 'Get all notifications' })
+    async getAllNotifications(@Query('limit') limit?: string) {
+        return this.adminService.getAllNotifications(limit ? parseInt(limit) : 100);
+    }
+
+    @Post('notifications/:id/read')
+    @ApiOperation({ summary: 'Mark notification as read' })
+    async markNotificationAsRead(@Param('id') id: string) {
+        return this.adminService.markNotificationAsRead(id);
+    }
+
+    @Delete('notifications/:id')
+    @ApiOperation({ summary: 'Delete a notification' })
+    async deleteNotification(@Param('id') id: string) {
+        return this.adminService.deleteNotification(id);
+    }
+
+    @Post('notifications/cleanup')
+    @ApiOperation({ summary: 'Delete all read notifications' })
+    async cleanupNotifications() {
+        return this.adminService.cleanupReadNotifications();
+    }
+
+    // =====================================
+    // System Logs Endpoints
+    // =====================================
+
+    @Get('logs')
+    @ApiOperation({ summary: 'Get system logs' })
+    async getSystemLogs(@Query('limit') limit?: string, @Query('level') level?: string) {
+        return this.adminService.getSystemLogs(limit ? parseInt(limit) : 100, level);
+    }
+
+    // =====================================
+    // User Activity Endpoints
+    // =====================================
+
+    @Get('activity')
+    @ApiOperation({ summary: 'Get user activity logs' })
+    async getUserActivity(@Query('limit') limit?: string, @Query('userId') userId?: string) {
+        return this.adminService.getUserActivity(limit ? parseInt(limit) : 100, userId);
+    }
 }
 

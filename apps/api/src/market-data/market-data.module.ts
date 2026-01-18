@@ -9,6 +9,10 @@ import { KisSyncService } from './kis-sync.service';
 import { TradingController } from './trading.controller';
 import { YahooFinanceService } from './yahoo-finance.service';
 import { OpenDartService } from './opendart.service';
+import { PublicDataService } from './public-data.service';
+import { NaverFinanceService } from './naver-finance.service';
+import { UpbitService } from './upbit.service';
+import { NewsSentimentService } from './news-sentiment.service';
 import { RealTimeEventHandler } from './realtime-event-handler.service';
 import { RealTimeGateway } from './realtime.gateway';
 import { UserApiKeysModule } from '../user-api-keys/user-api-keys.module';
@@ -30,6 +34,10 @@ import { NotificationsModule } from '../notifications/notifications.module';
         KisSyncService,
         YahooFinanceService,
         OpenDartService,
+        PublicDataService,
+        NaverFinanceService,
+        UpbitService,
+        NewsSentimentService,
         RealTimeEventHandler,
         RealTimeGateway,
     ],
@@ -40,10 +48,12 @@ import { NotificationsModule } from '../notifications/notifications.module';
         KisSyncService,
         YahooFinanceService,
         OpenDartService,
+        PublicDataService,
+        NaverFinanceService,
+        UpbitService,
+        NewsSentimentService,
         RealTimeEventHandler,
     ],
 })
 export class MarketDataModule { }
-
-
 

@@ -98,6 +98,195 @@ export class IndicatorsService {
     }
 
     /**
+     * Calculate ATR (Average True Range) - 변동성 지표
+     */
+    calculateATR(candles: CandleData[], period: number = 14): number[] {
+        if (candles.length < 2) return [];
+
+        const trueRanges: number[] = [];
+        
+        for (let i = 1; i < candles.length; i++) {
+            const high = candles[i].high;
+            const low = candles[i].low;
+            const prevClose = candles[i - 1].close;
+            
+            const tr = Math.max(
+                high - low,
+                Math.abs(high - prevClose),
+                Math.abs(low - prevClose)
+            );
+            trueRanges.push(tr);
+        }
+
+        // Calculate ATR using EMA of True Range
+        return this.calculateEMA(trueRanges, period);
+    }
+
+    /**
+     * Calculate ADX (Average Directional Index) - 추세 강도 지표
+     */
+    calculateADX(candles: CandleData[], period: number = 14): { adx: number[]; plusDI: number[]; minusDI: number[] } {
+        if (candles.length < period + 1) return { adx: [], plusDI: [], minusDI: [] };
+
+        const plusDMs: number[] = [];
+        const minusDMs: number[] = [];
+        const trs: number[] = [];
+
+        for (let i = 1; i < candles.length; i++) {
+            const high = candles[i].high;
+            const low = candles[i].low;
+            const prevHigh = candles[i - 1].high;
+            const prevLow = candles[i - 1].low;
+            const prevClose = candles[i - 1].close;
+
+            const plusDM = Math.max(0, high - prevHigh);
+            const minusDM = Math.max(0, prevLow - low);
+            
+            if (plusDM > minusDM) {
+                plusDMs.push(plusDM);
+                minusDMs.push(0);
+            } else if (minusDM > plusDM) {
+                plusDMs.push(0);
+                minusDMs.push(minusDM);
+            } else {
+                plusDMs.push(0);
+                minusDMs.push(0);
+            }
+
+            const tr = Math.max(high - low, Math.abs(high - prevClose), Math.abs(low - prevClose));
+            trs.push(tr);
+        }
+
+        const smoothedTR = this.calculateEMA(trs, period);
+        const smoothedPlusDM = this.calculateEMA(plusDMs, period);
+        const smoothedMinusDM = this.calculateEMA(minusDMs, period);
+
+        const plusDI: number[] = [];
+        const minusDI: number[] = [];
+        const dx: number[] = [];
+
+        for (let i = 0; i < smoothedTR.length; i++) {
+            const pdi = smoothedTR[i] !== 0 ? (smoothedPlusDM[i] / smoothedTR[i]) * 100 : 0;
+            const mdi = smoothedTR[i] !== 0 ? (smoothedMinusDM[i] / smoothedTR[i]) * 100 : 0;
+            plusDI.push(pdi);
+            minusDI.push(mdi);
+            
+            const dxVal = (pdi + mdi) !== 0 ? Math.abs(pdi - mdi) / (pdi + mdi) * 100 : 0;
+            dx.push(dxVal);
+        }
+
+        const adx = this.calculateEMA(dx, period);
+        return { adx, plusDI, minusDI };
+    }
+
+    /**
+     * Calculate VWAP (Volume Weighted Average Price)
+     */
+    calculateVWAP(candles: CandleData[]): number[] {
+        const vwap: number[] = [];
+        let cumulativeTPV = 0;
+        let cumulativeVolume = 0;
+
+        for (const candle of candles) {
+            const typicalPrice = (candle.high + candle.low + candle.close) / 3;
+            cumulativeTPV += typicalPrice * candle.volume;
+            cumulativeVolume += candle.volume;
+            vwap.push(cumulativeVolume > 0 ? cumulativeTPV / cumulativeVolume : typicalPrice);
+        }
+
+        return vwap;
+    }
+
+    /**
+     * Calculate Williams %R
+     */
+    calculateWilliamsR(candles: CandleData[], period: number = 14): number[] {
+        const result: number[] = [];
+
+        for (let i = period - 1; i < candles.length; i++) {
+            const slice = candles.slice(i - period + 1, i + 1);
+            const highestHigh = Math.max(...slice.map(c => c.high));
+            const lowestLow = Math.min(...slice.map(c => c.low));
+            const close = candles[i].close;
+
+            const wr = ((highestHigh - close) / (highestHigh - lowestLow)) * -100;
+            result.push(wr);
+        }
+
+        return result;
+    }
+
+    /**
+     * Calculate OBV (On-Balance Volume)
+     */
+    calculateOBV(candles: CandleData[]): number[] {
+        const obv: number[] = [0];
+
+        for (let i = 1; i < candles.length; i++) {
+            const prevOBV = obv[i - 1];
+            const volume = candles[i].volume;
+            const priceChange = candles[i].close - candles[i - 1].close;
+
+            if (priceChange > 0) {
+                obv.push(prevOBV + volume);
+            } else if (priceChange < 0) {
+                obv.push(prevOBV - volume);
+            } else {
+                obv.push(prevOBV);
+            }
+        }
+
+        return obv;
+    }
+
+    /**
+     * Calculate CCI (Commodity Channel Index)
+     */
+    calculateCCI(candles: CandleData[], period: number = 20): number[] {
+        const result: number[] = [];
+        const tps = candles.map(c => (c.high + c.low + c.close) / 3);
+        const smaTPs = this.calculateSMA(tps, period);
+
+        for (let i = period - 1; i < tps.length; i++) {
+            const smaIndex = i - period + 1;
+            const smaTP = smaTPs[smaIndex];
+            const slice = tps.slice(i - period + 1, i + 1);
+            
+            const meanDeviation = slice.reduce((sum, tp) => sum + Math.abs(tp - smaTP), 0) / period;
+            const cci = meanDeviation !== 0 ? (tps[i] - smaTP) / (0.015 * meanDeviation) : 0;
+            result.push(cci);
+        }
+
+        return result;
+    }
+
+    /**
+     * Detect Golden Cross / Death Cross
+     */
+    detectCrossover(shortMA: number[], longMA: number[]): ('GOLDEN' | 'DEATH' | 'NONE')[] {
+        const signals: ('GOLDEN' | 'DEATH' | 'NONE')[] = [];
+        const minLen = Math.min(shortMA.length, longMA.length);
+
+        for (let i = 1; i < minLen; i++) {
+            const prevShort = shortMA[i - 1];
+            const prevLong = longMA[i - 1];
+            const currShort = shortMA[i];
+            const currLong = longMA[i];
+
+            if (prevShort <= prevLong && currShort > currLong) {
+                signals.push('GOLDEN');
+            } else if (prevShort >= prevLong && currShort < currLong) {
+                signals.push('DEATH');
+            } else {
+                signals.push('NONE');
+            }
+        }
+
+        return signals;
+    }
+
+
+    /**
      * Store calculated indicators in database
      */
     async storeIndicators(stockId: string, timeframe: string, candles: CandleData[]) {

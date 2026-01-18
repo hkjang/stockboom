@@ -2760,5 +2760,228 @@ export class AdminService {
 
         return summary;
     }
+
+    // =====================================
+    // Portfolio Management
+    // =====================================
+
+    /**
+     * Get all portfolios with user info
+     */
+    async getAllPortfolios() {
+        return prisma.portfolio.findMany({
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        email: true,
+                        name: true,
+                    },
+                },
+                _count: {
+                    select: {
+                        positions: true,
+                    },
+                },
+            },
+            orderBy: { createdAt: 'desc' },
+        });
+    }
+
+    /**
+     * Delete a portfolio
+     */
+    async deletePortfolio(portfolioId: string) {
+        return prisma.portfolio.delete({
+            where: { id: portfolioId },
+        });
+    }
+
+    // =====================================
+    // Strategy Management
+    // =====================================
+
+    /**
+     * Get all strategies with user info
+     */
+    async getAllStrategies() {
+        return prisma.strategy.findMany({
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        email: true,
+                        name: true,
+                    },
+                },
+            },
+            orderBy: { createdAt: 'desc' },
+        });
+    }
+
+    /**
+     * Update strategy status
+     */
+    async updateStrategyStatus(strategyId: string, isActive?: boolean) {
+        if (isActive === undefined) return null;
+        return prisma.strategy.update({
+            where: { id: strategyId },
+            data: { isActive },
+        });
+    }
+
+    /**
+     * Delete a strategy
+     */
+    async deleteStrategy(strategyId: string) {
+        return prisma.strategy.delete({
+            where: { id: strategyId },
+        });
+    }
+
+    // =====================================
+    // Trade Monitoring
+    // =====================================
+
+    /**
+     * Get all trades with user info
+     */
+    async getAllTrades(limit: number = 100) {
+        return prisma.trade.findMany({
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        email: true,
+                        name: true,
+                    },
+                },
+                stock: {
+                    select: {
+                        id: true,
+                        symbol: true,
+                        name: true,
+                    },
+                },
+            },
+            orderBy: { createdAt: 'desc' },
+            take: limit,
+        });
+    }
+
+    // =====================================
+    // Notification Management
+    // =====================================
+
+    /**
+     * Get all notifications with user info
+     */
+    async getAllNotifications(limit: number = 100) {
+        return prisma.notification.findMany({
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        email: true,
+                        name: true,
+                    },
+                },
+            },
+            orderBy: { createdAt: 'desc' },
+            take: limit,
+        });
+    }
+
+    /**
+     * Mark notification as read
+     */
+    async markNotificationAsRead(id: string) {
+        return prisma.notification.update({
+            where: { id },
+            data: { isRead: true },
+        });
+    }
+
+    /**
+     * Delete a notification
+     */
+    async deleteNotification(id: string) {
+        return prisma.notification.delete({
+            where: { id },
+        });
+    }
+
+    /**
+     * Delete all read notifications (older than 7 days)
+     */
+    async cleanupReadNotifications() {
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+        const result = await prisma.notification.deleteMany({
+            where: {
+                isRead: true,
+                createdAt: { lt: sevenDaysAgo },
+            },
+        });
+
+        return { deleted: result.count };
+    }
+
+    // =====================================
+    // System Logs
+    // =====================================
+
+    /**
+     * Get system logs from database
+     */
+    async getSystemLogs(limit: number = 100, level?: string) {
+        // SystemLog model doesn't exist in schema yet
+        // Return empty array - implement logging strategy later
+        this.logger.debug(`getSystemLogs called with limit=${limit}, level=${level}`);
+        return [];
+    }
+
+    // =====================================
+    // User Activity
+    // =====================================
+
+    /**
+     * Get user activity logs
+     */
+    async getUserActivity(limit: number = 100, userId?: string) {
+        // UserActivity model doesn't exist in schema yet
+        // Return user login activity based on updatedAt as approximation
+        try {
+            const users = await prisma.user.findMany({
+                where: userId ? { id: userId } : undefined,
+                select: {
+                    id: true,
+                    email: true,
+                    name: true,
+                    updatedAt: true,
+                    createdAt: true,
+                },
+                orderBy: { updatedAt: 'desc' },
+                take: limit,
+            });
+
+            // Convert to activity-like format
+            return users.map(user => ({
+                id: `activity-${user.id}`,
+                userId: user.id,
+                action: 'login',
+                details: null,
+                createdAt: user.updatedAt,
+                user: {
+                    id: user.id,
+                    email: user.email,
+                    name: user.name,
+                },
+            }));
+        } catch {
+            return [];
+        }
+    }
 }
 

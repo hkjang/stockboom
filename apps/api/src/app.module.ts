@@ -22,6 +22,7 @@ import { CommonModule } from './common/common.module';
 import { UserApiKeysModule } from './user-api-keys/user-api-keys.module';
 import { WatchlistModule } from './watchlist/watchlist.module';
 import { TradingEngineModule } from './trading-engine/trading-engine.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
     imports: [
@@ -74,6 +75,7 @@ import { TradingEngineModule } from './trading-engine/trading-engine.module';
         UserApiKeysModule,
         WatchlistModule,
         TradingEngineModule,
+        HealthModule,
     ],
     providers: [
         // Global Rate Limiting Guard

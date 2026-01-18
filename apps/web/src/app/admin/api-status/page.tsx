@@ -1,11 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import useSWR from 'swr';
 import { 
     Wifi, WifiOff, RefreshCw, Activity, AlertCircle, CheckCircle, 
-    Clock, BarChart2, AlertTriangle, Zap, Database, Globe, Server
+    Clock, BarChart2, AlertTriangle, Zap, Database, Globe, Server,
+    ExternalLink, Settings, Copy, ChevronDown, ChevronUp
 } from 'lucide-react';
+import Link from 'next/link';
 
 const fetcher = (url: string) => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -16,80 +18,30 @@ const fetcher = (url: string) => {
 
 interface ApiStatus {
     name: string;
+    description: string;
     connected: boolean;
     message: string;
+    responseTime: number;
     lastCheck: string;
-    responseTime?: number;
-    dailyCalls?: number;
+    endpoint: string;
+    configRequired: string[];
+    configLocation: string;
+    documentation: string;
+    error?: string;
+    statusCode?: number;
     rateLimit?: { used: number; limit: number };
 }
 
 export default function ApiStatusPage() {
     const { data: statusData, mutate, isLoading } = useSWR('/api/admin/api-status', fetcher, {
-        refreshInterval: 30000,
+        refreshInterval: 60000, // 1분마다 자동 새로고침
     });
     const [isChecking, setIsChecking] = useState(false);
+    const [expandedApi, setExpandedApi] = useState<string | null>(null);
 
-    // Mock data - replace with real API status
-    const apiStatuses: ApiStatus[] = statusData?.apis || [
-        { 
-            name: 'KIS API (한국투자증권)', 
-            connected: true, 
-            message: 'Connected', 
-            lastCheck: new Date().toISOString(),
-            responseTime: 125,
-            dailyCalls: 1250,
-            rateLimit: { used: 1250, limit: 10000 }
-        },
-        { 
-            name: 'OpenDART (전자공시)', 
-            connected: true, 
-            message: 'Connected', 
-            lastCheck: new Date().toISOString(),
-            responseTime: 340,
-            dailyCalls: 450,
-            rateLimit: { used: 450, limit: 10000 }
-        },
-        { 
-            name: '공공데이터포털', 
-            connected: false, 
-            message: 'API Key not configured', 
-            lastCheck: new Date().toISOString(),
-            responseTime: 0,
-            dailyCalls: 0,
-            rateLimit: { used: 0, limit: 1000 }
-        },
-        { 
-            name: 'Naver Finance', 
-            connected: true, 
-            message: 'Connected (Web Scraping)', 
-            lastCheck: new Date().toISOString(),
-            responseTime: 890,
-            dailyCalls: 2340
-        },
-        { 
-            name: 'Yahoo Finance', 
-            connected: true, 
-            message: 'Connected', 
-            lastCheck: new Date().toISOString(),
-            responseTime: 450,
-            dailyCalls: 120
-        },
-        { 
-            name: 'KIS WebSocket', 
-            connected: true, 
-            message: 'Real-time connected', 
-            lastCheck: new Date().toISOString()
-        },
-    ];
-
-    const stats = {
-        total: apiStatuses.length,
-        connected: apiStatuses.filter(a => a.connected).length,
-        failed: apiStatuses.filter(a => !a.connected).length,
-        totalCalls: apiStatuses.reduce((sum, a) => sum + (a.dailyCalls || 0), 0),
-        avgResponseTime: Math.round(apiStatuses.filter(a => a.responseTime).reduce((sum, a) => sum + (a.responseTime || 0), 0) / apiStatuses.filter(a => a.responseTime).length) || 0,
-    };
+    const apis: ApiStatus[] = statusData?.apis || [];
+    const summary = statusData?.summary || { total: 0, connected: 0, disconnected: 0, avgResponseTime: 0 };
+    const isRealData = !!statusData?.timestamp;
 
     const handleRefreshAll = async () => {
         setIsChecking(true);
@@ -99,16 +51,30 @@ export default function ApiStatusPage() {
 
     const getStatusIcon = (connected: boolean) => {
         return connected 
-            ? <CheckCircle size={16} className="text-green-400" />
-            : <AlertCircle size={16} className="text-red-400" />;
+            ? <CheckCircle size={18} className="text-green-400" />
+            : <AlertCircle size={18} className="text-red-400" />;
     };
 
     const getApiIcon = (name: string) => {
-        if (name.includes('KIS')) return <Zap className="text-yellow-400" size={18} />;
-        if (name.includes('DART')) return <Database className="text-blue-400" size={18} />;
-        if (name.includes('공공')) return <Server className="text-purple-400" size={18} />;
-        if (name.includes('Naver') || name.includes('Yahoo')) return <Globe className="text-green-400" size={18} />;
-        return <Activity className="text-cyan-400" size={18} />;
+        if (name.includes('Backend')) return <Server size={18} className="text-blue-400" />;
+        if (name.includes('KIS') && name.includes('WebSocket')) return <Activity size={18} className="text-purple-400" />;
+        if (name.includes('KIS')) return <Zap size={18} className="text-yellow-400" />;
+        if (name.includes('DART')) return <Database size={18} className="text-blue-400" />;
+        if (name.includes('공공')) return <Server size={18} className="text-purple-400" />;
+        if (name.includes('Upbit')) return <Activity size={18} className="text-orange-400" />;
+        if (name.includes('Naver')) return <Globe size={18} className="text-green-400" />;
+        return <Activity size={18} className="text-cyan-400" />;
+    };
+
+    const getResponseTimeColor = (ms: number) => {
+        if (ms === 0) return 'text-gray-400';
+        if (ms < 300) return 'text-green-400';
+        if (ms < 1000) return 'text-yellow-400';
+        return 'text-red-400';
+    };
+
+    const copyToClipboard = (text: string) => {
+        navigator.clipboard.writeText(text);
     };
 
     return (
@@ -119,182 +85,258 @@ export default function ApiStatusPage() {
                     <h1 className="text-xl font-bold text-white flex items-center gap-2">
                         <Activity size={24} className="text-green-400" />
                         API 상태 모니터링
+                        {isRealData && <span className="px-2 py-0.5 text-[10px] bg-green-500/20 text-green-400 rounded-full">LIVE</span>}
                     </h1>
-                    <p className="text-xs text-blue-200 mt-0.5">외부 API 연결 상태 및 사용량 모니터링</p>
+                    <p className="text-xs text-blue-200 mt-0.5">외부 API 연결 상태, 응답 시간, 설정 안내</p>
                 </div>
                 <button 
                     onClick={handleRefreshAll} 
                     disabled={isChecking || isLoading}
-                    className="px-3 py-1.5 text-xs bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white rounded-lg flex items-center gap-1"
+                    className="px-4 py-2 text-sm bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white rounded-lg flex items-center gap-2"
                 >
-                    <RefreshCw size={14} className={(isChecking || isLoading) ? 'animate-spin' : ''} />
+                    <RefreshCw size={16} className={(isChecking || isLoading) ? 'animate-spin' : ''} />
                     전체 상태 확인
                 </button>
             </div>
 
             {/* Summary Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-3">
-                    <div className="flex items-center gap-2 mb-1">
-                        <Server size={14} className="text-blue-400" />
-                        <span className="text-xs text-blue-200">총 API</span>
-                    </div>
-                    <p className="text-xl font-bold text-white">{stats.total}</p>
-                </div>
-                <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-3">
-                    <div className="flex items-center gap-2 mb-1">
-                        <CheckCircle size={14} className="text-green-400" />
-                        <span className="text-xs text-blue-200">연결됨</span>
-                    </div>
-                    <p className="text-xl font-bold text-green-400">{stats.connected}</p>
-                </div>
-                <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-3">
-                    <div className="flex items-center gap-2 mb-1">
-                        <AlertCircle size={14} className="text-red-400" />
-                        <span className="text-xs text-blue-200">오류</span>
-                    </div>
-                    <p className="text-xl font-bold text-red-400">{stats.failed}</p>
-                </div>
-                <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-3">
-                    <div className="flex items-center gap-2 mb-1">
-                        <BarChart2 size={14} className="text-purple-400" />
-                        <span className="text-xs text-blue-200">오늘 호출</span>
-                    </div>
-                    <p className="text-xl font-bold text-white">{stats.totalCalls.toLocaleString()}</p>
-                </div>
-                <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-3">
-                    <div className="flex items-center gap-2 mb-1">
-                        <Clock size={14} className="text-yellow-400" />
-                        <span className="text-xs text-blue-200">평균 응답</span>
-                    </div>
-                    <p className="text-xl font-bold text-white">{stats.avgResponseTime}ms</p>
-                </div>
-            </div>
-
-            {/* API Status Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {apiStatuses.map((api, i) => (
-                    <div 
-                        key={i} 
-                        className={`bg-white/10 backdrop-blur-lg border rounded-xl p-4 transition-all hover:bg-white/15 ${
-                            api.connected ? 'border-green-500/30' : 'border-red-500/30'
-                        }`}
-                    >
-                        <div className="flex items-start justify-between mb-3">
-                            <div className="flex items-center gap-2">
-                                {getApiIcon(api.name)}
-                                <div>
-                                    <h3 className="text-sm font-semibold text-white">{api.name}</h3>
-                                    <div className="flex items-center gap-1 mt-0.5">
-                                        {api.connected ? (
-                                            <Wifi size={10} className="text-green-400" />
-                                        ) : (
-                                            <WifiOff size={10} className="text-red-400" />
-                                        )}
-                                        <span className={`text-xs ${api.connected ? 'text-green-400' : 'text-red-400'}`}>
-                                            {api.connected ? '연결됨' : '연결 안됨'}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            {getStatusIcon(api.connected)}
-                        </div>
-                        
-                        <div className="space-y-2 text-xs">
-                            <div className="flex justify-between">
-                                <span className="text-blue-200/70">상태</span>
-                                <span className={api.connected ? 'text-green-400' : 'text-red-400'}>{api.message}</span>
-                            </div>
-                            
-                            {api.responseTime !== undefined && (
-                                <div className="flex justify-between">
-                                    <span className="text-blue-200/70">응답 시간</span>
-                                    <span className={`text-white ${api.responseTime > 500 ? 'text-yellow-400' : ''}`}>
-                                        {api.responseTime}ms
-                                    </span>
-                                </div>
-                            )}
-                            
-                            {api.dailyCalls !== undefined && (
-                                <div className="flex justify-between">
-                                    <span className="text-blue-200/70">오늘 호출</span>
-                                    <span className="text-white">{api.dailyCalls.toLocaleString()}회</span>
-                                </div>
-                            )}
-                            
-                            {api.rateLimit && (
-                                <div className="space-y-1">
-                                    <div className="flex justify-between">
-                                        <span className="text-blue-200/70">Rate Limit</span>
-                                        <span className="text-white">{api.rateLimit.used.toLocaleString()} / {api.rateLimit.limit.toLocaleString()}</span>
-                                    </div>
-                                    <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
-                                        <div 
-                                            className={`h-full rounded-full transition-all ${
-                                                (api.rateLimit.used / api.rateLimit.limit) > 0.8 ? 'bg-red-500' :
-                                                (api.rateLimit.used / api.rateLimit.limit) > 0.5 ? 'bg-yellow-500' : 'bg-green-500'
-                                            }`}
-                                            style={{ width: `${(api.rateLimit.used / api.rateLimit.limit) * 100}%` }}
-                                        />
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                        
-                        <div className="mt-3 pt-2 border-t border-white/10">
-                            <div className="flex items-center gap-1 text-[10px] text-blue-200/50">
-                                <Clock size={10} />
-                                마지막 확인: {new Date(api.lastCheck).toLocaleTimeString('ko-KR')}
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
-
-            {/* Warning Messages */}
-            {stats.failed > 0 && (
-                <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4">
                     <div className="flex items-center gap-2 mb-2">
-                        <AlertTriangle size={16} className="text-red-400" />
-                        <span className="text-red-200 font-medium">연결 오류 감지</span>
+                        <Server size={16} className="text-blue-400" />
+                        <span className="text-sm text-blue-200">총 API</span>
                     </div>
-                    <ul className="text-sm text-red-200/80 space-y-1 ml-6">
-                        {apiStatuses.filter(a => !a.connected).map((api, i) => (
-                            <li key={i}>• {api.name}: {api.message}</li>
-                        ))}
-                    </ul>
+                    <p className="text-2xl font-bold text-white">{summary.total}</p>
+                </div>
+                <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                        <CheckCircle size={16} className="text-green-400" />
+                        <span className="text-sm text-blue-200">연결됨</span>
+                    </div>
+                    <p className="text-2xl font-bold text-green-400">{summary.connected}</p>
+                </div>
+                <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                        <AlertCircle size={16} className="text-red-400" />
+                        <span className="text-sm text-blue-200">오류</span>
+                    </div>
+                    <p className="text-2xl font-bold text-red-400">{summary.disconnected}</p>
+                </div>
+                <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                        <Clock size={16} className="text-yellow-400" />
+                        <span className="text-sm text-blue-200">평균 응답</span>
+                    </div>
+                    <p className={`text-2xl font-bold ${getResponseTimeColor(summary.avgResponseTime)}`}>
+                        {summary.avgResponseTime}ms
+                    </p>
+                </div>
+            </div>
+
+            {/* Connection Alert */}
+            {summary.disconnected > 0 && (
+                <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-4">
+                    <div className="flex items-start gap-3">
+                        <AlertTriangle size={20} className="text-red-400 mt-0.5" />
+                        <div>
+                            <p className="text-red-200 font-medium">
+                                {summary.disconnected}개 API 연결 오류
+                            </p>
+                            <p className="text-red-200/70 text-sm mt-1">
+                                아래 API 상세 정보에서 설정 방법을 확인하세요.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             )}
 
-            {/* API Configuration Guide */}
+            {/* API Status Cards */}
+            <div className="space-y-3">
+                {apis.map((api, i) => {
+                    const isExpanded = expandedApi === api.name;
+                    
+                    return (
+                        <div 
+                            key={i} 
+                            className={`bg-white/10 backdrop-blur-lg border rounded-xl transition-all ${
+                                api.connected ? 'border-green-500/30' : 'border-red-500/30'
+                            }`}
+                        >
+                            {/* Main Row */}
+                            <div 
+                                className="p-4 flex items-center justify-between cursor-pointer hover:bg-white/5"
+                                onClick={() => setExpandedApi(isExpanded ? null : api.name)}
+                            >
+                                <div className="flex items-center gap-3">
+                                    {getApiIcon(api.name)}
+                                    <div>
+                                        <div className="flex items-center gap-2">
+                                            <h3 className="text-sm font-semibold text-white">{api.name}</h3>
+                                            {getStatusIcon(api.connected)}
+                                        </div>
+                                        <p className="text-xs text-blue-200/60">{api.description}</p>
+                                    </div>
+                                </div>
+                                
+                                <div className="flex items-center gap-4">
+                                    <div className="text-right hidden sm:block">
+                                        <p className={`text-sm font-medium ${api.connected ? 'text-green-400' : 'text-red-400'}`}>
+                                            {api.message}
+                                        </p>
+                                        <p className={`text-xs ${getResponseTimeColor(api.responseTime)}`}>
+                                            {api.responseTime > 0 ? `${api.responseTime}ms` : '-'}
+                                        </p>
+                                    </div>
+                                    {isExpanded ? <ChevronUp size={16} className="text-blue-200" /> : <ChevronDown size={16} className="text-blue-200" />}
+                                </div>
+                            </div>
+                            
+                            {/* Expanded Details */}
+                            {isExpanded && (
+                                <div className="px-4 pb-4 border-t border-white/10 pt-4 space-y-4">
+                                    {/* Status Row */}
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                                        <div>
+                                            <p className="text-blue-200/60 mb-1">상태</p>
+                                            <p className={`font-medium ${api.connected ? 'text-green-400' : 'text-red-400'}`}>
+                                                {api.message}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p className="text-blue-200/60 mb-1">응답 시간</p>
+                                            <p className={`font-medium ${getResponseTimeColor(api.responseTime)}`}>
+                                                {api.responseTime > 0 ? `${api.responseTime}ms` : '측정 불가'}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p className="text-blue-200/60 mb-1">마지막 확인</p>
+                                            <p className="text-white">
+                                                {api.lastCheck ? new Date(api.lastCheck).toLocaleTimeString('ko-KR') : '-'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Endpoint */}
+                                    <div>
+                                        <p className="text-blue-200/60 mb-1 text-sm">엔드포인트</p>
+                                        <div className="flex items-center gap-2">
+                                            <code className="text-xs bg-black/30 text-blue-200 px-2 py-1 rounded flex-1 overflow-hidden text-ellipsis">
+                                                {api.endpoint}
+                                            </code>
+                                            <button 
+                                                onClick={(e) => { e.stopPropagation(); copyToClipboard(api.endpoint); }}
+                                                className="p-1.5 bg-white/10 hover:bg-white/20 rounded text-blue-200"
+                                            >
+                                                <Copy size={12} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Configuration */}
+                                    {!api.connected && api.configRequired.length > 0 && (
+                                        <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
+                                            <p className="text-yellow-400 font-medium text-sm mb-2 flex items-center gap-2">
+                                                <Settings size={14} />
+                                                설정 필요
+                                            </p>
+                                            <div className="space-y-2 text-sm">
+                                                <div>
+                                                    <p className="text-blue-200/60">필요한 환경변수:</p>
+                                                    <div className="flex flex-wrap gap-1 mt-1">
+                                                        {api.configRequired.map((key, j) => (
+                                                            <code key={j} className="text-xs bg-black/30 text-yellow-300 px-2 py-0.5 rounded">
+                                                                {key}
+                                                            </code>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <p className="text-blue-200/60">설정 위치:</p>
+                                                    {api.configLocation.includes('/admin') ? (
+                                                        <Link href="/admin/settings" className="text-blue-400 hover:underline flex items-center gap-1 mt-1">
+                                                            <Settings size={12} />
+                                                            {api.configLocation}
+                                                        </Link>
+                                                    ) : (
+                                                        <p className="text-white mt-1">{api.configLocation}</p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                    
+                                    {/* Documentation */}
+                                    <div className="flex items-center justify-between">
+                                        <a 
+                                            href={api.documentation} 
+                                            target="_blank" 
+                                            rel="noopener noreferrer"
+                                            className="text-sm text-blue-400 hover:underline flex items-center gap-1"
+                                        >
+                                            <ExternalLink size={12} />
+                                            API 문서 보기
+                                        </a>
+                                        
+                                        {api.error && (
+                                            <p className="text-xs text-red-400/80">
+                                                오류: {api.error}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    );
+                })}
+            </div>
+
+            {/* Quick Setup Guide */}
             <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-4">
-                <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
-                    <AlertCircle size={14} className="text-blue-400" />
-                    API 설정 안내
+                <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
+                    <Settings size={16} className="text-blue-400" />
+                    빠른 설정 가이드
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-blue-200/80">
-                    <div>
-                        <p className="font-medium text-white mb-1">KIS API (한국투자증권)</p>
-                        <p>계좌 개설 후 KIS Developers에서 App Key/Secret 발급</p>
-                        <p className="text-blue-400">→ /admin/settings에서 설정</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div className="space-y-2">
+                        <p className="font-medium text-yellow-400">1. KIS API (한국투자증권)</p>
+                        <ol className="text-blue-200/80 space-y-1 ml-4 list-decimal">
+                            <li>한국투자증권 계좌 개설</li>
+                            <li><a href="https://apiportal.koreainvestment.com" target="_blank" rel="noopener" className="text-blue-400 hover:underline">KIS Developers</a>에서 앱 등록</li>
+                            <li>App Key, App Secret 발급</li>
+                            <li><Link href="/admin/settings" className="text-blue-400 hover:underline">/admin/settings</Link>에서 입력</li>
+                        </ol>
                     </div>
-                    <div>
-                        <p className="font-medium text-white mb-1">OpenDART</p>
-                        <p>금융감독원 전자공시시스템에서 API 키 발급</p>
-                        <p className="text-blue-400">→ opendart.fss.or.kr</p>
+                    <div className="space-y-2">
+                        <p className="font-medium text-blue-400">2. OpenDART (전자공시)</p>
+                        <ol className="text-blue-200/80 space-y-1 ml-4 list-decimal">
+                            <li><a href="https://opendart.fss.or.kr" target="_blank" rel="noopener" className="text-blue-400 hover:underline">OpenDART</a> 회원가입</li>
+                            <li>인증키 발급 신청</li>
+                            <li><Link href="/admin/settings" className="text-blue-400 hover:underline">/admin/settings</Link>에서 입력</li>
+                        </ol>
                     </div>
-                    <div>
-                        <p className="font-medium text-white mb-1">공공데이터포털</p>
-                        <p>금융위원회 주식시세정보 API 신청</p>
-                        <p className="text-blue-400">→ data.go.kr</p>
+                    <div className="space-y-2">
+                        <p className="font-medium text-purple-400">3. 공공데이터포털</p>
+                        <ol className="text-blue-200/80 space-y-1 ml-4 list-decimal">
+                            <li><a href="https://www.data.go.kr" target="_blank" rel="noopener" className="text-blue-400 hover:underline">data.go.kr</a> 회원가입</li>
+                            <li>"금융위원회_주식시세정보" 검색</li>
+                            <li>활용신청 후 API 키 발급</li>
+                        </ol>
                     </div>
-                    <div>
-                        <p className="font-medium text-white mb-1">Naver/Yahoo Finance</p>
-                        <p>별도 API 키 불필요 (웹 스크래핑)</p>
-                        <p className="text-yellow-400">⚠ 과도한 호출 주의</p>
+                    <div className="space-y-2">
+                        <p className="font-medium text-green-400">4. Upbit & Naver Finance</p>
+                        <p className="text-blue-200/80 ml-4">
+                            ✅ Public API로 별도 설정 없이 사용 가능
+                        </p>
                     </div>
                 </div>
             </div>
+
+            {/* Last Update */}
+            {statusData?.timestamp && (
+                <div className="text-center text-xs text-blue-200/50">
+                    마지막 확인: {new Date(statusData.timestamp).toLocaleString('ko-KR')} · 1분마다 자동 갱신
+                </div>
+            )}
         </div>
     );
 }

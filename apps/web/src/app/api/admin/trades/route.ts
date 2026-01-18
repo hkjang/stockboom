@@ -5,7 +5,7 @@ export async function GET(request: NextRequest) {
     const url = new URL(request.url);
     const limit = url.searchParams.get('limit') || '100';
     
-    const apiResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/admin/trades?limit=${limit}`, {
+    const apiResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/admin/trades?limit=${limit}`, {
         headers: {
             'Authorization': token || '',
         },
